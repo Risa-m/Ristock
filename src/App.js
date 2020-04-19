@@ -1,25 +1,35 @@
 import React from 'react';
-import logo from './logo.svg';
+//import logo from './logo.svg';
+import { BrowserRouter, Route, Link, Switch } from 'react-router-dom'
 import './App.css';
+
+//const Home = lazy(() => import('./Home'));
+import { Home } from './view/Home.js'
+import { AddStock } from './view/AddStock.js'
+import { StockList } from './view/StockListView.js'
+
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <BrowserRouter>
+    <div className="App-root">
+      <div className="switch-view">
+      <ul>
+      <li><Link to='/'>Home</Link></li>
+      <li><Link to='/add'>Add Stocks</Link></li>
+      <li><Link to='/list'>List</Link></li>
+      </ul>
+
+      <Switch>
+        <Route exact path='/' component={Home} />
+        <Route exact path='/add' component={AddStock} />
+        <Route exact path='/list' component={StockList} />
+        {//<Route exact path='/works/:id' render={props => <WorksItem match={props.match} />} />
+        }
+      </Switch>
+      </div>
     </div>
+    </BrowserRouter>
   );
 }
 
