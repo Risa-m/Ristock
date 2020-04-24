@@ -5,8 +5,7 @@ import './App.css';
 
 //const Home = lazy(() => import('./Home'));
 import { Home } from './view/Home.js'
-import { AddStock } from './view/AddStock.js'
-import { StockList } from './view/StockListView.js'
+import { Stocks } from './view/Stocks.js'
 
 
 function App() {
@@ -16,16 +15,22 @@ function App() {
       <div className="switch-view">
       <ul>
       <li><Link to='/'>Home</Link></li>
-      <li><Link to='/add'>Add Stocks</Link></li>
-      <li><Link to='/list'>List</Link></li>
+      <li><Link to='/stocks/add'>Add Stocks</Link></li>
+      <li><Link to='/stocks'>List</Link></li>
       </ul>
 
       <Switch>
         <Route exact path='/' component={Home} />
-        <Route exact path='/add' component={AddStock} />
-        <Route exact path='/list' component={StockList} />
+        <Route exact path='/stocks' component={Stocks} />
+        <Route exact path='/stocks/:id' render={props => <Stocks match={props.match} />} />
+
+        {//<Route exact path='/stocks/add' component={AddStock} />
+        //<Route exact path='/stocks/list' component={StockList} />
+        }
+
         {//<Route exact path='/works/:id' render={props => <WorksItem match={props.match} />} />
         }
+
       </Switch>
       </div>
     </div>
