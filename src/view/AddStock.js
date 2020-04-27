@@ -7,8 +7,8 @@ import firebase, { db } from '../firebase'
 
 export class AddStock extends React.Component {
 
-  constructor(){
-    super()
+  constructor(props){
+    super(props)
 
     this.state = {
       id: "",
@@ -19,6 +19,7 @@ export class AddStock extends React.Component {
       stockNumber: 0,
       price: -1,
       category: "",
+      user: this.props.user
     }
     //const classes = useStyles();
   }
@@ -31,13 +32,33 @@ export class AddStock extends React.Component {
   handleSubmit(event){
     // DBに登録
 
-    return this.props.pageListener(undefined);
+    db.collection('users').doc(this.state.user.uid).get()
+    .then((doc) => {
+        console.log(doc.data())
+    })
+    .catch(error => {console.log("Error: ", error)});
+
+  
+    // postsのIDは自動生成
+    let addDoc = db.collection('users').doc(this.state.user.uid).collection('stock_items').add({
+      name: this.state.name,
+      modelNumber: this.state.modelNumber,
+      size: this.state.size,
+      color: this.state.color,
+      stockNumber: this.state.stockNumber,
+      price: this.state.price,
+      category: this.state.category,
+    }).then(ref => {
+      console.log('Added document with ID: ', ref.id);
+    });
+    
   }
 
   render(){
     return (
       <div className="add-stock-root">
         <p>{this.state.id}</p>
+        {console.log(this.state.user.uid)}
         <ul>
         <form /*className={this.classes.root}*/ noValidate autoComplete="off">
           <TextField id="standard-basic" value={this.state.name} label="名前" onChange={this.handleChanege.bind(this, "name")}/> 
