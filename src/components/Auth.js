@@ -11,7 +11,8 @@ class Auth extends React.Component {
     this.state = {
       signinCheck: false, //ログインチェックが完了してるか
       signedIn: false, //ログインしてるか
-      user: null
+      user: null,
+      userID: null
     }
   }
 
@@ -25,12 +26,11 @@ class Auth extends React.Component {
         firebase.auth().onAuthStateChanged(user => {
           // ログインしているとき
           if (user) {
-            // IDを登録 ?
+            // IDを登録
             let usersDocRef = db.collection('users').doc(user.uid)
             usersDocRef.get().then(doc => {
-              if(doc.exists){
-              }else{
-                let setDoc = usersDocRef.set({
+              if(!doc.exists){
+                usersDocRef.set({
                   uid: user.uid,
                   name: user.displayName,
                 })
@@ -44,6 +44,7 @@ class Auth extends React.Component {
                   userID: user.uid
               });
               this.props.setUser(user)
+              this.props.setUserID(user.uid)
               this.props.isSigned(true)
               console.log("mounted && signed")
               }
@@ -68,6 +69,7 @@ class Auth extends React.Component {
       firebase.auth().signOut()
       this.props.isSigned(false)
       this.props.setUser(null)
+      this.props.setUserID(null)
     }
 
     componentWillUnmount = () => {
@@ -90,19 +92,25 @@ class Auth extends React.Component {
             );
             */
            return (
-             <p>loading.</p>
+             <p>loading...</p>
            )
         }
 
         //チェックが終わりかつ
-        if (this.state.signedIn) {
+        if (this.props.isSigned) {
             //サインインしてるとき（そのまま表示）
-            return (           
+            if(this.props.isRedirect){
+
+              return <Redirect to="/"></Redirect>
+            }
+            else{
+            return (
             <div>
               {this.props.children}
               <Button onClick={this.logout}>logout</Button>
             </div>
-              );
+            );
+            }
         } else {
             //してないとき（ログイン画面にリダイレクト）
             this.login()
