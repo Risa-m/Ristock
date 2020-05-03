@@ -9,30 +9,46 @@ export class StockList extends React.Component{
     super(props)
 
     this.state = {
-      user: this.props.user
+      list: []
     }
-
+  }
+  async componentDidMount() {
+    await this.getDocs()
   }
 
-  getDocs(){
-    console.log("getDocs")
-    if(this.state.user != null){
-      db.collection('users').doc(this.state.user.uid).get()
-      .then(doc => {
-        console.log(doc.data())
+  async getDocs(){
+    if(this.props.userID){
+      let colRef = db.collection('users')
+                      .doc(this.props.userID)
+                      .collection('stock_items')
+      let snapshots = await colRef.get()
+      let docs = snapshots.docs.map(doc => [doc.id, doc.data()])
+      await this.setState({list : docs})      
+    }
+
+    /*
+    if(this.props.user != null){
+      await db.collection('users').doc(this.props.userID).collection('stock_items').get()
+      .then(snapshot => {
+        let docs = snapshot.docs.map(doc => [doc.id, doc.data()])
+        this.setState({list: docs})
       })
       .catch(error =>{
         console.log("Error : ", error)
       })
-    }
+    }*/
   }
 
   render(){
-    this.getDocs()
     return (
     <div className="stock-list-root">
       Stock List 
       <div>
+        {this.state.list.map(item => (
+          <ul key={item[0]}>
+            <li>{item[1].name}</li>
+          </ul>
+        ))}
         <Link to='/stocks/add'>Add Stocks</Link>
       </div>
     </div>
