@@ -46,6 +46,7 @@ export class AddStock extends React.Component {
       color: this.state.color,
       stockNumber: this.state.stockNumber,
       price: this.state.price,
+      lotSize: this.state.lotSize,
       category: this.state.category,
     }).then(ref => {
       console.log('Added document with ID: ', ref.id);
