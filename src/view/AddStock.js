@@ -1,9 +1,12 @@
 import React from 'react'
-import TextField from '@material-ui/core/TextField';
-import { makeStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
 import { Link } from 'react-router-dom'
 import firebase, { db } from '../firebase'
+import './views.css';
+
+import TextField from '@material-ui/core/TextField';
+import Button from '@material-ui/core/Button';
+import Grid from '@material-ui/core/Grid';
+
 
 export class AddStock extends React.Component {
 
@@ -57,18 +60,34 @@ export class AddStock extends React.Component {
   render(){
     return (
       <div className="add-stock-root">
-        <ul>
         <form /*className={this.classes.root}*/ noValidate autoComplete="off">
-          <TextField id="standard-basic" value={this.state.name} label="名前" onChange={this.handleChanege.bind(this, "name")}/> 
-          <TextField id="standard-basic" value={this.state.modelNumber} label="型番" onChange={this.handleChanege.bind(this, "modelNumber")}/> 
-          <TextField id="standard-basic" value={this.state.size} label="サイズ" onChange={this.handleChanege.bind(this, "size")}/> 
-          <TextField id="standard-basic" value={this.state.color} label="色" onChange={this.handleChanege.bind(this, "color")}/> 
-          <TextField id="standard-number" type="number" value={this.state.stockNumber} label="残数" onChange={this.handleChanege.bind(this, "stockNumber")} InputLabelProps={{shrink: true,}}/> 
-          <TextField id="standard-number" type="number" value={this.state.price} label="価格" onChange={this.handleChanege.bind(this, "price")} InputLabelProps={{shrink: true,}}/> 
-          <TextField id="standard-number" type="number" value={this.state.lotSize} label="入り数" onChange={this.handleChanege.bind(this, "lotSize")} InputLabelProps={{shrink: true,}}/> 
-          <TextField id="standard-basic" value={this.state.category} label="カテゴリー" onChange={this.handleChanege.bind(this, "category")}/> 
+        <Grid container spacing={3}>
+          <Grid item xs={6} sm={3}>
+            <TextField id="standard-basic" value={this.state.name} label="名前" onChange={this.handleChanege.bind(this, "name")}/> 
+          </Grid>
+          <Grid item xs={6} sm={3}>
+            <TextField id="standard-basic" value={this.state.modelNumber} label="型番" onChange={this.handleChanege.bind(this, "modelNumber")}/> 
+          </Grid>
+          <Grid item xs={6} sm={3}>
+            <TextField id="standard-basic" value={this.state.size} label="サイズ" onChange={this.handleChanege.bind(this, "size")}/> 
+          </Grid>
+          <Grid item xs={6} sm={3}>
+            <TextField id="standard-basic" value={this.state.color} label="色" onChange={this.handleChanege.bind(this, "color")}/> 
+          </Grid>
+          <Grid item xs={6} sm={3}>
+            <TextField id="standard-number" type="number" value={this.state.stockNumber} label="残数" onChange={this.handleChanege.bind(this, "stockNumber")} InputLabelProps={{shrink: true,}}/> 
+          </Grid>
+          <Grid item xs={6} sm={3}>
+            <TextField id="standard-number" type="number" value={this.state.price} label="価格" onChange={this.handleChanege.bind(this, "price")} InputLabelProps={{shrink: true,}}/> 
+          </Grid>
+          <Grid item xs={6} sm={3}>
+              <TextField id="standard-number" type="number" value={this.state.lotSize} label="入り数" onChange={this.handleChanege.bind(this, "lotSize")} InputLabelProps={{shrink: true,}}/> 
+          </Grid>
+          <Grid item xs={6} sm={3}>
+              <TextField id="standard-basic" value={this.state.category} label="カテゴリー" onChange={this.handleChanege.bind(this, "category")}/> 
+            </Grid>          
+          </Grid>
         </form>
-        </ul>
         <Link to={`/stocks`}><Button variant="outlined" onClick={this.handleSubmit.bind(this)}>とうろくする！</Button></Link>
       </div>
       )

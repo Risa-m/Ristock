@@ -1,6 +1,8 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import firebase, { db } from '../firebase'
+import './views.css';
+
 import Button from '@material-ui/core/Button';
 
 import Table from '@material-ui/core/Table';
@@ -13,12 +15,19 @@ import Paper from '@material-ui/core/Paper';
 
 import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
+import CachedIcon from '@material-ui/icons/Cached';
+import AddIcon from '@material-ui/icons/Add';
+
+import ImageIcon from '@material-ui/icons/Image';
+import ViewListIcon from '@material-ui/icons/ViewList';
+
 
 export class StockList extends React.Component{ 
   constructor(props){
     super(props)
 
     this.state = {
+      isImageShow: false,
       list: []
     }
   }
@@ -57,12 +66,26 @@ export class StockList extends React.Component{
     }
   }
 
+  updateDoc(docID){
+
+  }
+
+  // TODO: 写真の一覧形式とリスト形式選択できるようにする
   render(){
     return (
     <div className="stock-list-root">
-      Stock List 
-      <div>
-        <Link to='/stocks/add'>Add Stocks</Link>
+      <h2>List</h2>
+      <div className="stock-list-add-link">
+        <Link to='/stocks/add'>
+        <Button
+        className="stock-list-add-button"
+        variant="contained"
+        color="default"
+        startIcon={<AddIcon />}
+      >
+        Add
+      </Button>
+      </Link>
       </div>
       <div>
         <TableContainer component={Paper}>
@@ -77,7 +100,8 @@ export class StockList extends React.Component{
                 <TableCell align="right">価格&nbsp;(円)</TableCell>
                 <TableCell align="right">入り数&nbsp;(個)</TableCell>
                 <TableCell align="right">カテゴリー</TableCell>
-                <TableCell align="right">削除</TableCell>
+                <TableCell align="right"></TableCell>
+                <TableCell align="right"></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -93,6 +117,11 @@ export class StockList extends React.Component{
                   <TableCell align="right">{item[1].price}</TableCell>
                   <TableCell align="right">{item[1].lotSize}</TableCell>
                   <TableCell align="right">{item[1].category}</TableCell>
+                  <TableCell align="right">
+                    <IconButton aria-label="delete" onClick={this.updateDoc.bind(this, item[0])}>
+                      <CachedIcon />
+                    </IconButton>
+                  </TableCell>
                   <TableCell align="right">
                     <IconButton aria-label="delete" onClick={this.deleteDoc.bind(this, item[0])}>
                       <DeleteIcon />
