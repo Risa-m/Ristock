@@ -45,7 +45,6 @@ class Auth extends React.Component {
               });
               this.props.setUser(user)
               this.props.setUserID(user.uid)
-              this.props.isSigned(true)
               console.log("mounted && signed")
               }
             } else {
@@ -67,7 +66,6 @@ class Auth extends React.Component {
 
     logout = () => {
       firebase.auth().signOut()
-      this.props.isSigned(false)
       this.props.setUser(null)
       this.props.setUserID(null)
     }
@@ -97,23 +95,20 @@ class Auth extends React.Component {
         }
 
         //チェックが終わりかつ
-        if (this.props.isSigned) {
+        if (this.state.signedIn) {
             //サインインしてるとき（そのまま表示）
-            if(this.props.isRedirect){
+            console.log("isSigned")
 
-              return <Redirect to="/"></Redirect>
-            }
-            else{
             return (
             <div>
-              {this.props.children}
-              <Button onClick={this.logout}>logout</Button>
+              {this.props.children
+              }
             </div>
             );
-            }
         } else {
             //してないとき（ログイン画面にリダイレクト）
             this.login()
+            console.log("auth")
             return <p>please login. </p>
         }
     }

@@ -1,6 +1,6 @@
 import React from 'react';
 //import logo from './logo.svg';
-import { BrowserRouter, Route, Link, Switch } from 'react-router-dom'
+import { BrowserRouter, Route, Link, Switch, Redirect } from 'react-router-dom'
 import './App.css';
 
 import firebase from './firebase';
@@ -14,24 +14,28 @@ import { AddStock } from './view/AddStock';
 import Auth from './components/Auth.js'
 import { Login } from './components/Login.js'
 
+import BottomNavigation from '@material-ui/core/BottomNavigation';
+import BottomNavigationAction from '@material-ui/core/BottomNavigationAction';
+
+import HomeIcon from '@material-ui/icons/Home';
+import AddIcon from '@material-ui/icons/Add';
+import ListIcon from '@material-ui/icons/List';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+import InputIcon from '@material-ui/icons/Input';
+
+
 class App extends React.Component {
   constructor(){
     super()
 
     this.state = {
-      isSigned: false,
       user: null,
-      userID: null
+      userID: null,
+      buttomNav: "home"
     }
 
-    this.isSigned = this.isSigned.bind(this)
     this.setUser = this.setUser.bind(this)
     this.setUserID = this.setUserID.bind(this)
-  }
-
-  isSigned(isSigned) {
-    //console.log("callback isSigned", isSigned)
-    this.setState({isSigned : isSigned})
   }
 
   setUser(user){
@@ -45,9 +49,15 @@ class App extends React.Component {
   }
 
   logout(){
+    console.log("logout")
     firebase.auth().signOut()
     this.setState({isSigned: false, user: null, userID: null})
   }
+
+  handleButtomNavChange = (event, newValue) => {
+    this.setState({buttomNav: newValue});
+  };
+
 
 
   render(){
@@ -65,10 +75,12 @@ class App extends React.Component {
       }
       </ul>
       */}
+      {//<Button onClick={this.logout.bind(this)}>logout</Button>
+      }
       <Switch>
         <Route exact path='/' render={props =><Home user={this.state.user} userID={this.state.userID}/>} />
 
-        <Auth setUser={this.setUser} setUserID={this.setUserID} isSigned={this.isSigned} {...this.props}>
+        <Auth setUser={this.setUser} setUserID={this.setUserID}  {...this.props}>
           <Switch>
             <Route exact path='/login' render={props => <Login user={this.state.user} userID={this.state.userID}/>} />
             <Route exact path='/stocks' render={props => <StockList user={this.state.user} userID={this.state.userID}/>} />
@@ -78,6 +90,22 @@ class App extends React.Component {
         </Auth>
       </Switch>
       </div>
+
+      {(this.state.user)? 
+      <BottomNavigation showLabels value={this.state.buttomNav} onChange={this.handleButtomNavChange} className="bottom-nav" >
+        <BottomNavigationAction label="Home" value="home" icon={<HomeIcon />} to="/" component={Link} />
+        <BottomNavigationAction label="Add" value="add" icon={<AddIcon />} to="/stocks/add" component={Link} />
+        <BottomNavigationAction label="List" value="list" icon={<ListIcon />} to="/stocks" component={Link} />
+        {
+          <BottomNavigationAction label="Logout" value="logout" icon={<ExitToAppIcon />} onClick={this.logout.bind(this)} to="/" component={Link}/>
+        }
+      </BottomNavigation>
+      :
+      <BottomNavigation showLabels value={this.state.buttomNav} onChange={this.handleButtomNavChange} className="bottom-nav" >
+        <BottomNavigationAction label="Home" value="home" icon={<HomeIcon />} to="/" component={Link} />
+        <BottomNavigationAction label="Login" value="login" icon={<InputIcon />} to="/login" component={Link} />
+      </BottomNavigation>
+      }
     </div>
     </BrowserRouter>
     );
