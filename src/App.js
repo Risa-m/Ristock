@@ -30,7 +30,7 @@ class App extends React.Component {
 
     this.state = {
       user: null,
-      userID: null,
+      //userID: null,
       buttomNav: "home"
     }
 
@@ -58,6 +58,10 @@ class App extends React.Component {
     this.setState({buttomNav: newValue});
   };
 
+  setBottomNav(url){
+    this.setState({buttomNav: url})
+  }
+
 
 
   render(){
@@ -66,25 +70,14 @@ class App extends React.Component {
     <div className="App-root">
       <div className="switch-view">
       <Link to="/"><h1>Ristock</h1></Link>
-      {/*}
-      <ul>
-      <li><Link to='/'>Home</Link></li>
-      <li><Link to='/stocks/add'>Add Stocks</Link></li>
-      <li><Link to='/stocks'>List</Link></li>
-      {(this.state.isSigned)? <li><Button onClick={this.logout}>logout</Button></li> : null
-      }
-      </ul>
-      */}
-      {//<Button onClick={this.logout.bind(this)}>logout</Button>
-      }
       <Switch>
-        <Route exact path='/' render={props =><Home user={this.state.user} userID={this.state.userID}/>} />
+        <Route exact path='/' render={props =><Home user={this.state.user}/>} />
 
         <Auth setUser={this.setUser} setUserID={this.setUserID}  {...this.props}>
           <Switch>
-            <Route exact path='/login' render={props => <Login user={this.state.user} userID={this.state.userID}/>} />
-            <Route exact path='/stocks' render={props => <StockList user={this.state.user} userID={this.state.userID}/>} />
-            <Route exact path='/stocks/add' render={props => <AddStock user={this.state.user} userID={this.state.userID}/>} />
+            <Route exact path='/login' render={props => <Login user={this.state.user} {...props}/>} />
+            <Route exact path='/stocks' render={props => <StockList user={this.state.user} {...props}/>} />
+            <Route exact path='/stocks/add' render={props => <AddStock user={this.state.user} {...props}/>} />
             <Route render={() => <p>not found.</p>}/>
           </Switch>
         </Auth>
@@ -93,17 +86,17 @@ class App extends React.Component {
 
       {(this.state.user)? 
       <BottomNavigation showLabels value={this.state.buttomNav} onChange={this.handleButtomNavChange} className="bottom-nav" >
-        <BottomNavigationAction label="Home" value="home" icon={<HomeIcon />} to="/" component={Link} />
-        <BottomNavigationAction label="Add" value="add" icon={<AddIcon />} to="/stocks/add" component={Link} />
-        <BottomNavigationAction label="List" value="list" icon={<ListIcon />} to="/stocks" component={Link} />
+        <BottomNavigationAction label="Home" value="/" icon={<HomeIcon />} to="/" component={Link} />
+        <BottomNavigationAction label="Add" value="/stocks/add" icon={<AddIcon />} to="/stocks/add" component={Link} />
+        <BottomNavigationAction label="List" value="/stocks" icon={<ListIcon />} to="/stocks" component={Link} />
         {
-          <BottomNavigationAction label="Logout" value="logout" icon={<ExitToAppIcon />} onClick={this.logout.bind(this)} to="/" component={Link}/>
+          <BottomNavigationAction label="Logout" value="logout" color="secondary" icon={<ExitToAppIcon />} onClick={this.logout.bind(this)} to="/" component={Link}/>
         }
       </BottomNavigation>
       :
       <BottomNavigation showLabels value={this.state.buttomNav} onChange={this.handleButtomNavChange} className="bottom-nav" >
-        <BottomNavigationAction label="Home" value="home" icon={<HomeIcon />} to="/" component={Link} />
-        <BottomNavigationAction label="Login" value="login" icon={<InputIcon />} to="/login" component={Link} />
+        <BottomNavigationAction label="Home" value="/" icon={<HomeIcon />} to="/" component={Link} />
+        <BottomNavigationAction label="Login" value="/login" icon={<InputIcon />} to="/login" component={Link} />
       </BottomNavigation>
       }
     </div>

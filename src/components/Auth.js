@@ -12,7 +12,6 @@ class Auth extends React.Component {
       signinCheck: false, //ログインチェックが完了してるか
       signedIn: false, //ログインしてるか
       user: null,
-      userID: null
     }
   }
 
@@ -38,13 +37,11 @@ class Auth extends React.Component {
             })
             if (this._isMounted) {
               this.setState({
-                  signinCheck: true,
-                  signedIn: true,
-                  user: user,
-                  userID: user.uid
+                user: user,
+                signinCheck: true,
+                signedIn: true,
               });
               this.props.setUser(user)
-              this.props.setUserID(user.uid)
               console.log("mounted && signed")
               }
             } else {
@@ -67,7 +64,6 @@ class Auth extends React.Component {
     logout = () => {
       firebase.auth().signOut()
       this.props.setUser(null)
-      this.props.setUserID(null)
     }
 
     componentWillUnmount = () => {
@@ -97,8 +93,7 @@ class Auth extends React.Component {
         //チェックが終わりかつ
         if (this.state.signedIn) {
             //サインインしてるとき（そのまま表示）
-            console.log("isSigned")
-
+            console.log("SignedIn")
             return (
             <div>
               {this.props.children
