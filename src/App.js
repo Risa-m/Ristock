@@ -30,7 +30,7 @@ class App extends React.Component {
 
     this.state = {
       user: null,
-      //userID: null,
+      userID: null,
       buttomNav: "home"
     }
 
@@ -71,13 +71,13 @@ class App extends React.Component {
       <div className="switch-view">
       <Link to="/"><h1>Ristock</h1></Link>
       <Switch>
-        <Route exact path='/' render={props =><Home user={this.state.user}/>} />
+        <Route exact path='/' render={props =><Home user={this.state.user} userID={this.state.userID}/>} />
 
         <Auth setUser={this.setUser} setUserID={this.setUserID}  {...this.props}>
           <Switch>
-            <Route exact path='/login' render={props => <Login user={this.state.user} {...props}/>} />
-            <Route exact path='/stocks' render={props => <StockList user={this.state.user} {...props}/>} />
-            <Route exact path='/stocks/add' render={props => <AddStock user={this.state.user} {...props}/>} />
+            <Route exact path='/login' render={props => <Login user={this.state.user} userID={this.state.userID} {...props}/>} />
+            <Route exact path='/stocks' render={props => <StockList user={this.state.user} userID={this.state.userID} {...props}/>} />
+            <Route exact path='/stocks/add' render={props => <AddStock user={this.state.user} userID={this.state.userID} {...props}/>} />
             <Route render={() => <p>not found.</p>}/>
           </Switch>
         </Auth>

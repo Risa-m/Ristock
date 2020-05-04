@@ -70,7 +70,7 @@ export class StockList extends React.Component{
 
   }
 
-  // TODO: 写真の一覧形式とリスト形式選択できるようにする
+  // TODO: 写真の一覧形式とリスト形式
   render(){
     return (
     <div className="stock-list-root">
