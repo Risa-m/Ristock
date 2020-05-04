@@ -3,9 +3,8 @@
 }
 
 .App-root {
-  margin: 10px;
+  margin: 15px;
   color: #282c34;
-
 }
 
 .App-root a {
@@ -15,7 +14,12 @@
 
 
 .bottom-nav{
+  margin: auto;
 	position: absolute;
   bottom: 0;
-  width: 100vw;
+  width: calc(100vw - 20px);
+}
+
+a.MuiBottomNavigationAction-root{
+  min-width: 50px;
 }

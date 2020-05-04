@@ -21,6 +21,7 @@ export class Home extends React.Component {
       return (
         <div>
           <h3>HOME</h3>
+          <p>在庫を管理すとっく！</p>
           <Link to="stocks">stocks list</Link>
         </div>
       )
@@ -29,7 +30,8 @@ export class Home extends React.Component {
     return (
       <div className="home-root">
         <h3>HOME</h3>
-        <p>please login</p>
+        <p>在庫を管理するためのWebアプリケーションです。</p>
+        <p>利用するにはGoogleアカウントでのログインが必要です。</p>
       </div>
       )
     }

@@ -10,7 +10,6 @@ export class Login extends React.Component {
   render(){
     
     if(this.props.user === null){
-      console.log("login")
       return <p>please login (login)</p>
     }
     else{
