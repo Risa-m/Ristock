@@ -1,6 +1,14 @@
 
-
-
 .stock-list-add-button {
+  margin: 10px;
   float: right;
+}
+
+.add-stock-submit-button {
+  margin-top: 10px;
+}
+
+.add-stock-form .MuiTextField-root {
+  margin: auto;
+  width: 70%;
 }
