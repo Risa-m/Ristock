@@ -3,13 +3,17 @@
 }
 
 .App-root {
-  margin: 15px;
+  /*margin: 15px;*/
   color: #282c34;
 }
 
 .App-root a {
   color: #2e3138;
   text-decoration: none;
+}
+
+.App-title {
+  text-align: center;
 }
 
 

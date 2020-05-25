@@ -19,19 +19,27 @@ export class Home extends React.Component {
 
     if(this.props.user){
       return (
-        <div>
-          <h3>HOME</h3>
-          <p>在庫を管理すとっく！</p>
-          <Link to="stocks">stocks list</Link>
+        <div className="home-root">
+          <div className="home-background"></div>
         </div>
       )
     }else{
 
     return (
       <div className="home-root">
-        <h3>HOME</h3>
+          <div className="home-background"></div>
+          <div className="home-message">
+            <p>在庫管理アプリ</p>
+            <p>For　ハンドメイド</p>
+          </div>
+        {/*
         <p>在庫を管理するためのWebアプリケーションです。</p>
-        <p>利用するにはGoogleアカウントでのログインが必要です。</p>
+        <p>ハンドメイド資材等の在庫管理にお使い下さい(*'▽')</p>
+        */}
+        <div className="home-google-signin">
+          <img src="image/google_signin_normal.png" width="180" alt="Sign in with Google" onmouseover="this.src='image/google_signin_focus.png'" onmouseout="this.src='image/google_signin_normal.png'"/>
+          <p>ご利用にはGoogleアカウントでのログインが必要です。</p>
+        </div>
       </div>
       )
     }

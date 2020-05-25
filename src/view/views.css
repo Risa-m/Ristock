@@ -12,3 +12,28 @@
   margin: auto;
   width: 70%;
 }
+
+.home-background {
+  background-image: url("/image/top.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;  
+  background-position: center;
+  background-attachment: fixed;
+  position: absolute;
+  z-index: -1;
+  margin: auto;
+  width: calc(100% - 0px);
+  height: calc(100% - 100px);
+
+}
+
+.home-message {
+  color: white;
+  position: absolute;
+  left: 100px;
+  top: 500px;
+}
+
+.home-google-signin{
+  font-size: small;
+}
