@@ -13,6 +13,7 @@ import { StockList } from './view/StockList.js'
 import { AddStock } from './view/AddStock';
 import Auth from './components/Auth.js'
 import { Login } from './components/Login.js'
+import { StockDetail } from './view/StockDetail';
 
 import BottomNavigation from '@material-ui/core/BottomNavigation';
 import BottomNavigationAction from '@material-ui/core/BottomNavigationAction';
@@ -69,7 +70,9 @@ class App extends React.Component {
     <BrowserRouter>
     <div className="App-root">
       <div className="switch-view">
-      <Link to="/"><h1>Ristock</h1></Link>
+        <div className="App-title">
+          <Link to="/"><h1>Ristock</h1></Link>
+        </div>
       <Switch>
         <Route exact path='/' render={props =><Home user={this.state.user} userID={this.state.userID}/>} />
 
@@ -78,6 +81,7 @@ class App extends React.Component {
             <Route exact path='/login' render={props => <Login user={this.state.user} userID={this.state.userID} {...props}/>} />
             <Route exact path='/stocks' render={props => <StockList user={this.state.user} userID={this.state.userID} {...props}/>} />
             <Route exact path='/stocks/add' render={props => <AddStock user={this.state.user} userID={this.state.userID} {...props}/>} />
+            <Route exact path='/stocks/:id' render={props => <StockDetail user={this.state.user} userID={this.state.userID} match={props.match} {...props}/>} />
             <Route render={() => <p>not found.</p>}/>
           </Switch>
         </Auth>
