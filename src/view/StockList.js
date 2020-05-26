@@ -4,7 +4,7 @@ import firebase, { db } from '../firebase'
 import './views.css';
 
 import { StockDetail } from './StockDetail'
-
+import ModalWrapper from '../components/ModalWrapper'
 import Button from '@material-ui/core/Button';
 
 import Table from '@material-ui/core/Table';
@@ -31,7 +31,9 @@ export class StockList extends React.Component{
     this.state = {
       isImageShow: false,
       list: [],
-      detailsItem: null
+      detailsItemID: null,
+      detailsItem: null,
+      modalopen: false
     }
   }
   async componentDidMount() {
@@ -56,11 +58,6 @@ export class StockList extends React.Component{
       this.setState({list: newList})
     }
   }
-
-  updateDoc(docID){
-
-  }
-
   detailsDoc(docID){
     console.log(docID)
     //docID = "uPGdRKYK5Km3uYV9ud6j"
@@ -70,8 +67,12 @@ export class StockList extends React.Component{
       return value[0] === docID
     })
     console.log(searchItem)
-    this.setState({detailsItem: searchItem})
+    this.setState({detailsItem: searchItem, detailsItemID: docID, modalopen:true})
     
+  }
+
+  handleClose(){
+    this.setState({modalopen: false})
   }
 
   settingColumn(){
@@ -85,17 +86,6 @@ export class StockList extends React.Component{
     <div className="stock-list-root">
       <h2>List</h2>
       <div className="stock-list-add-link">
-        {/*
-        <Link to='/stocks/add'>
-        <Button
-        className="stock-list-add-button"
-        variant="contained"
-        color="default"
-        startIcon={<AddIcon />}>
-        Add
-      </Button>
-      </Link>
-        */}
         <IconButton className="stock-list-add-button" aria-label="setting" onClick={this.settingColumn.bind(this)}>
           <SettingsIcon />
         </IconButton>
@@ -140,11 +130,6 @@ export class StockList extends React.Component{
                     </IconButton>
                   </TableCell>
                   <TableCell align="right">
-                    <IconButton aria-label="update" onClick={this.updateDoc.bind(this, item[0])}>
-                      <CachedIcon />
-                    </IconButton>
-                  </TableCell>
-                  <TableCell align="right">
                     <IconButton aria-label="delete" onClick={this.deleteDoc.bind(this, item[0])}>
                       <DeleteIcon />
                     </IconButton>
@@ -156,16 +141,15 @@ export class StockList extends React.Component{
         </TableContainer>
       </div>
 
-      <div className="stock-list-details">
-        {(this.state.detailsItem && this.state.detailsItem[0])?
-        <Paper>
-          {this.state.detailsItem[0][0]}
-          <StockDetail item_id={this.state.detailsItem[0][0]} userID={this.props.userID}></StockDetail>
-        </Paper>
-        :
-        null}
-      </div>
-
+      <div className="stock-list-details-modal">
+      {(this.state.detailsItem && this.state.detailsItemID)?
+      <ModalWrapper
+      open={this.state.modalopen}
+      handleClose={this.handleClose.bind(this)}
+      content={<StockDetail item_id={this.state.detailsItemID} userID={this.props.userID}/>}
+     />:null
+       }
+       </div>
     </div>
     )
   }
