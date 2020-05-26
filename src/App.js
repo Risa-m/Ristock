@@ -40,17 +40,16 @@ class App extends React.Component {
   }
 
   setUser(user){
-    //console.log("callback user", user)
+    //console.log("[App]callback user", user)
     this.setState({user : user})
   }
 
   setUserID(userID){
-    //console.log("callback userID", userID)
+    //console.log("[App]callback userID", userID)
     this.setState({userID: userID})
   }
 
   logout(){
-    console.log("logout")
     firebase.auth().signOut()
     this.setState({isSigned: false, user: null, userID: null})
   }
@@ -74,7 +73,7 @@ class App extends React.Component {
           <Link to="/"><h1>Ristock</h1></Link>
         </div>
       <Switch>
-        <Route exact path='/' render={props =><Home user={this.state.user} userID={this.state.userID}/>} />
+        <Route exact path='/' render={props =><Home user={this.state.user} userID={this.state.userID}  {...props}/>} />
 
         <Auth setUser={this.setUser} setUserID={this.setUserID}  {...this.props}>
           <Switch>

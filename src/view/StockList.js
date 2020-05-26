@@ -29,6 +29,7 @@ export class StockList extends React.Component{
     super(props)
 
     this.state = {
+      isUserDataLoaded: false,
       isImageShow: false,
       list: [],
       detailsItemID: null,
@@ -37,6 +38,13 @@ export class StockList extends React.Component{
     }
   }
   async componentDidMount() {
+    await this.getDocs()
+  }
+
+  // Note: state update
+  async getUserData(){
+    console.log("[StockList] getUserdata")
+    this.state.isUserDataLoaded = true
     await this.getDocs()
   }
 
@@ -96,15 +104,17 @@ export class StockList extends React.Component{
 
   // TODO: 写真の一覧形式とリスト形式
   render(){
+    if(!this.state.isUserDataLoaded && this.props.userID){
+      this.getUserData()
+    }
+
     return (
     <div className="stock-list-root">
       <h2>List</h2>
       <div className="stock-list-add-link">
         <IconButton className="stock-list-add-button" aria-label="setting" onClick={this.settingColumn.bind(this)}>
           <SettingsIcon />
-        </IconButton>
-
-        
+        </IconButton>        
       </div>
 
       <div className="stock-list-table">

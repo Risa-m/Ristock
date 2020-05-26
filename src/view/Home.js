@@ -4,6 +4,8 @@ import firebase, { db } from '../firebase';
 import Button from '@material-ui/core/Button';
 import './views.css';
 
+import { StockList } from './StockList.js'
+
 import InputIcon from '@material-ui/icons/Input';
 import IconButton from '@material-ui/core/IconButton';
 
@@ -13,18 +15,18 @@ export class Home extends React.Component {
     super(props)
 
     this.state = {
-      user: this.props.user
-
+      user: this.props.user,
+      userID: this.props.userID,
     }
   }
 
-  
   render(){
+    console.log("[home] userID: ", this.props.userID)
 
     if(this.props.user){
       return (
         <div className="home-root">  
-          <div className="home-background"></div>
+        <StockList user={this.props.user} userID={this.props.userID} />
         </div>
       )
     }else{
