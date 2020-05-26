@@ -8,9 +8,8 @@ export class Login extends React.Component {
   }
 
   render(){
-    
     if(this.props.user === null){
-      return <p>please login (login)</p>
+      return <p>please login.</p>
     }
     else{
       return (

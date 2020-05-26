@@ -2,7 +2,7 @@ import React from 'react';
 import { Redirect } from 'react-router-dom';
 import { Button } from '@material-ui/core';
 import firebase, { db } from '../firebase';
-//import LoadingOverlay from 'react-loading-overlay';
+import LoadingOverlay from 'react-loading-overlay';
 
 class Auth extends React.Component {
   constructor(props){
@@ -25,6 +25,8 @@ class Auth extends React.Component {
         //ログインしてるかどうかチェック
         firebase.auth().onAuthStateChanged(user => {
           // ログインしているとき
+          // -> 新規ユーザのIDをDBに登録
+          // -> mountされたら、状態を更新
           if (user) {
             // IDを登録
             let usersDocRef = db.collection('users').doc(user.uid)
@@ -45,20 +47,21 @@ class Auth extends React.Component {
               });
               this.props.setUser(user)
               this.props.setUserID(user.uid)
-              console.log("mounted && signed")
               }
-            } else {
-                //してない
+            }
+            // ログインしていないとき 
+            // mountされたら状態を更新
+            else {
                 if (this._isMounted) {
                     this.setState({
                         signinCheck: true,
                         signedIn: false,
                     });
-                    console.log("mounted && not signed")
                 }
             }
         })
     }
+
     login = () => {
       const provider = new firebase.auth.GoogleAuthProvider()
       firebase.auth().signInWithRedirect(provider)
@@ -75,41 +78,41 @@ class Auth extends React.Component {
     }
 
     render() {
-        //チェックが終わってないとき（ローディング表示）
+        // ログインチェックが終わってないとき（ローディング表示）
+        // Todo: コンポーネント作る
         if (!this.state.signinCheck) {
-
-          /*
             return (
                 <LoadingOverlay
-                    active={true}
-                    spinner
-                    text='Loading...'
+                  active={true}
+                  spinner
+                  text='Loading...'
                 >
-                    <div style={{ height: '100vh', width: '100vw' }}></div>
+                  <div style={{ height: '100vh', width: '100vw',   backgroundImage: `url("/image/top.jpg")` }}></div>
                 </ LoadingOverlay>
             );
-            */
-           return (
-             <p>loading...</p>
-           )
         }
 
         //チェックが終わりかつ
         if (this.state.signedIn) {
             //サインインしてるとき（そのまま表示）
-            console.log("isSigned")
-
             return (
             <div>
-              {this.props.children
-              }
+              {this.props.children}
             </div>
             );
         } else {
             //してないとき（ログイン画面にリダイレクト）
             this.login()
-            console.log("auth")
-            return <p>please login. </p>
+            return (
+              <LoadingOverlay
+                active={true}
+                spinner
+                text='Redirect to login...'
+              >
+                <div style={{ height: '100vh', width: '100vw',   backgroundImage: `url("/image/top.jpg")` }}></div>
+            </ LoadingOverlay>
+              )
+            //return <p>please login. </p>
         }
     }
 }
