@@ -98,10 +98,13 @@ class App extends React.Component {
         }
       </BottomNavigation>
       :
+      /*
       <BottomNavigation showLabels value={this.state.buttomNav} onChange={this.handleButtomNavChange} className="bottom-nav" >
         <BottomNavigationAction label="Home" value="/" icon={<HomeIcon />} to="/" component={Link} />
         <BottomNavigationAction label="Login" value="/login" icon={<InputIcon />} to="/login" component={Link} />
       </BottomNavigation>
+      */
+       null
       }
     </div>
     </BrowserRouter>

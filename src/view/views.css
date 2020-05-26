@@ -33,7 +33,7 @@
   z-index: -1;
   margin: auto;
   width: calc(100% - 0px);
-  height: calc(100% - 100px);
+  height: calc(100vh - 50px);
 
 }
 
@@ -52,4 +52,15 @@
 }
 .home-google-signin p{
   color: white;
+}
+
+.home-login {
+  position: absolute;
+  top: 30px;  
+  right: 10px;
+  margin-right: 10px;
+}
+
+.home-login-icon {
+  vertical-align: bottom;
 }
