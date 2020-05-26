@@ -72,7 +72,21 @@ export class StockList extends React.Component{
   }
 
   handleClose(){
-    this.setState({modalopen: false})
+    this.setState({
+      detailsItemID: null,
+      detailsItem: null,
+      modalopen: false
+    })
+  }
+
+  async handleSubmitClose(props){
+    let newList = this.state.list.map(item => {
+      if(item[0] == this.state.detailsItemID){
+        return[this.state.detailsItemID, props]
+      }
+    })
+    this.setState({list: newList})
+    this.handleClose()
   }
 
   settingColumn(){
@@ -146,7 +160,7 @@ export class StockList extends React.Component{
       <ModalWrapper
       open={this.state.modalopen}
       handleClose={this.handleClose.bind(this)}
-      content={<StockDetail item_id={this.state.detailsItemID} userID={this.props.userID}/>}
+      content={<StockDetail item_id={this.state.detailsItemID} userID={this.props.userID} handleClose={this.handleSubmitClose.bind(this)}/>}
      />:null
        }
        </div>

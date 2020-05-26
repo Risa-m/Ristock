@@ -64,6 +64,28 @@ export class StockDetail extends React.Component{
     this.setState({ [property] : event.target.value})
   }
 
+  async handleSubmit(event){
+    let itemRef = db.collection('users')
+    .doc(this.props.userID)
+    .collection('stock_items')
+    .doc(this.state.item_id)
+
+    await itemRef.update({
+      name: this.state.name,
+      modelNumber: this.state.modelNumber,
+      size: this.state.size,
+      color: this.state.color,
+      stockNumber: this.state.stockNumber,
+      price: this.state.price,
+      lotSize: this.state.lotSize,
+      category: this.state.category,
+    }).then(ref => {
+      console.log('Updated document : ', ref);
+    });
+    
+    this.props.handleClose(this.state)
+  }
+
 
   render(){
     if(this.props.userID && this.state.data){
@@ -74,7 +96,7 @@ export class StockDetail extends React.Component{
           {console.log(this.state.data)}
           {this.state.data["name"]}
 
-          <form className="add-stock-form" noValidate autoComplete="off">
+          <form className="stock-form" noValidate autoComplete="off">
         <Grid container spacing={3}>
           <Grid item xs={12} sm={6} md={3}>
             <TextField id="standard-basic" value={this.state.name} label="名前" onChange={this.handleChanege.bind(this, "name")}/> 
@@ -102,6 +124,9 @@ export class StockDetail extends React.Component{
           </Grid>          
         </Grid>
         </form>
+        <div className="add-stock-submit-button">
+          <Button variant="outlined" onClick={this.handleSubmit.bind(this)}>Save</Button>
+        </div>
 
       </div>
   

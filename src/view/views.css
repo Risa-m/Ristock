@@ -1,17 +1,27 @@
 
+/*
 .stock-list-add-button {
   margin: 10px;
   float: right;
 }
-
+*/
 .add-stock-submit-button {
   margin-top: 10px;
+}
+
+.add-stock-root {
+  width: 90%;
+  margin: auto;
 }
 
 .add-stock-form .MuiTextField-root {
   margin: auto;
   width: 70%;
 }
+/*
+.MuiGrid-spacing-xs-3 {
+  width: 100%;
+}*/
 
 .home-background {
   background-image: url("/image/top.jpg");
@@ -36,4 +46,10 @@
 
 .home-google-signin{
   font-size: small;
+  position: absolute;
+  margin-top: 65vh;
+  margin-left: 10vw;
+}
+.home-google-signin p{
+  color: white;
 }
