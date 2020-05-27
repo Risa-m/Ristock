@@ -38,10 +38,14 @@
 }
 
 .home-message {
+  background-color: #b7faff63;
+  border-radius: 10px;
   color: white;
   position: absolute;
-  left: 100px;
-  top: 500px;
+  left: 10vw;
+  top: 60vh;
+  padding: 10px 20px;
+  line-height: 0.5em 
 }
 
 .home-google-signin{
@@ -49,6 +53,7 @@
   position: absolute;
   margin-top: 65vh;
   margin-left: 10vw;
+  line-height: 0.3em;
 }
 .home-google-signin p{
   color: white;
@@ -58,7 +63,13 @@
   position: absolute;
   top: 30px;  
   right: 10px;
-  margin-right: 10px;
+  padding-top: 10px;
+  margin-right: 20px;
+  line-height: 0.3em;
+  text-align: center;
+}
+.home-login p {
+  color: #a0a0a086;
 }
 
 .home-login-icon {

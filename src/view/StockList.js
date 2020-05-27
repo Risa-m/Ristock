@@ -110,7 +110,6 @@ export class StockList extends React.Component{
 
     return (
     <div className="stock-list-root">
-      <h2>List</h2>
       <div className="stock-list-add-link">
         <IconButton className="stock-list-add-button" aria-label="setting" onClick={this.settingColumn.bind(this)}>
           <SettingsIcon />
