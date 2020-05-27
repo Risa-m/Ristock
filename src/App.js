@@ -72,6 +72,21 @@ class App extends React.Component {
         <div className="App-title">
           <Link to="/"><h1>Ristock</h1></Link>
         </div>
+        <div className="App-login">
+          {(this.state.user)?
+          <Link to="/" onClick={this.logout.bind(this)}>
+            Logout&nbsp;
+          </Link>
+          :
+          <Link to="login" title="Sign in with Google Account">
+            Login&nbsp;
+            <p>with google</p>
+            {//<InputIcon fontSize="small" className="home-login-icon" />
+            }
+          </Link>
+        }
+        </div>
+
       <Switch>
         <Route exact path='/' render={props =><Home user={this.state.user} userID={this.state.userID}  {...props}/>} />
 
@@ -87,7 +102,7 @@ class App extends React.Component {
       </Switch>
       </div>
 
-      {(this.state.user)? 
+      {/*(this.state.user)? 
       <BottomNavigation showLabels value={this.state.buttomNav} onChange={this.handleButtomNavChange} className="bottom-nav" >
         <BottomNavigationAction label="Home" value="/" icon={<HomeIcon />} to="/" component={Link} />
         <BottomNavigationAction label="Add" value="/stocks/add" icon={<AddIcon />} to="/stocks/add" component={Link} />

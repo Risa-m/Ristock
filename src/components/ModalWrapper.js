@@ -20,8 +20,6 @@ const styles = theme => ({
 });
 class ModalWrapper extends Component {
   render() {
-    console.log("modal render");
-    console.log(this.props.open)
     const { classes } = this.props;
     return (
       <Modal id="Modal"

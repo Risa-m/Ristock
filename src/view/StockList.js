@@ -4,6 +4,7 @@ import firebase, { db } from '../firebase'
 import './views.css';
 
 import { StockDetail } from './StockDetail'
+import { StockContents} from '../components/StockContents'
 import ModalWrapper from '../components/ModalWrapper'
 import Button from '@material-ui/core/Button';
 
@@ -34,6 +35,7 @@ export class StockList extends React.Component{
       list: [],
       detailsItemID: null,
       detailsItem: null,
+      addItem: false,
       modalopen: false
     }
   }
@@ -67,32 +69,43 @@ export class StockList extends React.Component{
     }
   }
   detailsDoc(docID){
-    console.log(docID)
-    //docID = "uPGdRKYK5Km3uYV9ud6j"
+    console.log("[Stock List] details docID",docID)
     let searchItem = this.state.list.filter(value => {
-      console.log(value[0])
-      console.log(docID)
       return value[0] === docID
     })
-    console.log(searchItem)
-    this.setState({detailsItem: searchItem, detailsItemID: docID, modalopen:true})
-    
+    this.setState({detailsItem: searchItem, detailsItemID: docID, modalopen:true})    
+  }
+
+  addDoc(){
+    console.log("[Stock List] add")
+    this.setState({addItem: true, modalopen: true})
   }
 
   handleClose(){
     this.setState({
       detailsItemID: null,
       detailsItem: null,
+      addItem: false,
       modalopen: false
     })
   }
 
   async handleSubmitClose(props){
-    let newList = this.state.list.map(item => {
-      if(item[0] == this.state.detailsItemID){
-        return[this.state.detailsItemID, props]
-      }
-    })
+    let newList = this.state.list.slice()
+    // Add
+    if(this.state.addItem){
+      newList.push([props.item_id, props])
+    }
+    // Update
+    else if(this.state.detailsItemID){
+      newList = this.state.list.map(item => {
+        if(item[0] == this.state.detailsItemID){
+          console.log("[Stock List] new list item",[this.state.detailsItemID, props])
+          return[this.state.detailsItemID, props]
+        }
+      })  
+    }
+    console.log("[Stock List] newList: ",newList)
     this.setState({list: newList})
     this.handleClose()
   }
@@ -113,7 +126,11 @@ export class StockList extends React.Component{
       <div className="stock-list-add-link">
         <IconButton className="stock-list-add-button" aria-label="setting" onClick={this.settingColumn.bind(this)}>
           <SettingsIcon />
-        </IconButton>        
+        </IconButton>
+
+        <IconButton className="stock-list-add-button" aria-label="setting" onClick={this.addDoc.bind(this)}>
+          <AddIcon />
+        </IconButton>
       </div>
 
       <div className="stock-list-table">
@@ -165,11 +182,11 @@ export class StockList extends React.Component{
       </div>
 
       <div className="stock-list-details-modal">
-      {(this.state.detailsItem && this.state.detailsItemID)?
+      {((this.state.detailsItem && this.state.detailsItemID) || this.state.addItem)?
       <ModalWrapper
       open={this.state.modalopen}
       handleClose={this.handleClose.bind(this)}
-      content={<StockDetail item_id={this.state.detailsItemID} userID={this.props.userID} handleClose={this.handleSubmitClose.bind(this)}/>}
+      content={<StockContents item_id={this.state.detailsItemID} userID={this.props.userID} handleClose={this.handleSubmitClose.bind(this)}/>}
      />:null
        }
        </div>

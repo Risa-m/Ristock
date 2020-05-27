@@ -43,7 +43,7 @@ export class StockDetail extends React.Component{
       let doc = await itemRef.get()
       await this.setState({data: doc.data()})
 
-      this.setState({
+      await this.setState({
         name: this.state.data.name,
         modelNumber: this.state.data.modelNumber,
         size: this.state.data.size,
@@ -135,7 +135,6 @@ export class StockDetail extends React.Component{
     }
     return (
     <div className="stock-detail-root">
-      <p>Details</p>
       {console.log(this.state.item_id)}
 
       {console.log(this.state.data)}

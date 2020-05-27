@@ -33,12 +33,6 @@ export class Home extends React.Component {
 
     return (
       <div className="home-root">
-        <div className="home-login">
-          <Link to="login" >
-            Login&nbsp;
-            <InputIcon fontSize="small" className="home-login-icon" />
-          </Link>
-        </div>
 
           <div className="home-background"></div>
           <div className="home-message">
@@ -50,7 +44,9 @@ export class Home extends React.Component {
         <p>ハンドメイド資材等の在庫管理にお使い下さい(*'▽')</p>
         */}
         <div className="home-google-signin">
-          <img src="image/google_signin_normal.png" width="180" alt="Sign in with Google"/>
+          <Link to="login" title="Sign in with Google Account">
+            <img src="image/google_signin_normal.png" width="180" alt="Sign in with Google"/>
+          </Link>
           <p>ご利用にはGoogleアカウントでのログインが必要です。</p>
         </div>
       </div>
