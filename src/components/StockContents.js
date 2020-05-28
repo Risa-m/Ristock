@@ -28,6 +28,7 @@ export class StockContents extends React.Component{
       price: 0,
       lotSize: 0,
       category: "",
+      image_url: "",
 
       local_image: null,
       local_image_src: null,
@@ -58,19 +59,28 @@ export class StockContents extends React.Component{
         price: this.state.data.price,
         lotSize: this.state.data.lotSize,
         category: this.state.data.category,
+        image_url: this.state.data.image_url,
       })
     }
   }
 
   // form が変更されたとき、stateも更新
   handleChanege(property, event) {
-    console.log("[Stock Contents] handlechange property: ",[property])
-    console.log("[Stock Contents] handlechange event: ",event)
     this.setState({ [property] : event.target.value})
   }
 
   // update されたとき、DBを更新してモーダルに通知
   async handleUpdateSubmit(event){
+    let storageRef = firebase.storage().ref().child(`users/${this.props.userID}/${this.state.item_id}.jpg`);
+    await storageRef.put(this.state.local_image)
+    .then(snapshot => {
+      snapshot.ref.getDownloadURL().then(url => {
+        // エラーが出る？
+        //this.setState({ image_url: url })
+      })
+    });
+
+
     let itemRef = db.collection('users')
     .doc(this.props.userID)
     .collection('stock_items')
@@ -85,22 +95,21 @@ export class StockContents extends React.Component{
       price: this.state.price,
       lotSize: this.state.lotSize,
       category: this.state.category,
+      image_url: this.state.image_url,
     }).then(ref => {
       console.log('Updated document : ', ref);
     });
 
-    let storageRef = firebase.storage().ref().child(`users/${this.props.userID}/${this.state.item_id}.jpg`);
-    storageRef.put(this.state.local_image)
-    .then(function(snapshot) {
-      console.log('uploaded')
-    });
-
     this.props.handleClose(this.state)
   }
+
+
   // add されたとき、DBに追加してモーダルに通知
   async handleAddSubmit(event){
 
-    let addDoc = await db.collection('users').doc(this.props.userID).collection('stock_items').add({
+    let addDoc = db.collection('users').doc(this.props.userID).collection('stock_items')
+
+    await addDoc.add({
       name: this.state.name,
       modelNumber: this.state.modelNumber,
       size: this.state.size,
@@ -112,12 +121,18 @@ export class StockContents extends React.Component{
     }).then(ref => {
       console.log('Added document with ID: ', ref.id);
       this.setState({item_id: ref.id})
+
+      let storageRef = firebase.storage().ref().child(`users/${this.props.userID}/${this.state.item_id}.jpg`);
+      storageRef.put(this.state.local_image)
+      .then(snapshot => {
+          snapshot.ref.getDownloadURL().then(url => {
+            addDoc.doc(ref.id).set({image_url: url}, { merge: true });
+            // エラーが出る
+            //this.setState({image_url: url})
+          })
+     });
     });
-    let storageRef = firebase.storage().ref().child(`users/${this.props.userID}/${this.state.item_id}.jpg`);
-    storageRef.put(this.state.local_image)
-    .then(function(snapshot) {
-      console.log('uploaded')
-    });
+
     this.props.handleClose(this.state)
   }
 
@@ -161,7 +176,6 @@ export class StockContents extends React.Component{
         <input
             accept="image/*"
             id="contained-button-file"
-            multiple
             type="file"
             className="image-input"
             onChange={this.handleImage}

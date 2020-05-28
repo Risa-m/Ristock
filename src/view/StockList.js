@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import firebase, { db } from '../firebase'
+import firebase, { db, storage } from '../firebase'
 import './views.css';
 
 import { StockDetail } from './StockDetail'
@@ -63,6 +63,12 @@ export class StockList extends React.Component{
 
   deleteDoc(docID){
     if(this.props.userID){
+      let delete_image_url = this.state.list.filter(value => value[0] === docID)[0].image_url
+      console.log(delete_image_url)
+      if(delete_image_url){
+        var desertRef = firebase.storage().ref().child(`users/${this.props.userID}/${docID}.jpg`);
+        desertRef.delete().then(ref => {console.log("delete image ", docID)}).catch(error => {});
+      }
       let deleteDoc = db.collection('users').doc(this.props.userID).collection('stock_items').doc(docID).delete();
       let newList = this.state.list.filter(value => value[0] !== docID)
       this.setState({list: newList})
@@ -119,6 +125,9 @@ export class StockList extends React.Component{
 
   // TODO: 写真の一覧形式とリスト形式
   render(){
+
+    console.log(this.state)
+
     if(!this.state.isUserDataLoaded && this.props.userID){
       this.getUserData()
     }
@@ -140,6 +149,7 @@ export class StockList extends React.Component{
           <Table aria-label="simple table">
             <TableHead>
               <TableRow>
+                <TableCell></TableCell>
                 <TableCell>名称</TableCell>
                 <TableCell align="right">型番</TableCell>
                 <TableCell align="right">サイズ</TableCell>
@@ -156,8 +166,9 @@ export class StockList extends React.Component{
               {this.state.list.map(item => (
                 <TableRow key={item[0]}>
                   <TableCell component="th" scope="row">
-                    {item[1].name}
+                    <img src={item[1].image_url} width="50"/>
                   </TableCell>
+                  <TableCell align="right">{item[1].name}</TableCell>
                   <TableCell align="right">{item[1].modelNumber}</TableCell>
                   <TableCell align="right">{item[1].size}</TableCell>
                   <TableCell align="right">{item[1].color}</TableCell>
