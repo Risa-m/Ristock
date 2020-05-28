@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import Modal from '@material-ui/core/Modal';
 import { withStyles } from '@material-ui/core/styles';
 
+import IconButton from '@material-ui/core/IconButton';
+import CloseIcon from '@material-ui/icons/Close';
 
 const styles = theme => ({
   paper: {
@@ -17,6 +19,11 @@ const styles = theme => ({
     left: `50%`,
     transform: `translate(-50%, -50%)`,
   },
+  close: {
+    position: 'absolute',
+    right: '5px',
+    top: '5px'
+  }
 });
 class ModalWrapper extends Component {
   render() {
@@ -28,6 +35,9 @@ class ModalWrapper extends Component {
       open={this.props.open}
       onClose={this.props.handleClose}>
         <div className={classes.paper}>
+          <IconButton aria-label="close" onClick={this.props.handleClose} className={classes.close}>
+            <CloseIcon fontSize="small" />
+          </IconButton> 
           {this.props.content}
         </div>
       </Modal>
