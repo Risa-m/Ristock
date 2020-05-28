@@ -29,8 +29,8 @@ export class StockContents extends React.Component{
       lotSize: 0,
       category: "",
 
-      image: null,
-      image_src: null,
+      local_image: null,
+      local_image_src: null,
     }
   }
 
@@ -88,11 +88,18 @@ export class StockContents extends React.Component{
     }).then(ref => {
       console.log('Updated document : ', ref);
     });
-    
+
+    let storageRef = firebase.storage().ref().child(`users/${this.props.userID}/${this.state.item_id}.jpg`);
+    storageRef.put(this.state.local_image)
+    .then(function(snapshot) {
+      console.log('uploaded')
+    });
+
     this.props.handleClose(this.state)
   }
   // add されたとき、DBに追加してモーダルに通知
   async handleAddSubmit(event){
+
     let addDoc = await db.collection('users').doc(this.props.userID).collection('stock_items').add({
       name: this.state.name,
       modelNumber: this.state.modelNumber,
@@ -106,7 +113,11 @@ export class StockContents extends React.Component{
       console.log('Added document with ID: ', ref.id);
       this.setState({item_id: ref.id})
     });
-
+    let storageRef = firebase.storage().ref().child(`users/${this.props.userID}/${this.state.item_id}.jpg`);
+    storageRef.put(this.state.local_image)
+    .then(function(snapshot) {
+      console.log('uploaded')
+    });
     this.props.handleClose(this.state)
   }
 
@@ -114,10 +125,8 @@ export class StockContents extends React.Component{
     const image = event.target.files[0];
     console.log(image)
     var createObjectURL = (window.URL || window.webkitURL).createObjectURL || window.createObjectURL;
-
     const image_url = createObjectURL(image);
-
-    this.setState({image: image, image_src: image_url})
+    this.setState({local_image: image, local_image_src: image_url})
   };
 
   gridTemplate = () => {  
@@ -166,7 +175,7 @@ export class StockContents extends React.Component{
             //</Fab>
             }
           </label>
-          <img src={this.state.image_src} height="50" style={{position: "10px" ,padding: "5px"}}/>
+          <img src={this.state.local_image_src} height="50" style={{position: "10px" ,padding: "5px"}}/>
         </Grid>
       </Grid>
       </form>
