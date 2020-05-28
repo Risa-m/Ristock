@@ -101,7 +101,9 @@ export class StockList extends React.Component{
       newList = this.state.list.map(item => {
         if(item[0] == this.state.detailsItemID){
           console.log("[Stock List] new list item",[this.state.detailsItemID, props])
-          return[this.state.detailsItemID, props]
+          return [this.state.detailsItemID, props]
+        }else{
+          return item
         }
       })  
     }

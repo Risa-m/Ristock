@@ -93,9 +93,11 @@ class App extends React.Component {
         <Auth setUser={this.setUser} setUserID={this.setUserID}  {...this.props}>
           <Switch>
             <Route exact path='/login' render={props => <Login user={this.state.user} userID={this.state.userID} {...props}/>} />
+            {/*
             <Route exact path='/stocks' render={props => <StockList user={this.state.user} userID={this.state.userID} {...props}/>} />
             <Route exact path='/stocks/add' render={props => <AddStock user={this.state.user} userID={this.state.userID} {...props}/>} />
             <Route exact path='/stocks/:id' render={props => <StockDetail user={this.state.user} userID={this.state.userID} match={props.match} {...props}/>} />
+            */}
             <Route render={() => <p>not found.</p>}/>
           </Switch>
         </Auth>

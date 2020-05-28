@@ -25,7 +25,7 @@ export class Home extends React.Component {
 
     if(this.props.user){
       return (
-        <div className="home-root">  
+        <div className="home-root"> 
         <StockList user={this.props.user} userID={this.props.userID} />
         </div>
       )

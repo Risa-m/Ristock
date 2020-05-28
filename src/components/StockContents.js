@@ -1,17 +1,20 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import firebase, { db } from '../firebase'
+import firebase, { db, storage } from '../firebase'
+import './components.css'
 
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 
+import Fab from "@material-ui/core/Fab";
+import AddPhotoAlternateIcon from "@material-ui/icons/AddPhotoAlternate";
 
 
 export class StockContents extends React.Component{
   constructor(props){
     super(props)
-    
+
     this.state = {
       item_id: props.item_id,
       data: null,
@@ -25,6 +28,9 @@ export class StockContents extends React.Component{
       price: 0,
       lotSize: 0,
       category: "",
+
+      image: null,
+      image_src: null,
     }
   }
 
@@ -104,6 +110,16 @@ export class StockContents extends React.Component{
     this.props.handleClose(this.state)
   }
 
+  handleImage = event => {
+    const image = event.target.files[0];
+    console.log(image)
+    var createObjectURL = (window.URL || window.webkitURL).createObjectURL || window.createObjectURL;
+
+    const image_url = createObjectURL(image);
+
+    this.setState({image: image, image_src: image_url})
+  };
+
   gridTemplate = () => {  
     return (
       <form className="stock-form" noValidate autoComplete="off">
@@ -131,7 +147,27 @@ export class StockContents extends React.Component{
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <TextField id="standard-basic" value={this.state.category} label="カテゴリー" onChange={this.handleChanege.bind(this, "category")}/> 
-        </Grid>          
+        </Grid>
+        <Grid item xs={12} sm={6}>
+        <input
+            accept="image/*"
+            id="contained-button-file"
+            multiple
+            type="file"
+            className="image-input"
+            onChange={this.handleImage}
+          />
+          <label htmlFor="contained-button-file">
+            {//<Fab component="span" >
+            <Button variant="contained" color="primary" component="span">
+              Upload
+              <AddPhotoAlternateIcon />
+            </Button>
+            //</Fab>
+            }
+          </label>
+          <img src={this.state.image_src} height="50" style={{position: "10px" ,padding: "5px"}}/>
+        </Grid>
       </Grid>
       </form>
     )
@@ -149,7 +185,7 @@ export class StockContents extends React.Component{
       <div className="add-stock-submit-button">
         <Button variant="outlined" onClick={this.handleAddSubmit.bind(this)}>Save</Button>
       </div>
-    </div> 
+    </div>
     )
     }
 
