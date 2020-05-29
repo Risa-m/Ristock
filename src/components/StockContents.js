@@ -6,6 +6,11 @@ import './components.css'
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
+import MenuItem from '@material-ui/core/MenuItem';
+
+import IconButton from '@material-ui/core/IconButton';
+import AddIcon from '@material-ui/icons/Add';
+import DoneIcon from '@material-ui/icons/Done';
 
 import Fab from "@material-ui/core/Fab";
 import AddPhotoAlternateIcon from "@material-ui/icons/AddPhotoAlternate";
@@ -32,6 +37,10 @@ export class StockContents extends React.Component{
 
       local_image: null,
       local_image_src: null,
+
+      isAddCategoryOpen: false,
+      addCategory: "",
+      category_list: [],
     }
   }
 
@@ -71,16 +80,19 @@ export class StockContents extends React.Component{
 
   // update されたとき、DBを更新してモーダルに通知
   async handleUpdateSubmit(event){
-    let storageRef = firebase.storage().ref().child(`users/${this.props.userID}/${this.state.item_id}.jpg`);
-    await storageRef.put(this.state.local_image)
-    .then(snapshot => {
-      snapshot.ref.getDownloadURL().then(url => {
-        // エラーが出る？
-        //this.setState({ image_url: url })
-      })
-    });
+    // 画像ファイルの保存
+    if(this.state.local_image){
+      let storageRef = firebase.storage().ref().child(`users/${this.props.userID}/${this.state.item_id}.jpg`);
+      await storageRef.put(this.state.local_image)
+      .then(snapshot => {
+        snapshot.ref.getDownloadURL().then(url => {
+          // エラーが出る？
+          //this.setState({ image_url: url })
+        })
+      });  
+    }
 
-
+    // DBの参照
     let itemRef = db.collection('users')
     .doc(this.props.userID)
     .collection('stock_items')
@@ -95,7 +107,7 @@ export class StockContents extends React.Component{
       price: this.state.price,
       lotSize: this.state.lotSize,
       category: this.state.category,
-      image_url: this.state.image_url,
+      //image_url: this.state.image_url,
     }).then(ref => {
       console.log('Updated document : ', ref);
     });
@@ -122,18 +134,30 @@ export class StockContents extends React.Component{
       console.log('Added document with ID: ', ref.id);
       this.setState({item_id: ref.id})
 
-      let storageRef = firebase.storage().ref().child(`users/${this.props.userID}/${this.state.item_id}.jpg`);
-      storageRef.put(this.state.local_image)
-      .then(snapshot => {
-          snapshot.ref.getDownloadURL().then(url => {
-            addDoc.doc(ref.id).set({image_url: url}, { merge: true });
-            // エラーが出る
-            //this.setState({image_url: url})
-          })
-     });
+      if(this.state.local_image){
+        let storageRef = firebase.storage().ref().child(`users/${this.props.userID}/${this.state.item_id}.jpg`);
+        storageRef.put(this.state.local_image)
+        .then(snapshot => {
+            snapshot.ref.getDownloadURL().then(url => {
+              addDoc.doc(ref.id).set({image_url: url}, { merge: true });
+              // エラーが出る
+              //this.setState({image_url: url})
+            })
+       });          
+      }
     });
 
     this.props.handleClose(this.state)
+  }
+
+  addCategoryOpen(){
+    this.setState({isAddCategoryOpen: true})
+  }
+
+  addCategory(){
+    let new_list = this.state.category_list.slice()
+    new_list.push(this.state.addCategory)
+    this.setState({isAddCategoryOpen: false, category_list: new_list})
   }
 
   handleImage = event => {
@@ -170,7 +194,36 @@ export class StockContents extends React.Component{
           <TextField id="standard-number" type="number" value={this.state.lotSize} label="入り数" onChange={this.handleChanege.bind(this, "lotSize")} InputLabelProps={{shrink: true,}}/> 
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <TextField id="standard-basic" value={this.state.category} label="カテゴリー" onChange={this.handleChanege.bind(this, "category")}/> 
+          {
+        <TextField
+          id="standard-select"
+          select
+          label="Select"
+          value={this.state.category}
+          onChange={this.handleChanege.bind(this, "category")}
+          helperText="カテゴリー"
+        >
+          {this.state.category_list.map((category, idx) => (
+            <MenuItem key={idx} value={category}>
+              {category}
+            </MenuItem>
+          ))}
+        </TextField>
+        }
+          {(this.state.isAddCategoryOpen)?
+          <>
+          <TextField id="standard-basic" value={this.state.addCategory} label="add category" onChange={this.handleChanege.bind(this, "addCategory")}/>
+          <IconButton aria-label="add-category" onClick={this.addCategory.bind(this)}>
+            <DoneIcon fontSize="small" />
+            {console.log("isAddCategoryOpen")}
+          </IconButton>
+          </>
+          :
+          <IconButton aria-label="add-category" onClick={this.addCategoryOpen.bind(this)}>
+            <AddIcon fontSize="small" />
+            {console.log("isAddCategoryOpen")}
+          </IconButton>
+          }
         </Grid>
         <Grid item xs={12} sm={6}>
         <input
@@ -181,13 +234,10 @@ export class StockContents extends React.Component{
             onChange={this.handleImage}
           />
           <label htmlFor="contained-button-file">
-            {//<Fab component="span" >
             <Button variant="contained" color="primary" component="span">
               Upload
               <AddPhotoAlternateIcon />
             </Button>
-            //</Fab>
-            }
           </label>
           <img src={this.state.local_image_src} height="50" style={{position: "10px" ,padding: "5px"}}/>
         </Grid>

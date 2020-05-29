@@ -24,6 +24,7 @@ import AddIcon from '@material-ui/icons/Add';
 import ImageIcon from '@material-ui/icons/Image';
 import ViewListIcon from '@material-ui/icons/ViewList';
 import SettingsIcon from '@material-ui/icons/Settings';
+import CategoryIcon from '@material-ui/icons/Category';
 
 export class StockList extends React.Component{ 
   constructor(props){
@@ -43,9 +44,8 @@ export class StockList extends React.Component{
     await this.getDocs()
   }
 
-  // Note: state update
+  // Note: state update but not render
   async getUserData(){
-    console.log("[StockList] getUserdata")
     this.state.isUserDataLoaded = true
     await this.getDocs()
   }
@@ -83,7 +83,6 @@ export class StockList extends React.Component{
   }
 
   addDoc(){
-    console.log("[Stock List] add")
     this.setState({addItem: true, modalopen: true})
   }
 
@@ -142,6 +141,12 @@ export class StockList extends React.Component{
         <IconButton className="stock-list-add-button" aria-label="setting" onClick={this.addDoc.bind(this)}>
           <AddIcon />
         </IconButton>
+
+        {/*
+        <IconButton className="stock-list-add-category-button" aria-label="setting" onClick={this.addCategory.bind(this)}>
+          <CategoryIcon />
+        </IconButton>
+        */}
       </div>
 
       <div className="stock-list-table">

@@ -68,7 +68,7 @@ class App extends React.Component {
     return (
     <BrowserRouter>
     <div className="App-root">
-      <div className="switch-view">
+      <div className="App-header">
         <div className="App-title">
           <Link to="/"><h1>Ristock</h1></Link>
         </div>
@@ -81,47 +81,24 @@ class App extends React.Component {
           <Link to="login" title="Sign in with Google Account">
             Login&nbsp;
             <p>with google</p>
-            {//<InputIcon fontSize="small" className="home-login-icon" />
-            }
           </Link>
-        }
+           }
+          </div>
         </div>
-
-      <Switch>
-        <Route exact path='/' render={props =><Home user={this.state.user} userID={this.state.userID}  {...props}/>} />
-
-        <Auth setUser={this.setUser} setUserID={this.setUserID}  {...this.props}>
-          <Switch>
-            <Route exact path='/login' render={props => <Login user={this.state.user} userID={this.state.userID} {...props}/>} />
-            {/*
-            <Route exact path='/stocks' render={props => <StockList user={this.state.user} userID={this.state.userID} {...props}/>} />
-            <Route exact path='/stocks/add' render={props => <AddStock user={this.state.user} userID={this.state.userID} {...props}/>} />
-            <Route exact path='/stocks/:id' render={props => <StockDetail user={this.state.user} userID={this.state.userID} match={props.match} {...props}/>} />
-            */}
-            <Route render={() => <p>not found.</p>}/>
-          </Switch>
-        </Auth>
-      </Switch>
+      <div className="switch-view">
+        <Switch>
+          <Route exact path='/' render={props =><Home user={this.state.user} userID={this.state.userID}  {...props}/>} />
+          <Auth setUser={this.setUser} setUserID={this.setUserID}  {...this.props}>
+            <Switch>
+              <Route exact path='/login' render={props => <Login user={this.state.user} userID={this.state.userID} {...props}/>} />
+              <Route render={() => <p>Sorry, page not found.</p>}/>
+            </Switch>
+          </Auth>
+        </Switch>
       </div>
-
-      {/*(this.state.user)? 
-      <BottomNavigation showLabels value={this.state.buttomNav} onChange={this.handleButtomNavChange} className="bottom-nav" >
-        <BottomNavigationAction label="Home" value="/" icon={<HomeIcon />} to="/" component={Link} />
-        <BottomNavigationAction label="Add" value="/stocks/add" icon={<AddIcon />} to="/stocks/add" component={Link} />
-        <BottomNavigationAction label="List" value="/stocks" icon={<ListIcon />} to="/stocks" component={Link} />
-        {
-          <BottomNavigationAction label="Logout" value="logout" color="secondary" icon={<ExitToAppIcon />} onClick={this.logout.bind(this)} to="/" component={Link}/>
-        }
-      </BottomNavigation>
-      :
-      /*
-      <BottomNavigation showLabels value={this.state.buttomNav} onChange={this.handleButtomNavChange} className="bottom-nav" >
-        <BottomNavigationAction label="Home" value="/" icon={<HomeIcon />} to="/" component={Link} />
-        <BottomNavigationAction label="Login" value="/login" icon={<InputIcon />} to="/login" component={Link} />
-      </BottomNavigation>
-      */
-       null
-      }
+      <div className="App-footer">
+           
+      </div>
     </div>
     </BrowserRouter>
     );

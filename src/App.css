@@ -42,3 +42,12 @@ a.MuiBottomNavigationAction-root{
 .App-login p {
   color: #a0a0a086;
 }
+
+.App-footer {
+  border-top: 1px #282c34;
+  background-color: rgba(255, 255, 255, 0.705);
+  height: 50px;
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+}
