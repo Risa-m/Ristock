@@ -15,6 +15,7 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
+import Grid from '@material-ui/core/Grid';
 
 import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -37,7 +38,8 @@ export class StockList extends React.Component{
       detailsItemID: null,
       detailsItem: null,
       addItem: false,
-      modalopen: false
+      modalopen: false,
+      visible: VisibleViewString.list
     }
   }
   async componentDidMount() {
@@ -118,38 +120,21 @@ export class StockList extends React.Component{
   }
 
   settingColumn(){
-
+    let currentView = this.state.visible
+    let viewNumber = Object.keys(VisibleViewString).length
+    if(currentView+1 < viewNumber){
+      this.setState({visible: (currentView+1)})      
+    }
+    else{
+      this.setState({visible: 0})
+    }
   }
 
 
-  // TODO: 写真の一覧形式とリスト形式
-  render(){
-
-    console.log(this.state)
-
-    if(!this.state.isUserDataLoaded && this.props.userID){
-      this.getUserData()
-    }
-
-    return (
-    <div className="stock-list-root">
-      <div className="stock-list-add-link">
-        <IconButton className="stock-list-add-button" aria-label="setting" onClick={this.settingColumn.bind(this)}>
-          <SettingsIcon />
-        </IconButton>
-
-        <IconButton className="stock-list-add-button" aria-label="setting" onClick={this.addDoc.bind(this)}>
-          <AddIcon />
-        </IconButton>
-
-        {/*
-        <IconButton className="stock-list-add-category-button" aria-label="setting" onClick={this.addCategory.bind(this)}>
-          <CategoryIcon />
-        </IconButton>
-        */}
-      </div>
-
-      <div className="stock-list-table">
+  listTemplate = (props) => {
+    if(props.visible){
+      return (
+        <div className="stock-list-table">
         <TableContainer component={Paper}>
           <Table aria-label="simple table">
             <TableHead>
@@ -198,6 +183,54 @@ export class StockList extends React.Component{
           </Table>
         </TableContainer>
       </div>
+      )  
+    }
+    else{
+      return null
+    }
+  }
+
+  imageTemplate = (props) => {
+    if(props.visible){
+      return(
+      <div className="stock-list-image">
+      <Grid container>
+        {this.state.list.map(item => (
+            <Grid item xs={4} sm={3} md={2} lg={1} key={item[0]} style={{marginBottom: "10px"}}>
+                <img src={item[1].image_url} width="80"  onClick={this.detailsDoc.bind(this, item[0])}/>
+            </Grid>
+        ))}
+      </Grid>
+    </div>
+      )
+    }
+    else{
+      return null
+    }
+
+  }
+
+
+  // TODO: 写真の一覧形式とリスト形式
+  render(){
+    if(!this.state.isUserDataLoaded && this.props.userID){
+      this.getUserData()
+    }
+
+    return (
+    <div className="stock-list-root">
+      <div className="stock-list-add-link">
+        <IconButton className="stock-list-add-button" aria-label="setting" onClick={this.settingColumn.bind(this)}>
+          <SettingsIcon />
+        </IconButton>
+
+        <IconButton className="stock-list-add-button" aria-label="setting" onClick={this.addDoc.bind(this)}>
+          <AddIcon />
+        </IconButton>
+
+      </div>
+      <this.listTemplate visible={this.state.visible===VisibleViewString.list} />
+      <this.imageTemplate visible={this.state.visible===VisibleViewString.image} />
 
       <div className="stock-list-details-modal">
       {((this.state.detailsItem && this.state.detailsItemID) || this.state.addItem)?
@@ -211,4 +244,10 @@ export class StockList extends React.Component{
     </div>
     )
   }
+}
+
+
+const VisibleViewString = {
+  list: 0,
+  image: 1,
 }

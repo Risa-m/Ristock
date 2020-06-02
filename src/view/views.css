@@ -18,6 +18,15 @@
   margin: auto;
   width: 70%;
 }
+
+.stock-list-image-item {
+  margin-bottom: 10px;
+}
+
+.stock-list-image img{
+  display: block;
+  margin: auto;
+}
 /*
 .MuiGrid-spacing-xs-3 {
   width: 100%;
