@@ -12,7 +12,6 @@ import IconButton from '@material-ui/core/IconButton';
 import AddIcon from '@material-ui/icons/Add';
 import DoneIcon from '@material-ui/icons/Done';
 
-import Fab from "@material-ui/core/Fab";
 import AddPhotoAlternateIcon from "@material-ui/icons/AddPhotoAlternate";
 
 
@@ -57,7 +56,7 @@ export class StockContents extends React.Component{
                       .collection('stock_items')
                       .doc(this.state.item_id)
       let doc = await itemRef.get()
-      await this.setState({data: doc.data()})
+      this.setState({data: doc.data()})
 
       this.setState({
         name: this.state.data.name,
@@ -78,19 +77,27 @@ export class StockContents extends React.Component{
     this.setState({ [property] : event.target.value})
   }
 
+
   // update されたとき、DBを更新してモーダルに通知
   async handleUpdateSubmit(event){
-    // 画像ファイルの保存
-    if(this.state.local_image){
-      let storageRef = firebase.storage().ref().child(`users/${this.props.userID}/${this.state.item_id}.jpg`);
-      await storageRef.put(this.state.local_image)
-      .then(snapshot => {
-        snapshot.ref.getDownloadURL().then(url => {
-          // エラーが出る？
-          //this.setState({ image_url: url })
-        })
-      });  
-    }
+    // 画像ファイルの保存    
+    const imageUploadPromise = new Promise((resolve, reject) => {
+      if(this.state.local_image){
+        let storageRef = firebase.storage().ref().child(`users/${this.props.userID}/${this.state.item_id}.jpg`);
+        storageRef.put(this.state.local_image)
+        .then(snapshot => {
+          snapshot.ref.getDownloadURL().then(url => {
+            this.setState({image_url: url})
+            resolve()
+          })
+        });
+      }
+      else{
+        resolve()
+      }
+    })
+    
+    await imageUploadPromise
 
     // DBの参照
     let itemRef = db.collection('users')
@@ -107,8 +114,9 @@ export class StockContents extends React.Component{
       price: this.state.price,
       lotSize: this.state.lotSize,
       category: this.state.category,
-      //image_url: this.state.image_url,
+      image_url: this.state.image_url,
     }).then(ref => {
+      // undefined
       console.log('Updated document : ', ref);
     });
 
@@ -120,7 +128,6 @@ export class StockContents extends React.Component{
   async handleAddSubmit(event){
 
     let addDoc = db.collection('users').doc(this.props.userID).collection('stock_items')
-
     await addDoc.add({
       name: this.state.name,
       modelNumber: this.state.modelNumber,
@@ -132,28 +139,38 @@ export class StockContents extends React.Component{
       category: this.state.category,
     }).then(ref => {
       console.log('Added document with ID: ', ref.id);
-      this.setState({item_id: ref.id})
-
+      this.setState({item_id: ref.id})  
+    });
+        
+    const imageUploadPromise = new Promise((resolve, reject) => {
       if(this.state.local_image){
         let storageRef = firebase.storage().ref().child(`users/${this.props.userID}/${this.state.item_id}.jpg`);
         storageRef.put(this.state.local_image)
         .then(snapshot => {
-            snapshot.ref.getDownloadURL().then(url => {
-              addDoc.doc(ref.id).set({image_url: url}, { merge: true });
-              // エラーが出る
-              //this.setState({image_url: url})
-            })
-       });          
+          snapshot.ref.getDownloadURL().then(url => {
+            addDoc.doc(this.state.item_id).set({image_url: url}, { merge: true });
+            this.setState({image_url: url})
+            resolve()
+          })
+        });
       }
-    });
+      else{
+        resolve()
+      }
+    })    
+    await imageUploadPromise
 
     this.props.handleClose(this.state)
   }
 
+  
   addCategoryOpen(){
     this.setState({isAddCategoryOpen: true})
   }
 
+
+  // カテゴリの扱い
+  // category_list : [[ Firestore ID, name ], ...]
   addCategory(){
     let new_list = this.state.category_list.slice()
     new_list.push(this.state.addCategory)
