@@ -40,6 +40,8 @@ export class StockContents extends React.Component{
       isAddCategoryOpen: false,
       addCategory: "",
       category_list: [],
+
+      submitButtonCheck: false,
     }
   }
 
@@ -80,6 +82,9 @@ export class StockContents extends React.Component{
 
   // update されたとき、DBを更新してモーダルに通知
   async handleUpdateSubmit(event){
+
+    this.setState({submitButtonCheck: true})
+
     // 画像ファイルの保存    
     const imageUploadPromise = new Promise((resolve, reject) => {
       if(this.state.local_image){
@@ -127,6 +132,8 @@ export class StockContents extends React.Component{
   // add されたとき、DBに追加してモーダルに通知
   async handleAddSubmit(event){
 
+    this.setState({submitButtonCheck: true})
+
     let addDoc = db.collection('users').doc(this.props.userID).collection('stock_items')
     await addDoc.add({
       name: this.state.name,
@@ -163,7 +170,6 @@ export class StockContents extends React.Component{
     this.props.handleClose(this.state)
   }
 
-  
   addCategoryOpen(){
     this.setState({isAddCategoryOpen: true})
   }
@@ -269,11 +275,11 @@ export class StockContents extends React.Component{
     if(this.props.userID && (!this.state.item_id || !this.state.data)){
       return (
       <div className="stock-add-root">
-      <p>Add </p>
-        {this.gridTemplate()}
+      <p></p>
+      <this.gridTemplate />
 
       <div className="add-stock-submit-button">
-        <Button variant="outlined" onClick={this.handleAddSubmit.bind(this)}>Save</Button>
+        <Button variant="outlined" onClick={this.handleAddSubmit.bind(this)} disabled={this.state.submitButtonCheck}>Save</Button>
       </div>
     </div>
     )
@@ -284,14 +290,14 @@ export class StockContents extends React.Component{
     if(this.props.userID && this.state.data){
       return (
         <div className="stock-detail-root">
-        <p>Details</p>
+        <p></p>
           {console.log("[Stock Contents] item_id: ",this.state.item_id)}  
           {console.log("[Stock Contents] data: ",this.state.data)}
 
-        {this.gridTemplate()}
+          <this.gridTemplate />
 
         <div className="update-stock-submit-button">
-          <Button variant="outlined" onClick={this.handleUpdateSubmit.bind(this)}>Save</Button>
+          <Button variant="outlined" onClick={this.handleUpdateSubmit.bind(this)} disabled={this.state.submitButtonCheck}>Save</Button>
         </div>
 
       </div> 
