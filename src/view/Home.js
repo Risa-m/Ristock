@@ -1,13 +1,7 @@
 import React from 'react'
 import { Link } from "react-router-dom";
-import firebase, { db } from '../firebase';
-import Button from '@material-ui/core/Button';
 import './views.css';
-
 import { StockList } from './StockList.js'
-
-import InputIcon from '@material-ui/icons/Input';
-import IconButton from '@material-ui/core/IconButton';
 
 export class Home extends React.Component {
 
@@ -21,16 +15,6 @@ export class Home extends React.Component {
   }
 
   render(){
-    console.log("[home] userID: ", this.props.userID)
-
-    if(this.props.user){
-      return (
-        <div className="home-root"> 
-        <StockList user={this.props.user} userID={this.props.userID} />
-        </div>
-      )
-    }else{
-
     return (
       <div className="home-root">
 
@@ -51,7 +35,7 @@ export class Home extends React.Component {
         </div>
       </div>
       )
-    }
+    
   }
 }
 

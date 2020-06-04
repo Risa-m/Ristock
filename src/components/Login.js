@@ -1,6 +1,5 @@
 import React from 'react';
 import { Redirect } from 'react-router-dom';
-import { Button } from '@material-ui/core';
 
 export class Login extends React.Component {
   constructor(props){
@@ -13,7 +12,7 @@ export class Login extends React.Component {
     }
     else{
       return (
-        <Redirect to="/"></Redirect>
+        <Redirect to="/stocks"></Redirect>
       )
     }
   }

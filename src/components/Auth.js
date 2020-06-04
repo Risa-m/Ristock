@@ -1,6 +1,4 @@
 import React from 'react';
-import { Redirect } from 'react-router-dom';
-import { Button } from '@material-ui/core';
 import firebase, { db } from '../firebase';
 import LoadingOverlay from 'react-loading-overlay';
 
@@ -112,7 +110,6 @@ class Auth extends React.Component {
                 <div style={{ height: '100vh', width: '100vw',   backgroundImage: `url("/image/top.jpg")` }}></div>
             </ LoadingOverlay>
               )
-            //return <p>please login. </p>
         }
     }
 }

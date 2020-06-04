@@ -1,12 +1,10 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import firebase, { db, storage } from '../firebase'
+import firebase, { db } from '../firebase'
 import './views.css';
 
-import { StockDetail } from './StockDetail'
-import { StockContents} from '../components/StockContents'
+import { StockContents } from '../components/StockContents'
 import ModalWrapper from '../components/ModalWrapper'
-import Button from '@material-ui/core/Button';
 
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -19,7 +17,6 @@ import Grid from '@material-ui/core/Grid';
 
 import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
-import CachedIcon from '@material-ui/icons/Cached';
 import AddIcon from '@material-ui/icons/Add';
 
 import ImageIcon from '@material-ui/icons/Image';

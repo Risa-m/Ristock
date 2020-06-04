@@ -1,6 +1,5 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
-import firebase, { db, storage } from '../firebase'
+import firebase, { db } from '../firebase'
 import './components.css'
 
 import TextField from '@material-ui/core/TextField';
