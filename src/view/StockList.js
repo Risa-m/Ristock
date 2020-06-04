@@ -153,7 +153,11 @@ export class StockList extends React.Component{
               {this.state.list.map(item => (
                 <TableRow key={item[0]}>
                   <TableCell component="th" scope="row">
+                    {(item[1].image_url)?
                     <img src={item[1].image_url} width="50"/>
+                    :
+                    <img src="image/no_image.png" width="50"/>
+                  }
                   </TableCell>
                   <TableCell align="right">{item[1].name}</TableCell>
                   <TableCell align="right">{item[1].modelNumber}</TableCell>
@@ -194,7 +198,11 @@ export class StockList extends React.Component{
       <Grid container>
         {this.state.list.map(item => (
             <Grid item xs={4} sm={3} md={2} lg={1} key={item[0]} style={{marginBottom: "10px"}}>
-                <img src={item[1].image_url} width="80"  onClick={this.detailsDoc.bind(this, item[0])}/>
+              {(item[1].image_url)?
+                <img src={item[1].image_url} width="80"  onClick={this.detailsDoc.bind(this, item[0])} alt={item[1].name}/>
+                :
+                <img src="image/no_image.png" width="80" onClick={this.detailsDoc.bind(this, item[0])} alt={item[1].name}/>
+              }
             </Grid>
         ))}
       </Grid>

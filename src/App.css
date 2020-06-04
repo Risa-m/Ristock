@@ -3,7 +3,8 @@
 }
 
 .App-root {
-  /*margin: 15px;*/
+  margin-left: 10px;
+  margin-right: 10px;
   color: #282c34;
   font-family: "M PLUS Rounded 1c";
 }
@@ -18,16 +19,8 @@
   font-family: "M PLUS Rounded 1c";
 }
 
-
-.bottom-nav{
-  margin: auto;
-	position: absolute;
-  bottom: 0;
-  width: 100%;
-}
-
-a.MuiBottomNavigationAction-root{
-  min-width: 50px;
+.switch-view {
+  min-height: calc(80vh - 20px);
 }
 
 .App-login {
@@ -39,6 +32,7 @@ a.MuiBottomNavigationAction-root{
   line-height: 0.3em;
   text-align: center;
 }
+
 .App-login p {
   color: #a0a0a086;
 }
@@ -48,6 +42,11 @@ a.MuiBottomNavigationAction-root{
   background-color: rgba(255, 255, 255, 0.705);
   height: 50px;
   width: 100%;
-  position: absolute;
+  position: relative;
   bottom: 0;
+}
+
+.copyright{
+  size: 0.8em;
+  text-align: center;
 }

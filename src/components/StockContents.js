@@ -294,8 +294,6 @@ export class StockContents extends React.Component{
       return (
         <div className="stock-detail-root">
         <p></p>
-          {console.log("[Stock Contents] item_id: ",this.state.item_id)}  
-          {console.log("[Stock Contents] data: ",this.state.data)}
 
           <this.gridTemplate />
 

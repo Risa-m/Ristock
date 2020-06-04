@@ -83,7 +83,7 @@ class App extends React.Component {
         </Switch>
       </div>
       <div className="App-footer">
-        
+        <p className="copyright">&copy; 2020 Risa-m</p>      
       </div>
     </div>
     </BrowserRouter>

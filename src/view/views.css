@@ -1,10 +1,4 @@
 
-/*
-.stock-list-add-button {
-  margin: 10px;
-  float: right;
-}
-*/
 .add-stock-submit-button {
   margin-top: 10px;
 }
@@ -27,10 +21,6 @@
   display: block;
   margin: auto;
 }
-/*
-.MuiGrid-spacing-xs-3 {
-  width: 100%;
-}*/
 
 .home-background {
   background-image: url("/image/top.jpg");
@@ -42,8 +32,7 @@
   z-index: -1;
   margin: auto;
   width: calc(100% - 0px);
-  height: calc(100vh - 100px);
-
+  height: calc(100vh - 180px);
 }
 
 .home-message {
