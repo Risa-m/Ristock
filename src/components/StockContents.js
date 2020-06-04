@@ -208,13 +208,13 @@ export class StockContents extends React.Component{
           <TextField id="standard-basic" value={this.state.color} label="色" onChange={this.handleChanege.bind(this, "color")}/> 
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <TextField id="standard-number" type="number" value={this.state.stockNumber} label="残数" onChange={this.handleChanege.bind(this, "stockNumber")} InputLabelProps={{shrink: true,}}/> 
+          <TextField id="standard-number" type="number" value={this.state.stockNumber} InputProps={{ inputProps: { min: 0} }} label="残数" onChange={this.handleChanege.bind(this, "stockNumber")} InputLabelProps={{shrink: true,}}/> 
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <TextField id="standard-number" type="number" value={this.state.price} label="価格" onChange={this.handleChanege.bind(this, "price")} InputLabelProps={{shrink: true,}}/> 
+          <TextField id="standard-number" type="number" value={this.state.price} label="価格" InputProps={{ inputProps: { min: 0} }} onChange={this.handleChanege.bind(this, "price")} InputLabelProps={{shrink: true,}}/> 
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <TextField id="standard-number" type="number" value={this.state.lotSize} label="入り数" onChange={this.handleChanege.bind(this, "lotSize")} InputLabelProps={{shrink: true,}}/> 
+          <TextField id="standard-number" type="number" value={this.state.lotSize} label="入り数" InputProps={{ inputProps: { min: 0} }} onChange={this.handleChanege.bind(this, "lotSize")} InputLabelProps={{shrink: true,}}/> 
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           {
@@ -262,6 +262,10 @@ export class StockContents extends React.Component{
               <AddPhotoAlternateIcon />
             </Button>
           </label>
+          {(this.state.image_url && !this.state.local_image_src)?
+          <img src={this.state.image_url} height="50" style={{position: "10px" ,padding: "5px"}}/>
+          :null
+          }
           <img src={this.state.local_image_src} height="50" style={{position: "10px" ,padding: "5px"}}/>
         </Grid>
       </Grid>
@@ -279,7 +283,7 @@ export class StockContents extends React.Component{
       <this.gridTemplate />
 
       <div className="add-stock-submit-button">
-        <Button variant="outlined" onClick={this.handleAddSubmit.bind(this)} disabled={this.state.submitButtonCheck}>Save</Button>
+        <Button variant="outlined" onClick={this.handleAddSubmit.bind(this)} disabled={!(this.state.name) || this.state.submitButtonCheck}>Save</Button>
       </div>
     </div>
     )
@@ -297,7 +301,7 @@ export class StockContents extends React.Component{
           <this.gridTemplate />
 
         <div className="update-stock-submit-button">
-          <Button variant="outlined" onClick={this.handleUpdateSubmit.bind(this)} disabled={this.state.submitButtonCheck}>Save</Button>
+          <Button variant="outlined" onClick={this.handleUpdateSubmit.bind(this)} disabled={!(this.state.name) || this.state.submitButtonCheck}>Save</Button>
         </div>
 
       </div> 
