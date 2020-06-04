@@ -2,6 +2,8 @@ import React from 'react'
 import firebase, { db } from '../firebase'
 import './components.css'
 
+import { resizeImage } from './ResizeImage';
+
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
@@ -182,6 +184,7 @@ export class StockContents extends React.Component{
     this.setState({isAddCategoryOpen: false, category_list: new_list})
   }
 
+  /*
   handleImage = event => {
     const image = event.target.files[0];
     console.log(image)
@@ -189,6 +192,16 @@ export class StockContents extends React.Component{
     const image_url = createObjectURL(image);
     this.setState({local_image: image, local_image_src: image_url})
   };
+  */
+
+  async imageChangeHandler(e) {
+    const { imageFile, imageUri } = await resizeImage(e, 512);
+    this.setState({
+      local_image: imageFile,
+      local_image_src: imageUri,
+    });
+    console.log(this.state.local_image)
+  }
 
   gridTemplate = () => {  
     return (
@@ -253,7 +266,7 @@ export class StockContents extends React.Component{
             id="contained-button-file"
             type="file"
             className="image-input"
-            onChange={this.handleImage}
+            onChange={e => this.imageChangeHandler(e)}
           />
           <label htmlFor="contained-button-file">
             <Button variant="contained" color="primary" component="span">
