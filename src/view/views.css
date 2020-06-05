@@ -8,6 +8,15 @@
   margin: auto;
 }
 
+.stock-list-root hr {
+  border-width: 1px 0px 0px 0px; /* 太さ */
+  border-style: solid; /* 線種 */
+  border-color: #DBBDCC;   /* 線色 */
+  height: 1px;         /* 高さ(※古いIE用) */
+  margin-bottom: 15px;
+}
+
+
 .add-stock-form .MuiTextField-root {
   margin: auto;
   width: 70%;
@@ -16,6 +25,11 @@
 .stock-list-root {
   margin-left: 10px;
   margin-right: 10px;
+}
+
+.stock-list-table .MuiTableHead-root {
+  font-size: small;
+  font-weight: 600;
 }
 
 .stock-list-image-item {
@@ -46,6 +60,20 @@
 .stock-list-categories .MuiChip-outlinedPrimary {
   color: #7c8993;
 }
+
+.stock-list-categories-show {
+  max-width: 95%;
+  margin: auto;
+}
+
+.stock-list-categories-expand {
+  text-align: left;
+}
+
+.stock-list-buttons {  
+  margin-left: 5px;
+}
+
 
 .home-background {
   background-image: url("/image/top.jpg");

@@ -55,7 +55,10 @@ class App extends React.Component {
     <div className="App-root">
       <div className="App-header">
         <div className="App-title">
-          <Link to="/"><h1>Ristock</h1></Link>
+          <Link to="/">
+            <h1>Ristock</h1>
+            <img src="logo512.png" className="App-title-logo" width="60"/>
+          </Link>
         </div>
         <div className="App-login">
           {(this.state.user)?

@@ -75,7 +75,7 @@ export class StockContents extends React.Component{
         price: this.state.data.price,
         lotSize: this.state.data.lotSize,
         category: this.state.data.category,
-        image_url: this.state.data.image_url,
+        image_url: this.state.data.image_url || "",
       })
     }
   }
@@ -128,7 +128,7 @@ export class StockContents extends React.Component{
       image_url: this.state.image_url,
     }).then(ref => {
       // undefined
-      console.log('Updated document : ', ref);
+      //console.log('Updated document : ', ref);
     });
 
     this.props.handleClose(this.state)
@@ -151,7 +151,7 @@ export class StockContents extends React.Component{
       lotSize: this.state.lotSize,
       category: this.state.category,
     }).then(ref => {
-      console.log('Added document with ID: ', ref.id);
+      //console.log('Added document with ID: ', ref.id);
       this.setState({item_id: ref.id})  
     });
         
@@ -180,14 +180,14 @@ export class StockContents extends React.Component{
     this.setState({isAddCategoryOpen: true})
   }
 
-  addCategory(){
+  addCategoryHandler(){
     if(this.state.addCategoryText !== ""){
       let new_list = this.state.category_list.slice()
       new_list.push(this.state.addCategoryText)
-      this.setState({isAddCategoryOpen: false, })
+      this.setState({isAddCategoryOpen: false})
   
       if(new_list.length <= MAX_CATEGORY_SIZE){
-        this.setState({category_list: new_list})
+        this.setState({category_list: new_list, category: this.state.addCategoryText})
         var categoryRef = db.collection('users').doc(this.props.userID)
         categoryRef.update({
             category: firebase.firestore.FieldValue.arrayUnion(this.state.addCategoryText)
@@ -202,7 +202,6 @@ export class StockContents extends React.Component{
       local_image: imageFile,
       local_image_src: imageUri,
     });
-    console.log(this.state.local_image)
   }
 
   gridTemplate = () => {  
@@ -235,8 +234,8 @@ export class StockContents extends React.Component{
           {(this.state.isAddCategoryOpen)?
           <div className="stock-form-category-add">
           {/* カテゴリ追加 */}
-          <TextField id="standard-basic" className="stock-form-category-add-text" value={this.state.addCategory} label="Add Category" InputProps={{ inputProps: { maxLength: MAX_TEXT_INPUT_LENGTH} }} onChange={this.handleChanege.bind(this, "addCategory")}/>
-          <IconButton aria-label="add-category" className="stock-form-category-add-button" onClick={this.addCategory.bind(this)}>
+          <TextField id="standard-basic" className="stock-form-category-add-text" value={this.state.addCategoryText} label="Add Category" InputProps={{ inputProps: { maxLength: MAX_TEXT_INPUT_LENGTH} }} onChange={this.handleChanege.bind(this, "addCategoryText")}/>
+          <IconButton aria-label="add-category" className="stock-form-category-add-button" onClick={this.addCategoryHandler.bind(this)}>
             <DoneIcon fontSize="small" />
           </IconButton>
           <IconButton aria-label="add-category" className="stock-form-category-add-button" onClick={e => {this.setState({isAddCategoryOpen: false})}}>
@@ -283,10 +282,10 @@ export class StockContents extends React.Component{
             </Button>
           </label>
           {(this.state.image_url && !this.state.local_image_src)?
-          <img src={this.state.image_url} height="50" style={{position: "10px" ,padding: "5px"}}/>
-          :null
-          }
-          <img src={this.state.local_image_src} height="50" style={{position: "10px" ,padding: "5px"}}/>
+          <img src={this.state.image_url} className="stock-form-image-show"/>
+          :(this.state.local_image_src)?
+          <img src={this.state.local_image_src} className="stock-form-image-show"/>
+          :null}
         </Grid>
       </Grid>
       </form>

@@ -19,6 +19,8 @@ import Chip from '@material-ui/core/Chip';
 import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
 import AddIcon from '@material-ui/icons/Add';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 
 import ImageIcon from '@material-ui/icons/Image';
 import ViewListIcon from '@material-ui/icons/ViewList';
@@ -37,6 +39,7 @@ export class StockList extends React.Component{
       data_list: [],
       show_list: [],
       category_list: [" "],
+      isCategoryShow: true,
       selectedCategory: "all",
       detailsItemID: null,
       detailsItem: null,
@@ -69,7 +72,6 @@ export class StockList extends React.Component{
       let snapshots = await colRef.get()
       let docs = snapshots.docs.map(doc => [doc.id, doc.data()])
       this.setState({data_list: docs, show_list : docs, category_list: categoryList}) 
-      console.log(categoryList)
     }
   }
 
@@ -77,8 +79,8 @@ export class StockList extends React.Component{
     if(this.props.userID){
       let delete_item = this.state.data_list.filter(value => value[0] === docID)[0]
       if(delete_item[1]){
-        var desertRef = firebase.storage().ref().child(`users/${this.props.userID}/${docID}.jpg`);
-        desertRef.delete()//.then(ref => {console.log("delete image ", docID)}).catch(error => {console.log("failed to delete image")});
+        var deleteRef = firebase.storage().ref().child(`users/${this.props.userID}/${docID}.jpg`);
+        deleteRef.delete()
       }
       let deleteDoc = db.collection('users').doc(this.props.userID).collection('stock_items').doc(docID).delete();
       let newDataList = this.state.data_list.filter(value => value[0] !== docID)
@@ -218,11 +220,11 @@ export class StockList extends React.Component{
       <div className="stock-list-image">
       <Grid container>
         {this.state.show_list.map(item => (
-            <Grid item xs={4} sm={3} md={2} lg={1} key={item[0]} style={{marginBottom: "10px"}}>
+            <Grid item xs={4} sm={2} md={1} key={item[0]} style={{marginBottom: "10px"}}>
               {(item[1].image_url)?
-                <img src={item[1].image_url} width="80"  onClick={this.detailsDoc.bind(this, item[0])} alt={item[1].name}/>
+                <img src={item[1].image_url} width="80%" onClick={this.detailsDoc.bind(this, item[0])} alt={item[1].name}/>
                 :
-                <img src="image/no_image.png" width="80" onClick={this.detailsDoc.bind(this, item[0])} alt={item[1].name}/>
+                <img src="image/no_image.png" width="80%" onClick={this.detailsDoc.bind(this, item[0])} alt={item[1].name}/>
               }
               <p>{item[1].name}</p>
               <p>のこり：{item[1].stockNumber}</p>
@@ -245,8 +247,41 @@ export class StockList extends React.Component{
 
     return (
     <div className="stock-list-root">
-      <div className="stock-list-add-link">
-        <IconButton className="stock-list-add-button" aria-label="setting" onClick={this.settingColumn.bind(this)}>
+
+      <div className="stock-list-categories">
+        {(this.state.isCategoryShow)?
+        <>
+        <div className="stock-list-categories-show">
+          {this.state.category_list.map((val, idx) => (
+          (val)?
+          <Chip label={val} variant={this.state.selectedCategory === val ? "default":"outlined"} key={idx} color="primary" onClick={this.handleCategorySelect.bind(this, val)} />
+          :
+          <Chip label="No category" variant={this.state.selectedCategory === " " ? "default":"outlined"} key={idx} onClick={this.handleCategorySelect.bind(this, val)} />
+          ))}
+          <Chip label="All Category" variant={this.state.data_list.length===this.state.show_list.length? "default":"outlined"} key={-1} onClick={this.handleCategorySelectAll.bind(this)} />
+          </div>
+          {/*
+          <div className="stock-list-categories-expand" >
+            <ExpandLessIcon onClick={e => this.setState({isCategoryShow: false})}/>
+          </div>
+          */}
+        </>
+        :
+        <>
+        <div className="stock-list-categories-show">
+          <Chip label="All Categories" variant={this.state.data_list.length===this.state.show_list.length? "default":"outlined"} key={-1} onClick={this.handleCategorySelectAll.bind(this)} />
+        </div>
+        <div className="stock-list-categories-expand">
+          <ExpandMoreIcon className="stock-list-categories-expand" onClick={e => this.setState({isCategoryShow: true})}/>
+        </div>
+        </>
+        }
+
+      </div>
+
+
+      <div className="stock-list-buttons">
+        <IconButton className="stock-list-setting-button" aria-label="setting" onClick={this.settingColumn.bind(this)}>
           {(this.state.visible === VisibleViewString.image)?
           <ListIcon />
           :
@@ -257,21 +292,12 @@ export class StockList extends React.Component{
           }
         </IconButton>
 
-        <IconButton className="stock-list-add-button" aria-label="setting" onClick={this.addDoc.bind(this)}>
+        <IconButton className="stock-list-add-button" aria-label="add" onClick={this.addDoc.bind(this)}>
           <AddIcon />
         </IconButton>
 
       </div>
 
-      <div className="stock-list-categories">
-        {this.state.category_list.map((val, idx) => (
-          (val)?
-          <Chip label={val} variant={this.state.selectedCategory === val ? "default":"outlined"} key={idx} color="primary" onClick={this.handleCategorySelect.bind(this, val)} />
-          :
-          <Chip label="No category" variant={this.state.selectedCategory === " " ? "default":"outlined"} key={idx} onClick={this.handleCategorySelect.bind(this, val)} />
-          ))}
-          <Chip label="All" variant={this.state.data_list.length===this.state.show_list.length? "default":"outlined"} key={-1} onClick={this.handleCategorySelectAll.bind(this)} />
-      </div>
 
 
       <this.listTemplate visible={this.state.visible===VisibleViewString.list} />

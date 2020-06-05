@@ -15,3 +15,9 @@
 .stock-form-category-add-button {
   width: 20%;
 }
+
+.stock-form-image-show{
+  height: 50px;
+  padding: 10px;
+  vertical-align: middle;
+}

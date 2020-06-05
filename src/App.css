@@ -13,14 +13,29 @@
 }
 
 .App-title {
-  color: #7c8993;
+  /*color: #7c8993;*/
+  color: #7f3762;
   text-align: center;
   font-family: "M PLUS Rounded 1c";
+  margin-top: 10px;
+}
+
+.App-title h1 {
+  display: inline-block;
+  margin-top: 10px;
+  margin-bottom: 15px;
+  transform: translateX(20px);
+}
+
+.App-title-logo {
+  display: inline-block;
+  vertical-align: text-bottom;
+  transform: translateX(20px);
 }
 
 .App-title a {
-  color: #7c8993;
-
+  /*color: #7c8993;*/
+  color: #7f3762;
 }
 
 .switch-view {
