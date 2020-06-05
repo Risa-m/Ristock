@@ -14,6 +14,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
+import Chip from '@material-ui/core/Chip';
 
 import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -23,6 +24,9 @@ import ImageIcon from '@material-ui/icons/Image';
 import ViewListIcon from '@material-ui/icons/ViewList';
 import SettingsIcon from '@material-ui/icons/Settings';
 import CategoryIcon from '@material-ui/icons/Category';
+import ListIcon from '@material-ui/icons/List';
+
+const MAX_USER_ITEMS = 1000
 
 export class StockList extends React.Component{ 
   constructor(props){
@@ -31,12 +35,13 @@ export class StockList extends React.Component{
     this.state = {
       isUserDataLoaded: false,
       list: [],
-      category_list: [],
+      show_list: [],
+      category_list: [""],
       detailsItemID: null,
       detailsItem: null,
       addItem: false,
       modalopen: false,
-      visible: VisibleViewString.list
+      visible: VisibleViewString.image
     }
   }
   componentDidMount() {
@@ -55,14 +60,14 @@ export class StockList extends React.Component{
     if(this.props.userID){
       var categoryRef = db.collection('users').doc(this.props.userID)
       let categoryDoc = await categoryRef.get()
-      let categoryList = (categoryDoc.data()).category || []
+      let categoryList = (categoryDoc.data()).category || [""]
   
       let colRef = db.collection('users')
                       .doc(this.props.userID)
                       .collection('stock_items')
       let snapshots = await colRef.get()
       let docs = snapshots.docs.map(doc => [doc.id, doc.data()])
-      this.setState({list : docs, category_list: categoryList}) 
+      this.setState({list: docs, show_list : docs, category_list: categoryList}) 
       console.log(categoryList)
     }
   }
@@ -132,6 +137,16 @@ export class StockList extends React.Component{
       this.setState({visible: 0})
     }
   }
+  handleCategorySelectAll() {
+    this.setState({show_list: this.state.list})
+  }
+
+  handleCategorySelect(val) {
+    let selected_list = this.state.list.filter(value => {
+      return value[1].category === val
+    })
+    this.setState({show_list: selected_list})
+  }
 
 
   listTemplate = (props) => {
@@ -156,7 +171,7 @@ export class StockList extends React.Component{
               </TableRow>
             </TableHead>
             <TableBody>
-              {this.state.list.map(item => (
+              {this.state.show_list.map(item => (
                 <TableRow key={item[0]}>
                   <TableCell component="th" scope="row">
                     {(item[1].image_url)?
@@ -202,13 +217,15 @@ export class StockList extends React.Component{
       return(
       <div className="stock-list-image">
       <Grid container>
-        {this.state.list.map(item => (
+        {this.state.show_list.map(item => (
             <Grid item xs={4} sm={3} md={2} lg={1} key={item[0]} style={{marginBottom: "10px"}}>
               {(item[1].image_url)?
                 <img src={item[1].image_url} width="80"  onClick={this.detailsDoc.bind(this, item[0])} alt={item[1].name}/>
                 :
                 <img src="image/no_image.png" width="80" onClick={this.detailsDoc.bind(this, item[0])} alt={item[1].name}/>
               }
+              <p>{item[1].name}</p>
+              <p>のこり：{item[1].stockNumber}</p>
             </Grid>
         ))}
       </Grid>
@@ -230,7 +247,14 @@ export class StockList extends React.Component{
     <div className="stock-list-root">
       <div className="stock-list-add-link">
         <IconButton className="stock-list-add-button" aria-label="setting" onClick={this.settingColumn.bind(this)}>
+          {(this.state.visible === VisibleViewString.image)?
+          <ListIcon />
+          :
+          (this.state.visible === VisibleViewString.list)?
+          <ImageIcon />
+          :
           <SettingsIcon />
+          }
         </IconButton>
 
         <IconButton className="stock-list-add-button" aria-label="setting" onClick={this.addDoc.bind(this)}>
@@ -238,11 +262,23 @@ export class StockList extends React.Component{
         </IconButton>
 
       </div>
+
+      <div className="stock-list-categories">
+      {this.state.category_list.map((val, idx) => (
+        (val)?
+        <Chip label={val} variant="outlined" key={idx} color="primary" onClick={this.handleCategorySelect.bind(this, val)} />
+        :
+        <Chip label="No category" variant="outlined" key={idx} onClick={this.handleCategorySelect.bind(this, val)} />
+      ))}
+        <Chip label="All" variant="outlined" key={-1} onClick={this.handleCategorySelectAll.bind(this)} />
+      </div>
+
+
       <this.listTemplate visible={this.state.visible===VisibleViewString.list} />
       <this.imageTemplate visible={this.state.visible===VisibleViewString.image} />
 
       <div className="stock-list-details-modal">
-      {((this.state.detailsItem && this.state.detailsItemID) || this.state.addItem)?
+      {((this.state.detailsItem && this.state.detailsItemID) || (this.state.addItem && this.state.list.length <= MAX_USER_ITEMS))?
       <ModalWrapper
       open={this.state.modalopen}
       handleClose={this.handleClose.bind(this)}

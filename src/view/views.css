@@ -26,6 +26,17 @@
   display: block;
   margin: auto;
 }
+.stock-list-image p {
+  text-align: center;
+  line-height: 0.5em;
+  size: 0.8em;
+}
+
+.stock-list-categories {
+  margin: auto;
+  margin-top: 10x;
+  margin-bottom: 10px;
+}
 
 .home-background {
   background-image: url("/image/top.jpg");

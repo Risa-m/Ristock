@@ -16,6 +16,10 @@ import DoneIcon from '@material-ui/icons/Done';
 import AddPhotoAlternateIcon from "@material-ui/icons/AddPhotoAlternate";
 
 
+const MAX_CATEGORY_SIZE = 100
+const MAX_TEXT_INPUT_LENGTH = 20
+const IMAGE_MAX_SIZE = 512
+
 export class StockContents extends React.Component{
   constructor(props){
     super(props)
@@ -39,7 +43,7 @@ export class StockContents extends React.Component{
       local_image_src: null,
 
       isAddCategoryOpen: false,
-      addCategory: "",
+      addCategoryText: "",
       category_list: this.props.category_list,
 
       submitButtonCheck: false,
@@ -176,18 +180,23 @@ export class StockContents extends React.Component{
   }
 
   addCategory(){
-    let new_list = this.state.category_list.slice()
-    new_list.push(this.state.addCategory)
-    this.setState({isAddCategoryOpen: false, category_list: new_list})
-
-    var categoryRef = db.collection('users').doc(this.props.userID)
-    categoryRef.update({
-        category: firebase.firestore.FieldValue.arrayUnion(this.state.addCategory)
-    });
+    if(this.state.addCategoryText !== ""){
+      let new_list = this.state.category_list.slice()
+      new_list.push(this.state.addCategoryText)
+      this.setState({isAddCategoryOpen: false, })
+  
+      if(new_list.length <= MAX_CATEGORY_SIZE){
+        this.setState({category_list: new_list})
+        var categoryRef = db.collection('users').doc(this.props.userID)
+        categoryRef.update({
+            category: firebase.firestore.FieldValue.arrayUnion(this.state.addCategoryText)
+        });
+      }  
+    }
   }
 
   async imageChangeHandler(e) {
-    const { imageFile, imageUri } = await resizeImage(e, 512);
+    const { imageFile, imageUri } = await resizeImage(e, IMAGE_MAX_SIZE);
     this.setState({
       local_image: imageFile,
       local_image_src: imageUri,
@@ -200,16 +209,16 @@ export class StockContents extends React.Component{
       <form className="stock-form" noValidate autoComplete="off">
       <Grid container spacing={3}>
         <Grid item xs={12} sm={6} md={3}>
-          <TextField id="standard-basic" value={this.state.name} label="名前" onChange={this.handleChanege.bind(this, "name")}/> 
+          <TextField id="standard-basic" value={this.state.name} InputProps={{ inputProps: { maxLength: MAX_TEXT_INPUT_LENGTH} }} label="名前" onChange={this.handleChanege.bind(this, "name")}/> 
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <TextField id="standard-basic" value={this.state.modelNumber} label="型番" onChange={this.handleChanege.bind(this, "modelNumber")}/> 
+          <TextField id="standard-basic" value={this.state.modelNumber} InputProps={{ inputProps: { maxLength: MAX_TEXT_INPUT_LENGTH} }} label="型番" onChange={this.handleChanege.bind(this, "modelNumber")}/> 
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <TextField id="standard-basic" value={this.state.size} label="サイズ" onChange={this.handleChanege.bind(this, "size")}/> 
+          <TextField id="standard-basic" value={this.state.size} InputProps={{ inputProps: { maxLength: MAX_TEXT_INPUT_LENGTH} }} label="サイズ" onChange={this.handleChanege.bind(this, "size")}/> 
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <TextField id="standard-basic" value={this.state.color} label="色" onChange={this.handleChanege.bind(this, "color")}/> 
+          <TextField id="standard-basic" value={this.state.color} InputProps={{ inputProps: { maxLength: MAX_TEXT_INPUT_LENGTH} }} label="色" onChange={this.handleChanege.bind(this, "color")}/> 
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <TextField id="standard-number" type="number" value={this.state.stockNumber} InputProps={{ inputProps: { min: 0} }} label="残数" onChange={this.handleChanege.bind(this, "stockNumber")} InputLabelProps={{shrink: true,}}/> 
@@ -225,10 +234,9 @@ export class StockContents extends React.Component{
         <TextField
           id="standard-select"
           select
-          label="Select"
+          label="カテゴリー"
           value={this.state.category}
           onChange={this.handleChanege.bind(this, "category")}
-          helperText="カテゴリー"
         >
           {this.state.category_list.map((category, idx) => (
             <MenuItem key={idx} value={category}>
