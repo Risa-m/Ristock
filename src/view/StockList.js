@@ -31,6 +31,7 @@ export class StockList extends React.Component{
     this.state = {
       isUserDataLoaded: false,
       list: [],
+      category_list: [],
       detailsItemID: null,
       detailsItem: null,
       addItem: false,
@@ -52,12 +53,17 @@ export class StockList extends React.Component{
 
   async getDocs(){
     if(this.props.userID){
+      var categoryRef = db.collection('users').doc(this.props.userID)
+      let categoryDoc = await categoryRef.get()
+      let categoryList = (categoryDoc.data()).category || []
+  
       let colRef = db.collection('users')
                       .doc(this.props.userID)
                       .collection('stock_items')
       let snapshots = await colRef.get()
       let docs = snapshots.docs.map(doc => [doc.id, doc.data()])
-      this.setState({list : docs})      
+      this.setState({list : docs, category_list: categoryList}) 
+      console.log(categoryList)
     }
   }
 
@@ -73,7 +79,7 @@ export class StockList extends React.Component{
       this.setState({list: newList})
     }
   }
-  
+
   detailsDoc(docID){
     console.log("[Stock List] details docID",docID)
     let searchItem = this.state.list.filter(value => {
@@ -91,7 +97,7 @@ export class StockList extends React.Component{
       detailsItemID: null,
       detailsItem: null,
       addItem: false,
-      modalopen: false
+      modalopen: false,
     })
   }
 
@@ -112,8 +118,7 @@ export class StockList extends React.Component{
         }
       })  
     }
-    console.log("[Stock List] newList: ",newList)
-    this.setState({list: newList})
+    this.setState({list: newList, category_list: props.category_list})
     this.handleClose()
   }
 
@@ -241,7 +246,7 @@ export class StockList extends React.Component{
       <ModalWrapper
       open={this.state.modalopen}
       handleClose={this.handleClose.bind(this)}
-      content={<StockContents item_id={this.state.detailsItemID} userID={this.props.userID} handleClose={this.handleSubmitClose.bind(this)}/>}
+      content={<StockContents item_id={this.state.detailsItemID} userID={this.props.userID} category_list={this.state.category_list} handleClose={this.handleSubmitClose.bind(this)}/>}
      />:null
        }
        </div>

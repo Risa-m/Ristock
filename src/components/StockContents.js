@@ -40,7 +40,7 @@ export class StockContents extends React.Component{
 
       isAddCategoryOpen: false,
       addCategory: "",
-      category_list: [],
+      category_list: this.props.category_list,
 
       submitButtonCheck: false,
     }
@@ -175,24 +175,16 @@ export class StockContents extends React.Component{
     this.setState({isAddCategoryOpen: true})
   }
 
-
-  // カテゴリの扱い
-  // category_list : [[ Firestore ID, name ], ...]
   addCategory(){
     let new_list = this.state.category_list.slice()
     new_list.push(this.state.addCategory)
     this.setState({isAddCategoryOpen: false, category_list: new_list})
-  }
 
-  /*
-  handleImage = event => {
-    const image = event.target.files[0];
-    console.log(image)
-    var createObjectURL = (window.URL || window.webkitURL).createObjectURL || window.createObjectURL;
-    const image_url = createObjectURL(image);
-    this.setState({local_image: image, local_image_src: image_url})
-  };
-  */
+    var categoryRef = db.collection('users').doc(this.props.userID)
+    categoryRef.update({
+        category: firebase.firestore.FieldValue.arrayUnion(this.state.addCategory)
+    });
+  }
 
   async imageChangeHandler(e) {
     const { imageFile, imageUri } = await resizeImage(e, 512);
