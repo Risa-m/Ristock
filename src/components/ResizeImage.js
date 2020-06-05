@@ -18,13 +18,14 @@ const toBlob = (base64, reject) => {
   }
 }
 
-export const resizeImage = (event, maxWidth = 1024) => {
+export const resizeImage = (event, maxSize = 1024) => {
   return new Promise((resolve, reject) => {
     const file = event.target.files[0];
 
     loadImage.parseMetaData(file, (data) => {
       const options = {
-        maxWidth,
+        maxWidth: maxSize,
+        maxHeight: maxSize,
         canvas: true,
       };
       if (data.exif) {

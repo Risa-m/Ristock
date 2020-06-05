@@ -250,13 +250,11 @@ export class StockContents extends React.Component{
           <TextField id="standard-basic" value={this.state.addCategory} label="add category" onChange={this.handleChanege.bind(this, "addCategory")}/>
           <IconButton aria-label="add-category" onClick={this.addCategory.bind(this)}>
             <DoneIcon fontSize="small" />
-            {console.log("isAddCategoryOpen")}
           </IconButton>
           </>
           :
           <IconButton aria-label="add-category" onClick={this.addCategoryOpen.bind(this)}>
             <AddIcon fontSize="small" />
-            {console.log("isAddCategoryOpen")}
           </IconButton>
           }
         </Grid>

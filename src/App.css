@@ -3,20 +3,24 @@
 }
 
 .App-root {
-  margin-left: 10px;
-  margin-right: 10px;
-  color: #282c34;
+  color: #7c8993;
   font-family: "M PLUS Rounded 1c";
 }
 
 .App-root a {
-  color: #2e3138;
+  color: #afb1b3;
   text-decoration: none;
 }
 
 .App-title {
+  color: #7c8993;
   text-align: center;
   font-family: "M PLUS Rounded 1c";
+}
+
+.App-title a {
+  color: #7c8993;
+
 }
 
 .switch-view {
@@ -38,7 +42,7 @@
 }
 
 .App-footer {
-  border-top: 1px #282c34;
+  border-top: 1px #7c8993;
   background-color: rgba(255, 255, 255, 0.705);
   height: 50px;
   width: 100%;

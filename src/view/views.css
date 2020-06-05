@@ -13,6 +13,11 @@
   width: 70%;
 }
 
+.stock-list-root {
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
 .stock-list-image-item {
   margin-bottom: 10px;
 }
@@ -36,7 +41,7 @@
 }
 
 .home-message {
-  background-color: #b7faff63;
+  background-color: #dbbdcc81;
   border-radius: 10px;
   color: white;
   position: absolute;

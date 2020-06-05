@@ -30,7 +30,6 @@ export class StockList extends React.Component{
 
     this.state = {
       isUserDataLoaded: false,
-      isImageShow: false,
       list: [],
       detailsItemID: null,
       detailsItem: null,
@@ -39,14 +38,16 @@ export class StockList extends React.Component{
       visible: VisibleViewString.list
     }
   }
-  async componentDidMount() {
-    await this.getDocs()
+  componentDidMount() {
+    this.getDocs()
   }
 
   // Note: state update but not render
-  async getUserData(){
-    this.state.isUserDataLoaded = true
-    await this.getDocs()
+  getUserData(){
+    if(!this.state.isUserDataLoaded){
+      this.state.isUserDataLoaded = true
+      this.getDocs()  
+    }
   }
 
   async getDocs(){
@@ -56,23 +57,23 @@ export class StockList extends React.Component{
                       .collection('stock_items')
       let snapshots = await colRef.get()
       let docs = snapshots.docs.map(doc => [doc.id, doc.data()])
-      await this.setState({list : docs})      
+      this.setState({list : docs})      
     }
   }
 
   deleteDoc(docID){
     if(this.props.userID){
-      let delete_image_url = this.state.list.filter(value => value[0] === docID)[0].image_url
-      console.log(delete_image_url)
-      if(delete_image_url){
+      let delete_item = this.state.list.filter(value => value[0] === docID)[0]
+      if(delete_item[1]){
         var desertRef = firebase.storage().ref().child(`users/${this.props.userID}/${docID}.jpg`);
-        desertRef.delete().then(ref => {console.log("delete image ", docID)}).catch(error => {});
+        desertRef.delete()//.then(ref => {console.log("delete image ", docID)}).catch(error => {console.log("failed to delete image")});
       }
       let deleteDoc = db.collection('users').doc(this.props.userID).collection('stock_items').doc(docID).delete();
       let newList = this.state.list.filter(value => value[0] !== docID)
       this.setState({list: newList})
     }
   }
+  
   detailsDoc(docID){
     console.log("[Stock List] details docID",docID)
     let searchItem = this.state.list.filter(value => {
@@ -215,8 +216,6 @@ export class StockList extends React.Component{
 
   }
 
-
-  // TODO: 写真の一覧形式とリスト形式
   render(){
     if(!this.state.isUserDataLoaded && this.props.userID){
       this.getUserData()
