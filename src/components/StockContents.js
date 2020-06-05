@@ -12,6 +12,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import IconButton from '@material-ui/core/IconButton';
 import AddIcon from '@material-ui/icons/Add';
 import DoneIcon from '@material-ui/icons/Done';
+import CloseIcon from '@material-ui/icons/Close';
 
 import AddPhotoAlternateIcon from "@material-ui/icons/AddPhotoAlternate";
 
@@ -229,35 +230,44 @@ export class StockContents extends React.Component{
         <Grid item xs={12} sm={6} md={3}>
           <TextField id="standard-number" type="number" value={this.state.lotSize} label="入り数" InputProps={{ inputProps: { min: 0} }} onChange={this.handleChanege.bind(this, "lotSize")} InputLabelProps={{shrink: true,}}/> 
         </Grid>
+
         <Grid item xs={12} sm={6} md={3}>
-          {
-        <TextField
-          id="standard-select"
-          select
-          label="カテゴリー"
-          value={this.state.category}
-          onChange={this.handleChanege.bind(this, "category")}
-        >
-          {this.state.category_list.map((category, idx) => (
-            <MenuItem key={idx} value={category}>
-              {category}
-            </MenuItem>
-          ))}
-        </TextField>
-        }
           {(this.state.isAddCategoryOpen)?
-          <>
-          <TextField id="standard-basic" value={this.state.addCategory} label="add category" onChange={this.handleChanege.bind(this, "addCategory")}/>
-          <IconButton aria-label="add-category" onClick={this.addCategory.bind(this)}>
+          <div className="stock-form-category-add">
+          {/* カテゴリ追加 */}
+          <TextField id="standard-basic" className="stock-form-category-add-text" value={this.state.addCategory} label="Add Category" InputProps={{ inputProps: { maxLength: MAX_TEXT_INPUT_LENGTH} }} onChange={this.handleChanege.bind(this, "addCategory")}/>
+          <IconButton aria-label="add-category" className="stock-form-category-add-button" onClick={this.addCategory.bind(this)}>
             <DoneIcon fontSize="small" />
           </IconButton>
-          </>
+          <IconButton aria-label="add-category" className="stock-form-category-add-button" onClick={e => {this.setState({isAddCategoryOpen: false})}}>
+            <CloseIcon fontSize="small" />
+          </IconButton>
+          </div>
           :
-          <IconButton aria-label="add-category" onClick={this.addCategoryOpen.bind(this)}>
+          <>
+          {/* カテゴリ選択 */}
+          {<TextField
+              id="standard-select"
+              className="stock-form-category-select"
+              select
+              label="カテゴリー"
+              value={this.state.category}
+              onChange={this.handleChanege.bind(this, "category")}
+            >
+              {this.state.category_list.map((category, idx) => (
+                <MenuItem key={idx} value={category}>
+                  {category}
+                </MenuItem>
+              ))}
+            </TextField>
+            }    
+          <IconButton aria-label="add-category" className="stock-form-category-select-button" onClick={this.addCategoryOpen.bind(this)}>
             <AddIcon fontSize="small" />
           </IconButton>
+          </>
           }
         </Grid>
+
         <Grid item xs={12} sm={6}>
         <input
             accept="image/*"

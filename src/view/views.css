@@ -38,6 +38,15 @@
   margin-bottom: 10px;
 }
 
+.stock-list-categories-item {
+  margin-left: 5px;
+  float: left;
+}
+
+.stock-list-categories .MuiChip-outlinedPrimary {
+  color: #7c8993;
+}
+
 .home-background {
   background-image: url("/image/top.jpg");
   background-size: cover;

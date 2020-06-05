@@ -34,9 +34,10 @@ export class StockList extends React.Component{
 
     this.state = {
       isUserDataLoaded: false,
-      list: [],
+      data_list: [],
       show_list: [],
-      category_list: [""],
+      category_list: [" "],
+      selectedCategory: "all",
       detailsItemID: null,
       detailsItem: null,
       addItem: false,
@@ -60,34 +61,34 @@ export class StockList extends React.Component{
     if(this.props.userID){
       var categoryRef = db.collection('users').doc(this.props.userID)
       let categoryDoc = await categoryRef.get()
-      let categoryList = (categoryDoc.data()).category || [""]
+      let categoryList = (categoryDoc.data()).category || [" "]
   
       let colRef = db.collection('users')
                       .doc(this.props.userID)
                       .collection('stock_items')
       let snapshots = await colRef.get()
       let docs = snapshots.docs.map(doc => [doc.id, doc.data()])
-      this.setState({list: docs, show_list : docs, category_list: categoryList}) 
+      this.setState({data_list: docs, show_list : docs, category_list: categoryList}) 
       console.log(categoryList)
     }
   }
 
   deleteDoc(docID){
     if(this.props.userID){
-      let delete_item = this.state.list.filter(value => value[0] === docID)[0]
+      let delete_item = this.state.data_list.filter(value => value[0] === docID)[0]
       if(delete_item[1]){
         var desertRef = firebase.storage().ref().child(`users/${this.props.userID}/${docID}.jpg`);
         desertRef.delete()//.then(ref => {console.log("delete image ", docID)}).catch(error => {console.log("failed to delete image")});
       }
       let deleteDoc = db.collection('users').doc(this.props.userID).collection('stock_items').doc(docID).delete();
-      let newList = this.state.list.filter(value => value[0] !== docID)
-      this.setState({list: newList})
+      let newDataList = this.state.data_list.filter(value => value[0] !== docID)
+      let newShowList = this.state.show_list.filter(value => value[0] !== docID)
+      this.setState({data_list: newDataList, show_list: newShowList})
     }
   }
 
   detailsDoc(docID){
-    console.log("[Stock List] details docID",docID)
-    let searchItem = this.state.list.filter(value => {
+    let searchItem = this.state.data_list.filter(value => {
       return value[0] === docID
     })
     this.setState({detailsItem: searchItem, detailsItemID: docID, modalopen:true})    
@@ -107,23 +108,22 @@ export class StockList extends React.Component{
   }
 
   async handleSubmitClose(props){
-    let newList = this.state.list.slice()
+    let newList = this.state.data_list.slice()
     // Add
     if(this.state.addItem){
       newList.push([props.item_id, props])
     }
     // Update
     else if(this.state.detailsItemID){
-      newList = this.state.list.map(item => {
+      newList = this.state.data_list.map(item => {
         if(item[0] == this.state.detailsItemID){
-          console.log("[Stock List] new list item",[this.state.detailsItemID, props])
           return [this.state.detailsItemID, props]
         }else{
           return item
         }
       })  
     }
-    this.setState({list: newList, category_list: props.category_list})
+    this.setState({data_list: newList, show_list: newList, category_list: props.category_list})
     this.handleClose()
   }
 
@@ -138,14 +138,14 @@ export class StockList extends React.Component{
     }
   }
   handleCategorySelectAll() {
-    this.setState({show_list: this.state.list})
+    this.setState({show_list: this.state.data_list, selectedCategory: ""})
   }
 
   handleCategorySelect(val) {
-    let selected_list = this.state.list.filter(value => {
+    let selected_list = this.state.data_list.filter(value => {
       return value[1].category === val
     })
-    this.setState({show_list: selected_list})
+    this.setState({show_list: selected_list, selectedCategory: val})
   }
 
 
@@ -264,13 +264,13 @@ export class StockList extends React.Component{
       </div>
 
       <div className="stock-list-categories">
-      {this.state.category_list.map((val, idx) => (
-        (val)?
-        <Chip label={val} variant="outlined" key={idx} color="primary" onClick={this.handleCategorySelect.bind(this, val)} />
-        :
-        <Chip label="No category" variant="outlined" key={idx} onClick={this.handleCategorySelect.bind(this, val)} />
-      ))}
-        <Chip label="All" variant="outlined" key={-1} onClick={this.handleCategorySelectAll.bind(this)} />
+        {this.state.category_list.map((val, idx) => (
+          (val)?
+          <Chip label={val} variant={this.state.selectedCategory === val ? "default":"outlined"} key={idx} color="primary" onClick={this.handleCategorySelect.bind(this, val)} />
+          :
+          <Chip label="No category" variant={this.state.selectedCategory === " " ? "default":"outlined"} key={idx} onClick={this.handleCategorySelect.bind(this, val)} />
+          ))}
+          <Chip label="All" variant={this.state.data_list.length===this.state.show_list.length? "default":"outlined"} key={-1} onClick={this.handleCategorySelectAll.bind(this)} />
       </div>
 
 
@@ -278,7 +278,7 @@ export class StockList extends React.Component{
       <this.imageTemplate visible={this.state.visible===VisibleViewString.image} />
 
       <div className="stock-list-details-modal">
-      {((this.state.detailsItem && this.state.detailsItemID) || (this.state.addItem && this.state.list.length <= MAX_USER_ITEMS))?
+      {((this.state.detailsItem && this.state.detailsItemID) || (this.state.addItem && this.state.data_list.length <= MAX_USER_ITEMS))?
       <ModalWrapper
       open={this.state.modalopen}
       handleClose={this.handleClose.bind(this)}
