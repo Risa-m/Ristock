@@ -218,16 +218,18 @@ export class StockList extends React.Component{
     if(props.visible){
       return(
       <div className="stock-list-image">
-      <Grid container>
+      <Grid container spacing={3}>
         {this.state.show_list.map(item => (
-            <Grid item xs={4} sm={2} md={1} key={item[0]} style={{marginBottom: "10px"}}>
+            <Grid item xs={4} sm={2} lg={1} key={item[0]}>
+              <div className="stock-list-image-item">
               {(item[1].image_url)?
-                <img src={item[1].image_url} width="80%" onClick={this.detailsDoc.bind(this, item[0])} alt={item[1].name}/>
+                <img src={item[1].image_url} width="100%" onClick={this.detailsDoc.bind(this, item[0])} alt={item[1].name}/>
                 :
-                <img src="image/no_image.png" width="80%" onClick={this.detailsDoc.bind(this, item[0])} alt={item[1].name}/>
+                <img src="image/no_image.png" width="100%" onClick={this.detailsDoc.bind(this, item[0])} alt={item[1].name}/>
               }
               <p>{item[1].name}</p>
-              <p>のこり：{item[1].stockNumber}</p>
+              <p className="stock-list-image-stock">{item[1].stockNumber}</p>
+              </div>
             </Grid>
         ))}
       </Grid>
@@ -237,17 +239,10 @@ export class StockList extends React.Component{
     else{
       return null
     }
-
   }
 
-  render(){
-    if(!this.state.isUserDataLoaded && this.props.userID){
-      this.getUserData()
-    }
-
+  categoryTemplate = () => {
     return (
-    <div className="stock-list-root">
-
       <div className="stock-list-categories">
         {(this.state.isCategoryShow)?
         <>
@@ -278,8 +273,11 @@ export class StockList extends React.Component{
         }
 
       </div>
+    )
+  }
 
-
+  settingButtonTemplate = () => {
+    return(
       <div className="stock-list-buttons">
         <IconButton className="stock-list-setting-button" aria-label="setting" onClick={this.settingColumn.bind(this)}>
           {(this.state.visible === VisibleViewString.image)?
@@ -295,10 +293,21 @@ export class StockList extends React.Component{
         <IconButton className="stock-list-add-button" aria-label="add" onClick={this.addDoc.bind(this)}>
           <AddIcon />
         </IconButton>
-
       </div>
+    )
+  }
 
+  render(){
+    if(!this.state.isUserDataLoaded && this.props.userID){
+      this.getUserData()
+    }
 
+    return (
+    <div className="stock-list-root">
+
+      <this.categoryTemplate/>
+
+      <this.settingButtonTemplate/>
 
       <this.listTemplate visible={this.state.visible===VisibleViewString.list} />
       <this.imageTemplate visible={this.state.visible===VisibleViewString.image} />

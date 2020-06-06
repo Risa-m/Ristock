@@ -12,6 +12,13 @@
   text-decoration: none;
 }
 
+.App-menu {
+  display: block;
+  position: absolute;
+  top: 30px;
+  left: 20px;
+}
+
 .App-title {
   /*color: #7c8993;*/
   color: #7f3762;
@@ -38,8 +45,10 @@
   color: #7f3762;
 }
 
-.switch-view {
+.App-view {
   min-height: calc(80vh - 20px);
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 .App-login {
