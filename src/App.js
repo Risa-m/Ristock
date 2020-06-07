@@ -9,6 +9,8 @@ import { StockList } from './view/StockList'
 import Auth from './components/Auth.js'
 import { Login } from './components/Login.js'
 
+import Drawer from '@material-ui/core/Drawer';
+import MenuIcon from '@material-ui/icons/Menu';
 
 class App extends React.Component {
   constructor(){
@@ -17,7 +19,9 @@ class App extends React.Component {
     this.state = {
       user: null,
       userID: null,
-      buttomNav: "home"
+      buttomNav: "home",
+
+      leftDrawerOpen: false,
     }
 
     this.setUser = this.setUser.bind(this)
@@ -47,6 +51,82 @@ class App extends React.Component {
     this.setState({buttomNav: url})
   }
 
+  toggleDrawer = (open) => (event) => {
+    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+      return;
+    }
+    this.setState({leftDrawerOpen: open});
+  };
+
+  leftMenuList = () => {
+    if(this.state.user){
+      return (
+        <div className="App-menu-list">
+          <div className="App-menu-list-item">
+            <Link to="/stocks" >
+              My page
+            </Link>
+            {(this.state.user.email)?
+            <p style={{fontSize: "0.7em", paddingLeft: "10px"}}>{this.state.user.email}でログイン済みです。</p>
+            :null}
+          </div>
+
+          <div className="App-menu-list-item">
+            <Link to="/" onClick={this.logout.bind(this)}>
+              Logout&nbsp;
+            </Link>
+          </div>
+        </div>
+      )
+    }else{
+      return (
+        <div className="App-menu-list">
+          <div className="App-menu-list-item">
+          <Link to="login" title="Sign in with Google Account">
+            Login&nbsp;
+            <br/>
+            <p style={{fontSize: "0.7em", paddingLeft: "10px"}}>ご利用にはGoogleアカウントによる認証が必要です。</p>
+          </Link>
+          </div>
+        </div>
+      )
+
+    }
+  }
+
+  rightMenuList = () => {
+    if(this.state.user){
+      return(
+        <div className="App-menu-side">
+          <div className="App-menu-side-item">
+            <Link to="/stocks" >
+              My page
+              {(this.state.user.email)?
+            <p style={{fontSize: "0.7em", paddingLeft: "10px"}}>{this.state.user.email}</p>
+            :null}
+            </Link>
+          </div>
+
+          <div className="App-menu-side-item">
+            <Link to="/" onClick={this.logout.bind(this)}>
+              Logout&nbsp;
+            </Link>
+          </div>
+        </div>
+      )
+    }else{
+      return (
+        <div className="App-menu-side">
+          <div className="App-menu-side-item">
+            <Link to="login" title="Sign in with Google Account">
+            Login&nbsp;
+            <p style={{fontSize: "0.7em", paddingLeft: "10px"}}>with google</p>
+            </Link>
+          </div>
+        </div>
+      )
+    }
+  }
 
 
   render(){
@@ -54,14 +134,20 @@ class App extends React.Component {
     <BrowserRouter>
     <div className="App-root">
       <div className="App-header">
+
+        <div className="App-phone-menu" onClick={this.toggleDrawer(true)}><MenuIcon fontSize="large"/></div>
+          <Drawer anchor="left" open={this.state.leftDrawerOpen} onClose={this.toggleDrawer(false)}>
+            <this.leftMenuList/>
+          </Drawer>
+
         <div className="App-title">
           <Link to="/">
             <h1>Ristock</h1>
-            <img src="logo512.png" className="App-title-logo" width="60"/>
+            <img src="logo512.png" alt="Ristock" className="App-title-logo" width="60"/>
           </Link>
         </div>
-        <div className="App-login">
-          {(this.state.user)?
+        <div className="App-pc-menu">
+          {/*(this.state.user)?
           <Link to="/" onClick={this.logout.bind(this)}>
             Logout&nbsp;
           </Link>
@@ -70,10 +156,11 @@ class App extends React.Component {
             Login&nbsp;
             <p>with google</p>
           </Link>
-           }
+          */}
+          <this.rightMenuList/>
           </div>
         </div>
-      <div className="switch-view">
+      <div className="App-view">
         <Switch>
           <Route exact path='/' render={props =><Home user={this.state.user} userID={this.state.userID}  {...props}/>} />
           <Auth setUser={this.setUser} setUserID={this.setUserID}  {...this.props}>

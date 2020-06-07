@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
-import firebase from './firebase';
+//import firebase from './firebase';
 
 import {MuiThemeProvider} from '@material-ui/core/styles'
 import {theme} from './components/themePalette'

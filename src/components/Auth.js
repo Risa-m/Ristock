@@ -33,6 +33,7 @@ class Auth extends React.Component {
                 usersDocRef.set({
                   uid: user.uid,
                   name: user.displayName,
+                  email: user.email
                 })
               }
             })
@@ -94,9 +95,9 @@ class Auth extends React.Component {
         if (this.state.signedIn) {
             //サインインしてるとき（そのまま表示）
             return (
-            <div>
+            <>
               {this.props.children}
-            </div>
+            </>
             );
         } else {
             //してないとき（ログイン画面にリダイレクト）

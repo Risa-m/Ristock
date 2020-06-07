@@ -208,29 +208,29 @@ export class StockContents extends React.Component{
     return (
       <form className="stock-form" noValidate autoComplete="off">
       <Grid container spacing={3}>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid item xs={12} sm={6}>
           <TextField id="standard-basic" value={this.state.name} InputProps={{ inputProps: { maxLength: MAX_TEXT_INPUT_LENGTH} }} label="名前" onChange={this.handleChanege.bind(this, "name")}/> 
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid item xs={12} sm={6}>
           <TextField id="standard-basic" value={this.state.modelNumber} InputProps={{ inputProps: { maxLength: MAX_TEXT_INPUT_LENGTH} }} label="型番" onChange={this.handleChanege.bind(this, "modelNumber")}/> 
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid item xs={12} sm={6}>
           <TextField id="standard-basic" value={this.state.size} InputProps={{ inputProps: { maxLength: MAX_TEXT_INPUT_LENGTH} }} label="サイズ" onChange={this.handleChanege.bind(this, "size")}/> 
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid item xs={12} sm={6}>
           <TextField id="standard-basic" value={this.state.color} InputProps={{ inputProps: { maxLength: MAX_TEXT_INPUT_LENGTH} }} label="色" onChange={this.handleChanege.bind(this, "color")}/> 
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid item xs={12} sm={6}>
           <TextField id="standard-number" type="number" value={this.state.stockNumber} InputProps={{ inputProps: { min: 0} }} label="残数" onChange={this.handleChanege.bind(this, "stockNumber")} InputLabelProps={{shrink: true,}}/> 
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid item xs={12} sm={6}>
           <TextField id="standard-number" type="number" value={this.state.price} label="価格" InputProps={{ inputProps: { min: 0} }} onChange={this.handleChanege.bind(this, "price")} InputLabelProps={{shrink: true,}}/> 
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid item xs={12} sm={6}>
           <TextField id="standard-number" type="number" value={this.state.lotSize} label="入り数" InputProps={{ inputProps: { min: 0} }} onChange={this.handleChanege.bind(this, "lotSize")} InputLabelProps={{shrink: true,}}/> 
         </Grid>
 
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid item xs={12} sm={6}>
           {(this.state.isAddCategoryOpen)?
           <div className="stock-form-category-add">
           {/* カテゴリ追加 */}

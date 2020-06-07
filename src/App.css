@@ -12,11 +12,73 @@
   text-decoration: none;
 }
 
-.App-menu {
-  display: block;
+.App-pc-menu {
   position: absolute;
-  top: 30px;
-  left: 20px;
+  top: 30px;  
+  right: 10px;
+  padding-top: 10px;
+  margin-right: 20px;
+  line-height: 0.3em;
+  text-align: center;
+}
+
+
+/* PC画面でのMenu */
+.App-pc-menu p {
+  color: #a0a0a086;
+}
+
+.App-phone-menu {
+  display: none;
+}
+
+/* スマホ画面でのMenu */
+@media screen and (max-width: 768px){
+  .App-pc-menu {
+    display: none;
+  }
+  .App-phone-menu {
+    display: block;
+    position: absolute;
+    top: 30px;
+    left: 20px;
+  }
+}
+
+.App-menu-list {
+  color: #7c8993;
+  font-family: "M PLUS Rounded 1c";
+  font-size: 1.3em;
+  width: 200px;
+  padding: 20px;
+  margin-top: 10px;
+}
+
+.App-menu-list a {
+  color: #7c8993;
+  text-decoration: none;
+}
+
+.App-menu-list-item {
+  padding: 10px;
+  padding-bottom: 15px;
+}
+
+.App-menu-side {
+  color: #7c8993;
+}
+
+.App-menu-side a {
+  color: #7c8993;
+  text-decoration: none;
+}
+
+.App-menu-side-item {
+  display: inline-block;
+  margin-left: 15px;
+  max-width: 20vw;
+  text-align: center;
+  vertical-align: top;
 }
 
 .App-title {
@@ -49,20 +111,6 @@
   min-height: calc(80vh - 20px);
   margin-top: 10px;
   margin-bottom: 10px;
-}
-
-.App-login {
-  position: absolute;
-  top: 30px;  
-  right: 10px;
-  padding-top: 10px;
-  margin-right: 20px;
-  line-height: 0.3em;
-  text-align: center;
-}
-
-.App-login p {
-  color: #a0a0a086;
 }
 
 .App-footer {

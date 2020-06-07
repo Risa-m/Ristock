@@ -27,9 +27,10 @@
   margin-right: 10px;
 }
 
+
 .stock-list-image {
   width: calc(100% - 12px);
-  margin: auto;  
+  margin: auto;
 }
 
 p.stock-list-image-stock{
@@ -48,15 +49,15 @@ p.stock-list-image-stock{
   padding: 0;
   border: solid 1px rgba(217, 197, 191, 0.459);
   border-radius: 5px;
+  height: 90%;
 }
 
 .stock-list-image img{
   display: block;
   margin: auto;
   border-radius: 4px 4px 0 0 / 4px 4px 0 0;
-  /*-webkit-border-radius: 10px 10px 0 0 / 10px 10px 0 0;
-  -moz-border-radius: 10px 10px 0 0 / 10px 10px 0 0;
-  */
+  -webkit-border-radius: 4px 4px 0 0 / 4px 4px 0 0;
+  -moz-border-radius: 4px 4px 0 0 / 4px 4px 0 0;
 }
 
 .stock-list-image img:hover{
@@ -71,7 +72,6 @@ p.stock-list-image-stock{
 
 .stock-list-image p {
   text-align: center;
-  line-height: 0.4em;
   size: 0.5em;
 }
 
