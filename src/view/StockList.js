@@ -38,7 +38,7 @@ export class StockList extends React.Component{
       isUserDataLoaded: false,
       data_list: [],
       show_list: [],
-      category_list: [" "],
+      category_list: [""],
       isCategoryShow: true,
       selectedCategory: "all",
       detailsItemID: null,

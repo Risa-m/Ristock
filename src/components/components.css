@@ -15,6 +15,9 @@
 .stock-form-category-add-button {
   width: 20%;
 }
+.stock-form-text {
+  width: 80%;
+}
 
 .stock-form-image-show{
   height: 50px;
