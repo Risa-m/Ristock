@@ -29,12 +29,10 @@ class App extends React.Component {
   }
 
   setUser(user){
-    //console.log("[App]callback user", user)
     this.setState({user : user})
   }
 
   setUserID(userID){
-    //console.log("[App]callback userID", userID)
     this.setState({userID: userID})
   }
 
@@ -101,15 +99,15 @@ class App extends React.Component {
           <div className="App-menu-side-item">
             <Link to="/stocks" >
               My page
-              {(this.state.user.email)?
+              {/*(this.state.user.email)?
             <p style={{fontSize: "0.7em", paddingLeft: "10px"}}>{this.state.user.email}</p>
-            :null}
+              :null*/}
             </Link>
           </div>
 
           <div className="App-menu-side-item">
             <Link to="/" onClick={this.logout.bind(this)}>
-              Logout&nbsp;
+              Logout
             </Link>
           </div>
         </div>
@@ -119,7 +117,7 @@ class App extends React.Component {
         <div className="App-menu-side">
           <div className="App-menu-side-item">
             <Link to="login" title="Sign in with Google Account">
-            Login&nbsp;
+            Login
             <p style={{fontSize: "0.7em", paddingLeft: "10px"}}>with google</p>
             </Link>
           </div>
@@ -135,7 +133,7 @@ class App extends React.Component {
     <div className="App-root">
       <div className="App-header">
 
-        <div className="App-phone-menu" onClick={this.toggleDrawer(true)}><MenuIcon fontSize="large"/></div>
+        <div className="App-phone-menu" onClick={this.toggleDrawer(true)}><MenuIcon /*fontSize="large"*//></div>
           <Drawer anchor="left" open={this.state.leftDrawerOpen} onClose={this.toggleDrawer(false)}>
             <this.leftMenuList/>
           </Drawer>
@@ -143,20 +141,10 @@ class App extends React.Component {
         <div className="App-title">
           <Link to="/">
             <h1>Ristock</h1>
-            <img src="logo512.png" alt="Ristock" className="App-title-logo" width="60"/>
+            <img src="logo512.png" alt="Ristock" className="App-title-logo" width="50"/>
           </Link>
         </div>
         <div className="App-pc-menu">
-          {/*(this.state.user)?
-          <Link to="/" onClick={this.logout.bind(this)}>
-            Logout&nbsp;
-          </Link>
-          :
-          <Link to="login" title="Sign in with Google Account">
-            Login&nbsp;
-            <p>with google</p>
-          </Link>
-          */}
           <this.rightMenuList/>
           </div>
         </div>

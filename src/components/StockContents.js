@@ -126,6 +126,7 @@ export class StockContents extends React.Component{
       lotSize: this.state.lotSize,
       category: this.state.category,
       image_url: this.state.image_url,
+      updated_at: firebase.firestore.FieldValue.serverTimestamp()
     }).then(ref => {
       // undefined
       //console.log('Updated document : ', ref);
@@ -150,6 +151,8 @@ export class StockContents extends React.Component{
       price: this.state.price,
       lotSize: this.state.lotSize,
       category: this.state.category,
+      created_at: firebase.firestore.FieldValue.serverTimestamp(),
+      updated_at: firebase.firestore.FieldValue.serverTimestamp()
     }).then(ref => {
       //console.log('Added document with ID: ', ref.id);
       this.setState({item_id: ref.id})  

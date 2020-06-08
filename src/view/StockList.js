@@ -64,7 +64,7 @@ export class StockList extends React.Component{
     if(this.props.userID){
       var categoryRef = db.collection('users').doc(this.props.userID)
       let categoryDoc = await categoryRef.get()
-      let categoryList = (categoryDoc.data()).category || [" "]
+      let categoryList = (categoryDoc.data()).category || [""]
   
       let colRef = db.collection('users')
                       .doc(this.props.userID)
@@ -182,7 +182,7 @@ export class StockList extends React.Component{
                     <img src="image/no_image.png" width="80"/>
                   }
                   </TableCell>
-                  <TableCell align="right">{item[1].name}</TableCell>
+                  <TableCell >{item[1].name}</TableCell>
                   <TableCell align="right">{item[1].modelNumber}</TableCell>
                   <TableCell align="right">{item[1].size}</TableCell>
                   <TableCell align="right">{item[1].color}</TableCell>
@@ -218,7 +218,7 @@ export class StockList extends React.Component{
     if(props.visible){
       return(
       <div className="stock-list-image">
-      <Grid container spacing={3}>
+      <Grid container spacing={2}>
         {this.state.show_list.map(item => (
             <Grid item xs={6} sm={4} md={3} lg={2} xl={1} key={item[0]}>
               <div className="stock-list-image-item">

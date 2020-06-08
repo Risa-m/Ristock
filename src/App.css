@@ -76,6 +76,7 @@
 .App-menu-side-item {
   display: inline-block;
   margin-left: 15px;
+  margin-right: 20px;
   max-width: 20vw;
   text-align: center;
   vertical-align: top;
