@@ -124,7 +124,12 @@
   bottom: 0;
 }
 
+.App-footer p {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
 .copyright{
   size: 0.8em;
   text-align: center;
+  line-height: 0.8em;
 }
