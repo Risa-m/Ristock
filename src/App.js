@@ -161,7 +161,8 @@ class App extends React.Component {
         </Switch>
       </div>
       <div className="App-footer">
-        <p className="copyright">&copy; 2020 Risa-m</p>      
+        <p className="copyright">&copy; 2020 Risa-m</p>
+        <p className="version" style={{fontSize: "0.6em", textAlign: "center"}}>version: 0.9.0</p>   
       </div>
     </div>
     </BrowserRouter>
