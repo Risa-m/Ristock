@@ -3,7 +3,8 @@
 ## What's this?
 ハンドメイド資材在庫管理Webアプリです。  
 ご利用はこちらから
-→　~~[Ristock](https://ristock.web.app/)~~
+→　[Ristock](https://ristock.web.app/)
+
 
 ## What can this do?
 - Googleアカウントを用いたユーザー管理
@@ -16,11 +17,11 @@
   - 価格
   - 入り数
   - カテゴリー
-  - 画像（未実装）
+  - 画像
 - 以下の機能があります
   - 一覧表示
-  - 画像一覧表示（未実装）
-  - カテゴリ分類（未実装）
+  - 画像一覧表示
+  - カテゴリ分類・カテゴリ検索
 
 ---
 
@@ -35,9 +36,3 @@
   - Cloud Strage for Firebase
 - Figma(for design)
   
---- 
-
-## Memo
-
-
----
