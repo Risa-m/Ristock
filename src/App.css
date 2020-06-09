@@ -51,7 +51,7 @@
   font-size: 1.3em;
   width: 200px;
   padding: 20px;
-  margin-top: 10px;
+  margin-top: 20px;
 }
 
 .App-menu-list a {
@@ -60,8 +60,9 @@
 }
 
 .App-menu-list-item {
-  padding: 10px;
+  padding: 5px;
   padding-bottom: 15px;
+  word-wrap: break-word;
 }
 
 .App-menu-side {
