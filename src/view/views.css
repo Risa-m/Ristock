@@ -27,14 +27,18 @@
   margin-right: 10px;
 }
 
+.MuiTable-root th {
+  min-width: 70px;
+}
+
+.MuiTable-root td {
+  min-width: 70px;
+}
+
 
 .stock-list-image {
   width: calc(100% - 12px);
   margin: auto;
-}
-
-p.stock-list-image-stock{
-  font-weight: 600;
 }
 
 .stock-list-table .MuiTableHead-root {
@@ -49,8 +53,23 @@ p.stock-list-image-stock{
   padding: 0;
   border: solid 1px rgba(217, 197, 191, 0.459);
   border-radius: 5px;
-  height: 90%;
+  height: 95%;
 }
+
+.stock-list-image-item p {
+  font-size: 0.65em;
+  line-height: 0.5em;
+}
+
+p.stock-list-image-name{
+  font-size: 0.75em;
+}
+
+p.stock-list-image-stock{
+  font-weight: 600;
+  font-size: 0.75em;
+}
+
 
 .stock-list-image img{
   display: block;

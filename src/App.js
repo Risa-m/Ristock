@@ -63,10 +63,10 @@ class App extends React.Component {
           <div className="App-menu-list-item">
             <Link to="/stocks" >
               My page
-            </Link>
             {(this.state.user.email)?
             <p style={{fontSize: "0.7em", paddingLeft: "10px"}}>{this.state.user.email}でログイン済みです。</p>
             :null}
+            </Link>
           </div>
 
           <div className="App-menu-list-item">
