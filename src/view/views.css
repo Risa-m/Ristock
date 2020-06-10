@@ -53,21 +53,31 @@
   padding: 0;
   border: solid 1px rgba(217, 197, 191, 0.459);
   border-radius: 5px;
-  height: 95%;
+  position: relative;
+  height: 100%;
 }
 
 .stock-list-image-item p {
   font-size: 0.65em;
-  line-height: 0.5em;
+  line-height: 1em;
+  margin-top: 5px;
+  margin-bottom: 5px;
 }
 
 p.stock-list-image-name{
   font-size: 0.75em;
+  margin-top: 10px;
 }
 
 p.stock-list-image-stock{
   font-weight: 600;
   font-size: 0.75em;
+  width: 100%;
+  position: absolute;
+  text-align: center;
+  margin-right: auto;
+  margin-left: auto;
+  bottom: 5px;
 }
 
 
