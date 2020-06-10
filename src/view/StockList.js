@@ -167,7 +167,7 @@ export class StockList extends React.Component{
                 <TableCell align="center">色</TableCell>
                 <TableCell align="center">数&nbsp;(個)</TableCell>
                 <TableCell align="center">価格&nbsp;(円)</TableCell>
-                <TableCell align="center">入り数&nbsp;(個)</TableCell>
+                {/*<TableCell align="center">入り数&nbsp;(個)</TableCell>*/}
                 <TableCell align="center">カテゴリー</TableCell>
                 <TableCell align="center"></TableCell>
                 <TableCell align="center"></TableCell>
@@ -189,7 +189,7 @@ export class StockList extends React.Component{
                   <TableCell align="center">{item[1].color}</TableCell>
                   <TableCell align="center">{item[1].stockNumber}</TableCell>
                   <TableCell align="center">{item[1].price}</TableCell>
-                  <TableCell align="center">{item[1].lotSize}</TableCell>
+                  {/*<TableCell align="center">{item[1].lotSize}</TableCell>*/}
                   <TableCell align="center">{item[1].category}</TableCell>
                   <TableCell align="center">
                     <Link to=""></Link>
@@ -223,11 +223,13 @@ export class StockList extends React.Component{
         {this.state.show_list.map(item => (
             <Grid item xs={6} sm={4} md={3} lg={2} xl={1} key={item[0]}>
               <div className="stock-list-image-item">
-              {(item[1].image_url)?
-                <img src={item[1].image_url} width="100%" onClick={this.detailsDoc.bind(this, item[0])} alt={item[1].name}/>
-                :
-                <img src="image/no_image.png" width="100%" onClick={this.detailsDoc.bind(this, item[0])} alt={item[1].name}/>
-              }
+                <span className="square-content">
+                {(item[1].image_url)?
+                  <img src={item[1].image_url} width="100%" onClick={this.detailsDoc.bind(this, item[0])} alt={item[1].name}/>
+                  :
+                  <img src="image/no_image.png" width="100%" onClick={this.detailsDoc.bind(this, item[0])} alt={item[1].name}/>
+                }
+                </span>
               <p className="stock-list-image-name">{item[1].name}</p>
               <p>{item[1].modelNumber} {item[1].size} {item[1].color}</p>
               <p className="stock-list-image-stock">{item[1].stockNumber}</p>

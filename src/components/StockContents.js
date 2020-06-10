@@ -16,6 +16,9 @@ import CloseIcon from '@material-ui/icons/Close';
 
 import AddPhotoAlternateIcon from "@material-ui/icons/AddPhotoAlternate";
 
+import AddRoundedIcon from '@material-ui/icons/AddRounded';
+import RemoveRoundedIcon from '@material-ui/icons/RemoveRounded';
+
 
 const MAX_CATEGORY_SIZE = 100
 const MAX_TEXT_INPUT_LENGTH = 20
@@ -207,6 +210,16 @@ export class StockContents extends React.Component{
     });
   }
 
+  
+  phonePlusMinusTemplate = (props) => {
+    return (
+      <div className="stock-form-phone-view">
+        <div className="stock-form-phone-view-item" onClick={() => this.setState({[props.property]: (this.state[props.property]+1)})}><AddRoundedIcon /></div>
+        <div className="stock-form-phone-view-item" onClick={() => (this.state[props.property] > 0)? this.setState({[props.property]: (this.state[props.property]-1)}):null}><RemoveRoundedIcon /></div>
+      </div>
+    )
+  }
+
   gridTemplate = () => {  
     return (
       <form className="stock-form" noValidate autoComplete="off">
@@ -225,13 +238,18 @@ export class StockContents extends React.Component{
         </Grid>
         <Grid item xs={12} sm={6}>
           <TextField id="standard-number" className="stock-form-text" type="number" value={this.state.stockNumber} InputProps={{ inputProps: { min: 0} }} label="残数" onChange={this.handleChanege.bind(this, "stockNumber")} InputLabelProps={{shrink: true,}}/> 
+          <this.phonePlusMinusTemplate property="stockNumber"/>
         </Grid>
         <Grid item xs={12} sm={6}>
           <TextField id="standard-number" className="stock-form-text" type="number" value={this.state.price} label="価格" InputProps={{ inputProps: { min: 0} }} onChange={this.handleChanege.bind(this, "price")} InputLabelProps={{shrink: true,}}/> 
         </Grid>
+        {/*
         <Grid item xs={12} sm={6}>
           <TextField id="standard-number" className="stock-form-text" type="number" value={this.state.lotSize} label="入り数" InputProps={{ inputProps: { min: 0} }} onChange={this.handleChanege.bind(this, "lotSize")} InputLabelProps={{shrink: true,}}/> 
+          <this.phonePlusMinusTemplate property="lotSize"/>
         </Grid>
+        */}
+
 
         <Grid item xs={12} sm={6}>
           {(this.state.isAddCategoryOpen)?
