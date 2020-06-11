@@ -1,13 +1,5 @@
 
-.add-stock-submit-button {
-  margin-top: 10px;
-}
-
-.add-stock-root {
-  width: 90%;
-  margin: auto;
-}
-
+/* StockList */
 .stock-list-root hr {
   border-width: 1px 0px 0px 0px; /* 太さ */
   border-style: solid; /* 線種 */
@@ -23,6 +15,8 @@
 }
 
 .stock-list-root {
+  margin-top: 20px;
+  margin-bottom: 20px;
   margin-left: 10px;
   margin-right: 10px;
 }
@@ -140,6 +134,93 @@ p.stock-list-image-stock{
 }
 
 
+/* HOME画面 */
+.home-root {
+
+}
+
+/* PC画面でのHOME */
+@media screen and (min-width: 768px){
+  .home-top-message {
+    position: relative;
+    width: 80%;
+    top: 50px;
+    margin: 0 auto;
+    padding: 60px;
+    border-radius: 10px;
+    /*background-color: rgba(255, 255, 255, 0.75);*/
+  }
+  
+  .home-top-message h1, h2{
+    padding-top: 20px;
+    width: 100%;
+    margin: 0 auto;
+    /*color: #7f3762;*/
+    color: white;
+    font-size: 2.0em;
+    line-height: 1.5em;
+    text-align: left;
+    /*text-shadow: 0px 2px 1px #7f37624b;*/
+    font-family: "M PLUS 1p";
+    margin-bottom: 40px;
+  }
+  
+  .home-top-message p {
+    padding: 20px;
+    text-align: left;
+    font-size: 1.05em;
+    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.75);
+    position: absolute;
+    display: inline-block;
+    vertical-align: middle;
+    right: 10%;
+    top: 40%;
+    width: 40%;
+  }
+}
+
+/* スマホ画面でのHOME */
+@media screen and (max-width: 768px){
+
+  .home-top-message {
+    position: relative;
+    width: 80%;
+    top: 50px;
+    margin: 0 auto;
+    padding: 15px;
+    border-radius: 10px;
+    /*background-color: rgba(255, 255, 255, 0.75);*/
+  }
+  
+  .home-top-message h1, h2{
+    padding-top: 20px;
+    width: 100%;
+    margin: 0 auto;
+    /*color: #7f3762;*/
+    color: white;
+    font-size: 2.0em;
+    line-height: 1.5em;
+    text-align: left;
+    /*text-shadow: 0px 2px 1px #7f37624b;*/
+    font-family: "M PLUS 1p";
+  }
+    
+  .home-top-message p {
+    padding: 20px;
+    text-align: left;
+    margin-top: 40px;
+    margin-bottom: 35px;
+    font-size: 1.05em;
+    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.75);
+    position: relative;
+    display: inline-block;
+    max-width: 500px;
+  }
+}
+
+
 .home-background {
   background-image: url("/image/top.jpg");
   background-size: cover;
@@ -151,8 +232,16 @@ p.stock-list-image-stock{
   margin: auto;
   width: calc(100% - 0px);
   height: calc(100vh - 180px);
+  
+  filter: alpha(opacity=90);  
+  -ms-filter: "alpha(opacity=90)";  /* ie 8 */
+  -moz-opacity:0.9;                 /* FF lt 1.5, Netscape */
+  -khtml-opacity: 0.9;              /* Safari 1.x */
+  opacity:0.9;
+  zoom:1;
 }
 
+/*
 .home-message {
   background-color: #dbbdcc81;
   border-radius: 10px;
@@ -161,7 +250,8 @@ p.stock-list-image-stock{
   left: 10vw;
   top: 60vh;
   padding: 10px 20px;
-  line-height: 0.5em 
+  line-height: 0.5em;
+  display: none;
 }
 
 .home-google-signin{
@@ -177,4 +267,12 @@ p.stock-list-image-stock{
 
 .home-login-icon {
   vertical-align: bottom;
+}
+*/
+
+/* SignUp画面 */
+
+.signup-root {
+  width: 70%;
+  margin: auto;
 }

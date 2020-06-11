@@ -6,6 +6,7 @@ import firebase from './firebase';
 
 import { Home } from './view/Home.js'
 import { StockList } from './view/StockList'
+import { signup, SignUp } from './view/SignUp';
 import Auth from './components/Auth.js'
 import { Login } from './components/Login.js'
 
@@ -141,7 +142,7 @@ class App extends React.Component {
         <div className="App-title">
           <Link to="/">
             <h1>Ristock</h1>
-            <img src="logo512.png" alt="Ristock" className="App-title-logo" width="50"/>
+            <img src="icon.png" alt="Ristock" className="App-title-logo"/>
           </Link>
         </div>
         <div className="App-pc-menu">
@@ -151,6 +152,7 @@ class App extends React.Component {
       <div className="App-view">
         <Switch>
           <Route exact path='/' render={props =><Home user={this.state.user} userID={this.state.userID}  {...props}/>} />
+          <Route exact path='/signup' render={props =><SignUp user={this.state.user} userID={this.state.userID}  {...props}/>} />
           <Auth setUser={this.setUser} setUserID={this.setUserID}  {...this.props}>
             <Switch>
               <Route exact path='/login' render={props => <Login user={this.state.user} userID={this.state.userID} {...props}/>} />
@@ -161,8 +163,8 @@ class App extends React.Component {
         </Switch>
       </div>
       <div className="App-footer">
-        <p className="copyright">&copy; 2020 Risa-m</p>
-        <p className="version" style={{fontSize: "0.6em", textAlign: "center"}}>version: 0.0.2</p>   
+        <p className="copyright"><a href="https://github.com/Risa-m">&copy; 2020 Risa-m</a></p>
+        <p className="version" style={{fontSize: "0.6em", textAlign: "center"}}>version: 0.0.3</p>   
       </div>
     </div>
     </BrowserRouter>

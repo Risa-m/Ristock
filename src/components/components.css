@@ -3,6 +3,15 @@
   display: none;
 }
 
+.add-stock-submit-button {
+  margin-top: 10px;
+}
+
+.add-stock-root {
+  width: 90%;
+  margin: auto;
+}
+
 .stock-form-category-select {
   width: 80%;
 }
