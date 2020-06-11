@@ -3,6 +3,15 @@
   display: none;
 }
 
+.add-stock-submit-button {
+  margin-top: 10px;
+}
+
+.add-stock-root {
+  width: 90%;
+  margin: auto;
+}
+
 .stock-form-category-select {
   width: 80%;
 }
@@ -17,6 +26,23 @@
 }
 .stock-form-text {
   width: 80%;
+}
+
+.stock-form-phone-view {
+  display: none;
+}
+
+@media screen and (max-width: 768px){
+  .stock-form-phone-view {
+    font-size: small;
+    color: #7c8993;
+    display: inline-block;
+    width: 20%;
+  }
+  .stock-form-phone-view-item {
+    text-align: center;
+    line-height: 1.5em;
+  }
 }
 
 .stock-form-image-show{

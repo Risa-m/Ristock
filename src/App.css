@@ -40,8 +40,11 @@
   .App-phone-menu {
     display: block;
     position: absolute;
-    top: 30px;
-    left: 20px;
+    top: 20px;
+    right: 20px;
+  }
+  .App-header {
+    background-color: rgba(219, 189, 204, 0.20);
   }
 }
 
@@ -84,11 +87,13 @@
 }
 
 .App-title {
-  /*color: #7c8993;*/
   color: #7f3762;
   text-align: center;
   font-family: "M PLUS Rounded 1c";
   margin-top: 10px;
+}
+.App-title a {
+  color: #7f3762;
 }
 
 .App-title h1 {
@@ -102,25 +107,38 @@
   display: inline-block;
   vertical-align: text-bottom;
   transform: translateX(20px);
+  width: 50px;
 }
 
-.App-title a {
-  /*color: #7c8993;*/
-  color: #7f3762;
+@media screen and (max-width: 768px){
+  .App-title {
+    text-align: left;
+    padding-top: 10px;
+    padding-bottom: 15px;
+    margin: 0;
+  } 
+  .App-title h1 {
+    display: none;
+    margin: 0;
+  }
+  .App-title-logo {
+    padding-top: 5px;
+    width: 35px;
+  }
 }
 
 .App-view {
   min-height: calc(80vh - 20px);
-  margin-top: 10px;
-  margin-bottom: 10px;
 }
 
 .App-footer {
+  padding-top: 20px;
+  padding-bottom: 15px;
   border-top: 1px #7c8993;
-  background-color: rgba(255, 255, 255, 0.705);
+  background-color: rgb(255, 255, 255);
   height: 50px;
   width: 100%;
-  position: relative;
+  position: static;
   bottom: 0;
 }
 
@@ -129,7 +147,10 @@
   margin-bottom: 5px;
 }
 .copyright{
-  size: 0.8em;
+  size: 0.65em;
   text-align: center;
   line-height: 0.8em;
+}
+.copyright a {
+  color: #7c8993;
 }
