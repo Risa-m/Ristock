@@ -141,7 +141,7 @@ class App extends React.Component {
 
         <div className="App-title">
           <Link to="/">
-            <h1>Ristock</h1>
+            <h1>Ristock</h1><span className="title-beta">β</span>
             <img src="icon.png" alt="Ristock" className="App-title-logo"/>
           </Link>
         </div>

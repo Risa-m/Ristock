@@ -102,6 +102,11 @@
   margin-bottom: 15px;
   transform: translateX(20px);
 }
+.App-title .title-beta {
+  display: inline-block;
+  font-size: 0.8em;
+  transform: translateX(20px);
+}
 
 .App-title-logo {
   display: inline-block;
