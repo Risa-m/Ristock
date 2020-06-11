@@ -6,7 +6,7 @@ import firebase from './firebase';
 
 import { Home } from './view/Home.js'
 import { StockList } from './view/StockList'
-import { signup, SignUp } from './view/SignUp';
+import { SignUp } from './view/SignUp';
 import Auth from './components/Auth.js'
 import { Login } from './components/Login.js'
 
@@ -164,7 +164,7 @@ class App extends React.Component {
       </div>
       <div className="App-footer">
         <p className="copyright"><a href="https://github.com/Risa-m">&copy; 2020 Risa-m</a></p>
-        <p className="version" style={{fontSize: "0.6em", textAlign: "center"}}>version: 0.0.3</p>   
+        <p className="version" style={{fontSize: "0.6em", textAlign: "center"}}>version: 1.0.1</p>   
       </div>
     </div>
     </BrowserRouter>

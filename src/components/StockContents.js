@@ -238,7 +238,8 @@ export class StockContents extends React.Component{
         </Grid>
         <Grid item xs={12} sm={6}>
           <TextField id="standard-number" className="stock-form-text" type="number" value={this.state.stockNumber} InputProps={{ inputProps: { min: 0} }} label="残数" onChange={this.handleChanege.bind(this, "stockNumber")} InputLabelProps={{shrink: true,}}/> 
-          <this.phonePlusMinusTemplate property="stockNumber"/>
+          {//<this.phonePlusMinusTemplate property="stockNumber"/>
+          }
         </Grid>
         <Grid item xs={12} sm={6}>
           <TextField id="standard-number" className="stock-form-text" type="number" value={this.state.price} label="価格" InputProps={{ inputProps: { min: 0} }} onChange={this.handleChanege.bind(this, "price")} InputLabelProps={{shrink: true,}}/> 
