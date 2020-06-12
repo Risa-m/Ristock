@@ -6,7 +6,7 @@ const toBlob = (base64, reject) => {
   for (let i = 0; i < bin.length; i += 1) {
     buffer[i] = bin.charCodeAt(i);
   }
-  // Blobを作成
+
   try {
     const blob = new Blob([buffer.buffer], {
       type: 'image/jpg',

@@ -136,11 +136,11 @@
 }
 
 .App-footer {
-  padding-top: 20px;
-  padding-bottom: 15px;
+  padding-top: 10px;
+  padding-bottom: 10px;
   border-top: 1px #7c8993;
   background-color: rgb(255, 255, 255);
-  height: 50px;
+  height: 40px;
   width: 100%;
   position: static;
   bottom: 0;
