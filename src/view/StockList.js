@@ -32,18 +32,25 @@ import EditIcon from '@material-ui/icons/Edit';
 const MAX_USER_ITEMS = 1000
 
 export class StockList extends React.Component{ 
+  /*
+  props: 
+    userID: ユーザー固有ID
+   */
   constructor(props){
     super(props)
 
     this.state = {
       isUserDataLoaded: false,
-      data_list: [],
-      show_list: [],
-      category_list: [""],
+      data_list: [], // 全アイテムの[id, data]のリスト
+      show_list: [], // 表示するアイテムの[id, data]のリスト
+      category_list: [""], // 全カテゴリのリスト
+      category_map: {},
+
       isCategoryShow: true,
       selectedCategory: "all",
+
       detailsItemID: null,
-      detailsItem: null,
+      //detailsItem: null,
       addItem: false,
       modalopen: false,
       visible: VisibleViewString.image
@@ -66,20 +73,22 @@ export class StockList extends React.Component{
       var categoryRef = db.collection('users').doc(this.props.userID)
       let categoryDoc = await categoryRef.get()
       let categoryList = (categoryDoc.data()).category || [""]
-  
+      let categoryMap = (categoryDoc.data()).category_map || {}
+
       let colRef = db.collection('users')
                       .doc(this.props.userID)
                       .collection('stock_items')
       let snapshots = await colRef.get()
       let docs = snapshots.docs.map(doc => [doc.id, doc.data()])
-      this.setState({data_list: docs, show_list : docs, category_list: categoryList}) 
+      this.setState({data_list: docs, show_list : docs, category_map: categoryMap, category_list: categoryList}) 
     }
   }
 
   deleteDoc(docID){
     if(this.props.userID){
       let delete_item = this.state.data_list.filter(value => value[0] === docID)[0]
-      if(delete_item[1]){
+      console.log(delete_item)
+      if(delete_item[1].image_url){
         var deleteRef = firebase.storage().ref().child(`users/${this.props.userID}/${docID}.jpg`);
         deleteRef.delete()
       }
@@ -94,7 +103,7 @@ export class StockList extends React.Component{
     let searchItem = this.state.data_list.filter(value => {
       return value[0] === docID
     })
-    this.setState({detailsItem: searchItem, detailsItemID: docID, modalopen:true})    
+    this.setState({/*detailsItem: searchItem,*/ detailsItemID: docID, modalopen:true})    
   }
 
   addDoc(){
@@ -104,7 +113,7 @@ export class StockList extends React.Component{
   handleClose(){
     this.setState({
       detailsItemID: null,
-      detailsItem: null,
+      //detailsItem: null,
       addItem: false,
       modalopen: false,
     })
@@ -126,7 +135,7 @@ export class StockList extends React.Component{
         }
       })  
     }
-    this.setState({data_list: newList, show_list: newList, category_list: props.category_list})
+    this.setState({data_list: newList, show_list: newList, category_list: props.category_list, category_map: props.category_map})
     this.handleClose()
   }
 
@@ -149,6 +158,11 @@ export class StockList extends React.Component{
       return value[1].category === val
     })
     this.setState({show_list: selected_list, selectedCategory: val})
+  }
+
+  // 各種設定画面を開く
+  settingChange = () => {
+
   }
 
 
@@ -251,7 +265,8 @@ export class StockList extends React.Component{
         {(this.state.isCategoryShow)?
         <>
         <div className="stock-list-categories-show">
-          {this.state.category_list.map((val, idx) => (
+          {Object.keys(this.state.category_map).map((val, idx) => (
+          //{this.state.category_list.map((val, idx) => (
           (val)?
           <Chip label={val} variant={this.state.selectedCategory === val ? "default":"outlined"} key={idx} color="primary" onClick={this.handleCategorySelect.bind(this, val)} />
           :
@@ -284,20 +299,25 @@ export class StockList extends React.Component{
   settingButtonTemplate = () => {
     return(
       <div className="stock-list-buttons">
-        <IconButton className="stock-list-setting-button" aria-label="setting" onClick={this.settingColumn.bind(this)}>
+        <IconButton className="stock-list-view-button" aria-label="view change" onClick={this.settingColumn.bind(this)}>
           {(this.state.visible === VisibleViewString.image)?
           <ListIcon />
           :
           (this.state.visible === VisibleViewString.list)?
           <ImageIcon />
           :
-          <SettingsIcon />
+          null
           }
         </IconButton>
 
         <IconButton className="stock-list-add-button" aria-label="add" onClick={this.addDoc.bind(this)}>
           <AddIcon />
         </IconButton>
+        {/*
+        <IconButton className="stock-list-setting-button" aria-label="setting" onClick={this.settingChange}>
+          <SettingsIcon />
+        </IconButton>
+        */}
       </div>
     )
   }
@@ -307,6 +327,7 @@ export class StockList extends React.Component{
       this.getUserData()
     }
 
+    console.log(this.state.category_map)
     return (
     <div className="stock-list-root">
 
@@ -318,11 +339,11 @@ export class StockList extends React.Component{
       <this.imageTemplate visible={this.state.visible===VisibleViewString.image} />
 
       <div className="stock-list-details-modal">
-      {((this.state.detailsItem && this.state.detailsItemID) || (this.state.addItem && this.state.data_list.length <= MAX_USER_ITEMS))?
+      {((/*this.state.detailsItem && */this.state.detailsItemID) || (this.state.addItem && this.state.data_list.length <= MAX_USER_ITEMS))?
       <ModalWrapper
       open={this.state.modalopen}
       handleClose={this.handleClose.bind(this)}
-      content={<StockContents item_id={this.state.detailsItemID} userID={this.props.userID} category_list={this.state.category_list} handleClose={this.handleSubmitClose.bind(this)}/>}
+      content={<StockContents item_id={this.state.detailsItemID} userID={this.props.userID} category_list={this.state.category_list} category_map={this.state.category_map} handleClose={this.handleSubmitClose.bind(this)}/>}
      />:null
        }
        </div>
