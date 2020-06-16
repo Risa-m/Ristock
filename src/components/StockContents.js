@@ -25,6 +25,13 @@ const MAX_TEXT_INPUT_LENGTH = 20
 const IMAGE_MAX_SIZE = 512
 
 export class StockContents extends React.Component{
+  /*
+  props: 
+    item_id: 詳細表示するアイテムの固有ID
+    category_list: 全カテゴリのリスト
+    userID: ユーザー固有ID
+    handleClose: Submitしたときにデータを渡す
+  */
   constructor(props){
     super(props)
 
@@ -49,6 +56,8 @@ export class StockContents extends React.Component{
       isAddCategoryOpen: false,
       addCategoryText: "",
       category_list: this.props.category_list,
+      //category_map: this.props.category_map,
+      category_map: {},
 
       submitButtonCheck: false,
     }
@@ -127,7 +136,7 @@ export class StockContents extends React.Component{
       stockNumber: this.state.stockNumber,
       price: this.state.price,
       lotSize: this.state.lotSize,
-      category: this.state.category,
+      category: [this.state.category],
       image_url: this.state.image_url,
       updated_at: firebase.firestore.FieldValue.serverTimestamp()
     }).then(ref => {
@@ -153,7 +162,7 @@ export class StockContents extends React.Component{
       stockNumber: this.state.stockNumber,
       price: this.state.price,
       lotSize: this.state.lotSize,
-      category: this.state.category,
+      category: [this.state.category],
       created_at: firebase.firestore.FieldValue.serverTimestamp(),
       updated_at: firebase.firestore.FieldValue.serverTimestamp()
     }).then(ref => {
@@ -194,10 +203,27 @@ export class StockContents extends React.Component{
   
       if(new_list.length <= MAX_CATEGORY_SIZE){
         this.setState({category_list: new_list, category: this.state.addCategoryText})
-        var categoryRef = db.collection('users').doc(this.props.userID)
-        categoryRef.update({
+        var categoryListRef = db.collection('users').doc(this.props.userID)
+        categoryListRef.update({
             category: firebase.firestore.FieldValue.arrayUnion(this.state.addCategoryText)
-        });
+        })
+
+        // category_itemの追加
+        var categoryDoc = categoryListRef.collection('categories')
+        categoryDoc.add({
+          name: this.state.addCategoryText,
+          created_at: firebase.firestore.FieldValue.serverTimestamp(),
+          updated_at: firebase.firestore.FieldValue.serverTimestamp()    
+        }).then(ref => {
+          // カテゴリ名とIDの紐づけ
+          // カテゴリ名が存在していないとき追加
+          if(!(this.state.addCategoryText in this.state.category_map)){
+            let new_category_map = this.state.category_map
+            new_category_map[this.state.addCategoryText] = ref.id
+            categoryListRef.update({ category_map: new_category_map })
+            this.setState({category_map: new_category_map})
+          }
+        })
       }  
     }
   }
