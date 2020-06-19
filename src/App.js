@@ -11,7 +11,12 @@ import Auth from './components/Auth.js'
 import { Login } from './components/Login.js'
 
 import Drawer from '@material-ui/core/Drawer';
+import IconButton from '@material-ui/core/IconButton';
+
 import MenuIcon from '@material-ui/icons/Menu';
+import SettingsIcon from '@material-ui/icons/Settings';
+import HomeIcon from '@material-ui/icons/Home';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 
 class App extends React.Component {
   constructor(){
@@ -57,22 +62,30 @@ class App extends React.Component {
     this.setState({leftDrawerOpen: open});
   };
 
+  settingChange = () => {
+
+  }
+
   leftMenuList = () => {
     if(this.state.user){
       return (
         <div className="App-menu-list">
           <div className="App-menu-list-item">
             <Link to="/stocks" >
-              My page
+              <HomeIcon style={{verticalAlign: "middle"}}/> My page
             {(this.state.user.email)?
             <p style={{fontSize: "0.7em", paddingLeft: "10px"}}>{this.state.user.email}でログイン済みです。</p>
             :null}
             </Link>
           </div>
 
+          <div className="App-menu-list-item" onClick={this.settingChange}>
+            <SettingsIcon style={{verticalAlign: "middle"}}/> Setting 
+          </div>
+
           <div className="App-menu-list-item">
             <Link to="/" onClick={this.logout.bind(this)}>
-              Logout&nbsp;
+              <ExitToAppIcon style={{verticalAlign: "middle"}}/> Logout&nbsp;
             </Link>
           </div>
         </div>
@@ -97,6 +110,9 @@ class App extends React.Component {
     if(this.state.user){
       return(
         <div className="App-menu-side">
+          <div className="App-menu-side-item">
+            <SettingsIcon onClick={this.settingChange}/>
+          </div>
           <div className="App-menu-side-item">
             <Link to="/stocks" >
               My page
