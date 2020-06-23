@@ -47,17 +47,18 @@ export class StockContents extends React.Component{
       stockNumber: 0,
       price: 0,
       lotSize: 0,
-      category: "",
-      image_url: "",
+      category: [],  // 表示名
+      category_id: [], // カテゴリーのid
+      image_url: "",      
 
       local_image: null,
       local_image_src: null,
 
       isAddCategoryOpen: false,
       addCategoryText: "",
-      category_list: this.props.category_list,
-      //category_map: this.props.category_map,
-      category_map: {},
+      category_list: this.props.category_list, // 全category 名前のリスト
+      category_map: this.props.category_map, // 全categoryの{id: name}
+      //category_map: {},
 
       submitButtonCheck: false,
     }
@@ -86,7 +87,8 @@ export class StockContents extends React.Component{
         stockNumber: this.state.data.stockNumber,
         price: this.state.data.price,
         lotSize: this.state.data.lotSize,
-        category: this.state.data.category,
+        category_id: this.state.data.category_id || [""],
+        category: this.state.category_map[this.state.data.category_id] || "",
         image_url: this.state.data.image_url || "",
       })
     }
@@ -136,7 +138,8 @@ export class StockContents extends React.Component{
       stockNumber: this.state.stockNumber,
       price: this.state.price,
       lotSize: this.state.lotSize,
-      category: [this.state.category],
+      category: this.state.category,
+      category_id: this.state.category_id,
       image_url: this.state.image_url,
       updated_at: firebase.firestore.FieldValue.serverTimestamp()
     }).then(ref => {
@@ -162,7 +165,8 @@ export class StockContents extends React.Component{
       stockNumber: this.state.stockNumber,
       price: this.state.price,
       lotSize: this.state.lotSize,
-      category: [this.state.category],
+      category: this.state.category,
+      category_id: this.state.category_id,
       created_at: firebase.firestore.FieldValue.serverTimestamp(),
       updated_at: firebase.firestore.FieldValue.serverTimestamp()
     }).then(ref => {
@@ -170,6 +174,7 @@ export class StockContents extends React.Component{
       this.setState({item_id: ref.id})  
     });
         
+    // 画像をstorageに保存
     const imageUploadPromise = new Promise((resolve, reject) => {
       if(this.state.local_image){
         let storageRef = firebase.storage().ref().child(`users/${this.props.userID}/${this.state.item_id}.jpg`);
@@ -195,11 +200,16 @@ export class StockContents extends React.Component{
     this.setState({isAddCategoryOpen: true})
   }
 
+  handleCategoryChanege(event) {
+    let new_id = Object.keys(this.state.category_map).filter(val => val === event.target.value)
+    this.setState({category : this.state.category_map[event.target.value], category_id: new_id})
+  }
+
   addCategoryHandler(){
     if(this.state.addCategoryText !== ""){
       let new_list = this.state.category_list.slice()
       new_list.push(this.state.addCategoryText)
-      this.setState({isAddCategoryOpen: false})
+
   
       if(new_list.length <= MAX_CATEGORY_SIZE){
         this.setState({category_list: new_list, category: this.state.addCategoryText})
@@ -209,21 +219,28 @@ export class StockContents extends React.Component{
         })
 
         // category_itemの追加
-        var categoryDoc = categoryListRef.collection('categories')
-        categoryDoc.add({
-          name: this.state.addCategoryText,
-          created_at: firebase.firestore.FieldValue.serverTimestamp(),
-          updated_at: firebase.firestore.FieldValue.serverTimestamp()    
-        }).then(ref => {
-          // カテゴリ名とIDの紐づけ
-          // カテゴリ名が存在していないとき追加
-          if(!(this.state.addCategoryText in this.state.category_map)){
-            let new_category_map = this.state.category_map
-            new_category_map[this.state.addCategoryText] = ref.id
-            categoryListRef.update({ category_map: new_category_map })
-            this.setState({category_map: new_category_map})
-          }
-        })
+        // カテゴリ名が存在していないときのみ追加する
+        if(!(this.state.addCategoryText in this.state.category_map)){
+          var categoryDoc = categoryListRef.collection('categories')
+          categoryDoc.add({
+            name: this.state.addCategoryText,
+            created_at: firebase.firestore.FieldValue.serverTimestamp(),
+            updated_at: firebase.firestore.FieldValue.serverTimestamp()    
+          }).then(ref => {
+            // カテゴリ名とIDの紐づけ
+              let new_category_map = this.state.category_map
+              new_category_map[ref.id] = this.state.addCategoryText
+              categoryListRef.update({ category_map: new_category_map })
+
+              let new_category_id = this.state.category_id
+              //new_category_id.push(ref.id)
+              new_category_id = [ref.id]
+              this.setState({category_map: new_category_map, category_id: new_category_id})
+          })
+        }
+
+        // カテゴリ追加の表示を閉じる
+        this.setState({isAddCategoryOpen: false})
       }  
     }
   }
@@ -298,12 +315,12 @@ export class StockContents extends React.Component{
               className="stock-form-category-select"
               select
               label="カテゴリー"
-              value={this.state.category}
-              onChange={this.handleChanege.bind(this, "category")}
+              value={this.state.category_id}
+              onChange={this.handleCategoryChanege.bind(this)}
             >
-              {this.state.category_list.map((category, idx) => (
-                <MenuItem key={idx} value={category}>
-                  {category}
+              {Object.keys(this.state.category_map).map((category_id, idx) => (
+                <MenuItem key={idx} value={category_id /* event.target.value */}>
+                  {this.state.category_map[category_id]/* dropdownに表示する項目 */}
                 </MenuItem>
               ))}
             </TextField>
@@ -361,7 +378,6 @@ export class StockContents extends React.Component{
     if(this.props.userID && this.state.data){
       return (
         <div className="stock-detail-root">
-        <p></p>
 
           <this.gridTemplate />
 
