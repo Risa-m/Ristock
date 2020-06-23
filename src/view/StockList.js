@@ -155,7 +155,10 @@ export class StockList extends React.Component{
 
   handleCategorySelect(val) {
     let selected_list = this.state.data_list.filter(value => {
-      return value[1].category === val
+      if((value[1]).category_id && (value[1].category_id).length > 0){
+        // 各項目のcategory_idのリストの中に、検索したいカテゴリIDが含まれているかどうかチェック
+        return ((value[1].category_id).indexOf(val) >= 0)
+      }
     })
     this.setState({show_list: selected_list, selectedCategory: val})
   }
@@ -268,7 +271,7 @@ export class StockList extends React.Component{
           {Object.keys(this.state.category_map).map((val, idx) => (
           //{this.state.category_list.map((val, idx) => (
           (val)?
-          <Chip label={val} variant={this.state.selectedCategory === val ? "default":"outlined"} key={idx} color="primary" onClick={this.handleCategorySelect.bind(this, val)} />
+          <Chip label={this.state.category_map[val]} variant={this.state.selectedCategory === val ? "default":"outlined"} key={idx} color="primary" onClick={this.handleCategorySelect.bind(this, val)} />
           :
           null
           ))}
@@ -327,7 +330,6 @@ export class StockList extends React.Component{
       this.getUserData()
     }
 
-    console.log(this.state.category_map)
     return (
     <div className="stock-list-root">
 
@@ -338,6 +340,8 @@ export class StockList extends React.Component{
       <this.listTemplate visible={this.state.visible===VisibleViewString.list} />
       <this.imageTemplate visible={this.state.visible===VisibleViewString.image} />
 
+
+      {/* 詳細・更新モーダル */}
       <div className="stock-list-details-modal">
       {((/*this.state.detailsItem && */this.state.detailsItemID) || (this.state.addItem && this.state.data_list.length <= MAX_USER_ITEMS))?
       <ModalWrapper
@@ -346,7 +350,9 @@ export class StockList extends React.Component{
       content={<StockContents item_id={this.state.detailsItemID} userID={this.props.userID} category_list={this.state.category_list} category_map={this.state.category_map} handleClose={this.handleSubmitClose.bind(this)}/>}
      />:null
        }
-       </div>
+      </div>
+
+
     </div>
     )
   }
