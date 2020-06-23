@@ -133,9 +133,9 @@ export class StockList extends React.Component{
         }else{
           return item
         }
-      })  
+      })
     }
-    this.setState({data_list: newList, show_list: newList, category_list: props.category_list, category_map: props.category_map})
+    this.setState({data_list: newList, show_list: newList, category_list: props.category_list, category_map: props.category_map, selectedCategory: "all"})
     this.handleClose()
   }
 
@@ -151,6 +151,13 @@ export class StockList extends React.Component{
   }
   handleCategorySelectAll() {
     this.setState({show_list: this.state.data_list, selectedCategory: " "})
+  }
+
+  handleCategorySelectNone() {
+    let selected_list = this.state.data_list.filter(value => {
+      return !(value[1]).category_id || ((value[1]).category_id && (value[1].category_id).length == 0)
+    })
+    this.setState({show_list: selected_list, selectedCategory: ""})
   }
 
   handleCategorySelect(val) {
@@ -275,7 +282,7 @@ export class StockList extends React.Component{
           :
           null
           ))}
-          <Chip label="No category" variant={this.state.selectedCategory === "" ? "default":"outlined"} key={-2} onClick={this.handleCategorySelect.bind(this, "")} />
+          <Chip label="No category" variant={this.state.selectedCategory === "" ? "default":"outlined"} key={-2} onClick={this.handleCategorySelectNone.bind(this)} />
           <Chip label="All Category" variant={this.state.data_list.length===this.state.show_list.length? "default":"outlined"} key={-1} onClick={this.handleCategorySelectAll.bind(this)} />
           </div>
           {/*
