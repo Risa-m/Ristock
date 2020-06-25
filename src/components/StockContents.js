@@ -150,12 +150,38 @@ export class StockContents extends React.Component{
     });
 
     // カテゴリ側にitemIDを登録
-    /*
-    let categoryRef = db.collection('users')
-    .doc(this.props.userID)
-    .collection('categories')
-    .doc(this.state.old_category_id)
-    */
+    console.log(this.state.old_category_id)
+    console.log(this.state.category_id)
+    if(this.state.old_category_id !== this.state.category_id){
+      console.log("DB category update")
+      if(this.state.old_category_id !== ""){
+        // もとのカテゴリからitemIDを削除
+        let oldCategoryRef = db.collection('users')
+        .doc(this.props.userID)
+        .collection('categories')
+        .doc(this.state.old_category_id)
+        let oldCetegoryData = (await oldCategoryRef.get()).data()
+        // DBからそのカテゴリが登録されているitemIDのリストを取得
+        let oldCetegoryItems = oldCetegoryData.item_id || []
+        let oldCategoryList = oldCetegoryItems.filter(item => item !== this.state.category_id)
+        oldCategoryRef.update({
+          item_id: oldCategoryList
+        })
+      }
+
+      // 新しいカテゴリにitemIDを追加
+      let newCategoryRef = db.collection('users')
+      .doc(this.props.userID)
+      .collection('categories')
+      .doc(this.state.category_id)
+      let newCetegoryData = (await newCategoryRef.get()).data()
+      // DBからそのカテゴリが登録されているitemIDのリストを取得
+      let newCetegoryItems = newCetegoryData.item_id || []
+      newCetegoryItems.push(this.state.category_id)
+      newCategoryRef.update({
+        item_id: newCetegoryItems
+      })
+    }
 
     this.props.handleClose(this.state)
   }
@@ -184,8 +210,21 @@ export class StockContents extends React.Component{
       this.setState({item_id: ref.id})  
     });
 
-    // カテゴリ側にitemIDを登録
-        
+    // カテゴリにitemIDを追加
+    let newCategoryRef = db.collection('users')
+    .doc(this.props.userID)
+    .collection('categories')
+    .doc(this.state.category_id)
+    let newCetegoryData = (await newCategoryRef.get()).data()
+    // DBからそのカテゴリが登録されているitemIDのリストを取得
+    let newCetegoryItems = newCetegoryData.item_id || []
+    newCetegoryItems.push(this.state.category_id)
+    
+    newCategoryRef.update({
+      item_id: newCetegoryItems
+    })
+
+
     // 画像をstorageに保存
     const imageUploadPromise = new Promise((resolve, reject) => {
       if(this.state.local_image){
@@ -236,6 +275,7 @@ export class StockContents extends React.Component{
           var categoryDoc = categoryListRef.collection('categories')
           categoryDoc.add({
             name: this.state.addCategoryText,
+            item_id: [],
             created_at: firebase.firestore.FieldValue.serverTimestamp(),
             updated_at: firebase.firestore.FieldValue.serverTimestamp()    
           }).then(ref => {
