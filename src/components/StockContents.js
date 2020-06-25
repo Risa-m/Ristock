@@ -48,7 +48,8 @@ export class StockContents extends React.Component{
       price: 0,
       lotSize: 0,
       category: [],  // 表示名
-      category_id: [], // カテゴリーのid
+      old_category_id: "",
+      category_id: "", // カテゴリーのid TODO: リスト化
       image_url: "",      
 
       local_image: null,
@@ -87,7 +88,8 @@ export class StockContents extends React.Component{
         stockNumber: this.state.data.stockNumber,
         price: this.state.data.price,
         lotSize: this.state.data.lotSize,
-        category_id: this.state.data.category_id || [""],
+        old_category_id: this.state.data.category_id || "",
+        category_id: this.state.data.category_id || "",
         category: this.state.category_map[this.state.data.category_id] || "",
         image_url: this.state.data.image_url || "",
       })
@@ -147,6 +149,14 @@ export class StockContents extends React.Component{
       //console.log('Updated document : ', ref);
     });
 
+    // カテゴリ側にitemIDを登録
+    /*
+    let categoryRef = db.collection('users')
+    .doc(this.props.userID)
+    .collection('categories')
+    .doc(this.state.old_category_id)
+    */
+
     this.props.handleClose(this.state)
   }
 
@@ -173,6 +183,8 @@ export class StockContents extends React.Component{
       //console.log('Added document with ID: ', ref.id);
       this.setState({item_id: ref.id})  
     });
+
+    // カテゴリ側にitemIDを登録
         
     // 画像をstorageに保存
     const imageUploadPromise = new Promise((resolve, reject) => {
@@ -201,8 +213,8 @@ export class StockContents extends React.Component{
   }
 
   handleCategoryChanege(event) {
-    let new_id = Object.keys(this.state.category_map).filter(val => val === event.target.value)
-    this.setState({category : this.state.category_map[event.target.value], category_id: new_id})
+    //let new_id = Object.keys(this.state.category_map).filter(val => val === event.target.value)
+    this.setState({category : this.state.category_map[event.target.value], category_id: event.target.value})
   }
 
   addCategoryHandler(){
@@ -232,9 +244,9 @@ export class StockContents extends React.Component{
               new_category_map[ref.id] = this.state.addCategoryText
               categoryListRef.update({ category_map: new_category_map })
 
-              let new_category_id = this.state.category_id
+              //let new_category_id = this.state.category_id
               //new_category_id.push(ref.id)
-              new_category_id = [ref.id]
+              let new_category_id = ref.id
               this.setState({category_map: new_category_map, category_id: new_category_id})
           })
         }

@@ -155,17 +155,24 @@ export class StockList extends React.Component{
 
   handleCategorySelectNone() {
     let selected_list = this.state.data_list.filter(value => {
-      return !(value[1]).category_id || ((value[1]).category_id && (value[1].category_id).length == 0)
+      // カテゴリIDが存在しないときまたは空白のとき
+      return !(value[1]).category_id || ((value[1]).category_id && (value[1].category_id) === "")
+      //return !(value[1]).category_id || ((value[1]).category_id && (value[1].category_id).length == 0)
     })
     this.setState({show_list: selected_list, selectedCategory: ""})
   }
 
   handleCategorySelect(val) {
     let selected_list = this.state.data_list.filter(value => {
+      console.log(value[1])
+      console.log(val)
+      /*
       if((value[1]).category_id && (value[1].category_id).length > 0){
         // 各項目のcategory_idのリストの中に、検索したいカテゴリIDが含まれているかどうかチェック
         return ((value[1].category_id).indexOf(val) >= 0)
       }
+      */
+     return value[1].category_id === val
     })
     this.setState({show_list: selected_list, selectedCategory: val})
   }
