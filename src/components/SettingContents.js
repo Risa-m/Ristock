@@ -65,8 +65,6 @@ export class SettingContents extends React.Component{
     let ItemContainsCategoryShots = await db.collection('users').doc(this.props.userID).collection('stock_items').where('category_id', '==', categoryID).get()
     if(ItemContainsCategoryShots && !ItemContainsCategoryShots.empty)
     ItemContainsCategoryShots.forEach(doc => {
-      console.log(doc.id)
-      console.log(doc.ref)
       doc.ref.update({
         category_id: ""
       })
@@ -99,7 +97,6 @@ export class SettingContents extends React.Component{
         )
       }
       else if(this.state.visible === settingChoice.category){
-        console.log(this.state.category_map)
         return (
           <div className="setting-category-chips">
             {Object.keys(this.state.category_map).map((val, idx) => (

@@ -133,6 +133,11 @@ p.stock-list-image-stock{
   margin-bottom: 5px;
 }
 
+.stock-list-setting-button {
+  float: right;
+  margin-right: 15px;
+}
+
 
 /* HOME画面 */
 .home-root {

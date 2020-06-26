@@ -113,7 +113,6 @@ export class StockList extends React.Component{
   handleClose(){
     this.setState({
       detailsItemID: null,
-      //detailsItem: null,
       addItem: false,
       modalopen: false,
     })

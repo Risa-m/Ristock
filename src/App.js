@@ -9,6 +9,8 @@ import { StockList } from './view/StockList'
 import { SignUp } from './view/SignUp';
 import Auth from './components/Auth.js'
 import { Login } from './components/Login.js'
+import ModalWrapper from './components/ModalWrapper'
+import { SettingContents } from './components/SettingContents'
 
 import Drawer from '@material-ui/core/Drawer';
 import IconButton from '@material-ui/core/IconButton';
@@ -28,6 +30,7 @@ class App extends React.Component {
       buttomNav: "home",
 
       leftDrawerOpen: false,
+      settingModalOpen: false,
     }
 
     this.setUser = this.setUser.bind(this)
@@ -62,8 +65,34 @@ class App extends React.Component {
     this.setState({leftDrawerOpen: open});
   };
 
-  settingChange = () => {
 
+  handleSettingModalClose(){
+    this.setState({
+      settingModalOpen: false,
+    })
+  }
+
+  settingChangeModalOpen = () => {
+    this.setState({
+      settingModalOpen: true,
+      leftDrawerOpen: false,
+    })
+  }
+
+  settingModal = () => {
+    if(this.state.user){
+      return (
+        <div className="stock-setting-modal">
+        <ModalWrapper
+        open={this.state.settingModalOpen}
+        handleClose={this.handleSettingModalClose.bind(this)}
+        content={<SettingContents userID={this.state.userID} handleClose={this.handleSettingModalClose.bind(this)}/>}
+        />
+        </div>
+      )
+    }else{
+      return <></>
+    }
   }
 
   leftMenuList = () => {
@@ -79,7 +108,7 @@ class App extends React.Component {
             </Link>
           </div>
 
-          <div className="App-menu-list-item" onClick={this.settingChange}>
+          <div className="App-menu-list-item" onClick={this.settingChangeModalOpen}>
             <SettingsIcon style={{verticalAlign: "middle"}}/> Setting 
           </div>
 
@@ -111,7 +140,7 @@ class App extends React.Component {
       return(
         <div className="App-menu-side">
           <div className="App-menu-side-item">
-            <SettingsIcon onClick={this.settingChange}/>
+            <SettingsIcon onClick={this.settingChangeModalOpen}/>
           </div>
           <div className="App-menu-side-item">
             <Link to="/stocks" >
@@ -165,6 +194,7 @@ class App extends React.Component {
           <this.rightMenuList/>
           </div>
         </div>
+        <this.settingModal/>
       <div className="App-view">
         <Switch>
           <Route exact path='/' render={props =><Home user={this.state.user} userID={this.state.userID}  {...props}/>} />
