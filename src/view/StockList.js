@@ -53,7 +53,7 @@ export class StockList extends React.Component{
       //detailsItem: null,
       addItem: false,
       modalopen: false,
-      visible: VisibleViewString.image
+      visible: VisibleViewString.image,
     }
   }
   componentDidMount() {

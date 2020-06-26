@@ -149,8 +149,6 @@ export class StockContents extends React.Component{
     });
 
     // カテゴリ側にitemIDを登録
-    console.log(this.state.old_category_id)
-    console.log(this.state.category_id)
     if(this.state.old_category_id !== this.state.category_id){
       console.log("DB category update")
       if(this.state.old_category_id !== ""){

@@ -71,6 +71,8 @@ export class SettingContents extends React.Component{
     })
     // カテゴリのドキュメントをDBから削除
     await db.collection('users').doc(this.props.userID).collection('categories').doc(categoryID).delete()
+
+    this.props.handleSettingChanged()
   }
 
   addCategoryHandler(){

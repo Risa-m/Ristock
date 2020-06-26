@@ -31,7 +31,13 @@ class App extends React.Component {
 
       leftDrawerOpen: false,
       settingModalOpen: false,
+
+      settingChanged: false,
+      refresh: false,
     }
+
+    this.stockListRef = React.createRef();
+
 
     this.setUser = this.setUser.bind(this)
     this.setUserID = this.setUserID.bind(this)
@@ -66,10 +72,26 @@ class App extends React.Component {
   };
 
 
+
+  handleSettingChanged() {
+    this.setState({
+      settingChanged: true
+    })
+  }
+
   handleSettingModalClose(){
     this.setState({
       settingModalOpen: false,
     })
+    this.stockListRefresh()
+  }
+
+  stockListRefresh(){
+    if(this.state.settingChanged){
+      console.log("stock list refresh")
+      this.stockListRef.current.getDocs();
+      this.setState({settingChanged: false})
+    }
   }
 
   settingChangeModalOpen = () => {
@@ -86,7 +108,7 @@ class App extends React.Component {
         <ModalWrapper
         open={this.state.settingModalOpen}
         handleClose={this.handleSettingModalClose.bind(this)}
-        content={<SettingContents userID={this.state.userID} handleClose={this.handleSettingModalClose.bind(this)}/>}
+        content={<SettingContents userID={this.state.userID} handleClose={this.handleSettingModalClose.bind(this)} handleSettingChanged={this.handleSettingChanged.bind(this)}/>}
         />
         </div>
       )
@@ -202,7 +224,7 @@ class App extends React.Component {
           <Auth setUser={this.setUser} setUserID={this.setUserID}  {...this.props}>
             <Switch>
               <Route exact path='/login' render={props => <Login user={this.state.user} userID={this.state.userID} {...props}/>} />
-              <Route exact path='/stocks' render={props =><StockList user={this.state.user} userID={this.state.userID}  {...props}/>} />
+              <Route exact path='/stocks' render={props =><StockList user={this.state.user} userID={this.state.userID} ref={this.stockListRef} {...props}/>} />
               <Route render={() => <p>Sorry, page not found.</p>}/>
             </Switch>
           </Auth>
