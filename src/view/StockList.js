@@ -348,13 +348,14 @@ export class StockList extends React.Component{
     return (
     <div className="stock-list-root">
 
-      <this.categoryTemplate/>
+      {//<this.categoryTemplate/>
+      }
+      <CategorySelectionShow category_map={this.state.category_map} data_list={this.state.data_list} show_list={this.state.show_list} selectedCategory={this.state.selectedCategory} handleCategorySelect={this.handleCategorySelect.bind(this)} handleCategorySelectNone={this.handleCategorySelectNone.bind(this)} handleCategorySelectAll={this.handleCategorySelectAll.bind(this)}/>
 
       <this.settingButtonTemplate/>
 
       <this.listTemplate visible={this.state.visible===VisibleViewString.list} />
-      {<StockContentsImageShow visible={this.state.visible===VisibleViewString.image} show_list={this.state.show_list} detailsDoc={this.detailsDoc.bind(this)}/>
-      }
+      <StockContentsImageShow visible={this.state.visible===VisibleViewString.image} show_list={this.state.show_list} detailsDoc={this.detailsDoc.bind(this)}/>      
       {
       //<this.imageTemplate visible={this.state.visible===VisibleViewString.image} />
       }
@@ -382,6 +383,54 @@ const VisibleViewString = {
   image: 1,
 }
 
+
+/* カテゴリの選択 */
+const CategorySelectionShow = (props) => {
+  const { category_map, selectedCategory } = props
+
+  const isEmpty = (obj) => {
+    return !Object.keys(obj).length;
+  }
+  const categoryChip = (category_map) => {
+    if(!isEmpty(category_map)){
+      return (
+        Object.keys(category_map).map((val, idx) => (
+          <Chip 
+            label={category_map[val]} 
+            variant={selectedCategory === val ? "default":"outlined"} 
+            key={idx} 
+            color="primary" 
+            onClick={() => props.handleCategorySelect(val)} />
+        ))
+      )
+    }
+    else{
+      return null
+    }
+  }
+
+  return (
+    <div className="stock-list-categories">
+      <div className="stock-list-categories-show">
+        {categoryChip(category_map)}
+        <Chip label="No category" variant={props.selectedCategory === "" ? "default":"outlined"} key={-2} onClick={()=> props.handleCategorySelectNone()} />
+        <Chip label="All Category" variant={props.data_list.length === props.show_list.length ? "default":"outlined"} key={-1} onClick={() => props.handleCategorySelectAll()} />
+        </div>
+    </div>
+  )
+}
+
+CategorySelectionShow.propTypes = {
+  category_map: PropTypes.object,
+  selectedCategory: PropTypes.string,
+  handleCategorySelect: PropTypes.func,
+  handleCategorySelectNone: PropTypes.func,
+  handleCategorySelectAll: PropTypes.func,
+  data_list: PropTypes.array,
+  show_list: PropTypes.array,
+}
+
+
 const StockContentsImageShow = (props) => {
   const { visible, show_list } = props
 
@@ -394,7 +443,6 @@ const StockContentsImageShow = (props) => {
     }
   }
   
-
   if(visible){
     return(
     <div className="stock-list-image">
@@ -404,11 +452,6 @@ const StockContentsImageShow = (props) => {
               <div className="stock-list-image-item">
                 <span className="square-content">
                 {imageView(item)}
-                {/*(item[1].image_url)?
-                  <img src={item[1].image_url} width="100%" onClick={() => props.detailsDoc(item[0])} alt={item[1].name}/>
-                  :
-                  <img src="image/no_image.png" width="100%" onClick={() => props.detailsDoc(item[0])} alt={item[1].name}/>
-                */}
                 </span>
               <p className="stock-list-image-name">{item[1].name}</p>
               <p>{item[1].modelNumber} {item[1].size} {item[1].color}</p>
