@@ -54,7 +54,7 @@ export class StockList extends React.Component{
       //detailsItem: null,
       addItem: false,
       modalopen: false,
-      visible: VisibleViewString.image,
+      current_view: VisibleViewString.image,
     }
 
   }
@@ -89,7 +89,6 @@ export class StockList extends React.Component{
   deleteDoc(docID){
     if(this.props.userID){
       let delete_item = this.state.data_list.filter(value => value[0] === docID)[0]
-      console.log(delete_item)
       if(delete_item[1].image_url){
         var deleteRef = firebase.storage().ref().child(`users/${this.props.userID}/${docID}.jpg`);
         deleteRef.delete()
@@ -106,6 +105,15 @@ export class StockList extends React.Component{
       return value[0] === docID
     })
     this.setState({/*detailsItem: searchItem,*/ detailsItemID: docID, modalopen:true})    
+  }
+
+  canUserAddDocs(){
+    if(this.state.data_list.length <= MAX_USER_ITEMS){
+      return true
+    }
+    else{
+      return false
+    }
   }
 
   addDoc(){
@@ -141,13 +149,13 @@ export class StockList extends React.Component{
   }
 
   settingColumn(){
-    let currentView = this.state.visible
+    let currentView = this.state.current_view
     let viewNumber = Object.keys(VisibleViewString).length
     if(currentView+1 < viewNumber){
-      this.setState({visible: (currentView+1)})      
+      this.setState({current_view: (currentView+1)})      
     }
     else{
-      this.setState({visible: 0})
+      this.setState({current_view: 0})
     }
   }
   handleCategorySelectAll() {
@@ -165,8 +173,6 @@ export class StockList extends React.Component{
 
   handleCategorySelect(val) {
     let selected_list = this.state.data_list.filter(value => {
-      console.log(value[1])
-      console.log(val)
       /*
       if((value[1]).category_id && (value[1].category_id).length > 0){
         // 各項目のcategory_idのリストの中に、検索したいカテゴリIDが含まれているかどうかチェック
@@ -179,162 +185,6 @@ export class StockList extends React.Component{
   }
 
 
-  listTemplate = (props) => {
-    if(props.visible){
-      return (
-        <div className="stock-list-table">
-        <TableContainer component={Paper}>
-          <Table aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <TableCell></TableCell>
-                <TableCell>名称</TableCell>
-                <TableCell align="center">型番</TableCell>
-                <TableCell align="center">サイズ</TableCell>
-                <TableCell align="center">色</TableCell>
-                <TableCell align="center">数&nbsp;(個)</TableCell>
-                <TableCell align="center">価格&nbsp;(円)</TableCell>
-                {/*<TableCell align="center">入り数&nbsp;(個)</TableCell>*/}
-                <TableCell align="center">カテゴリー</TableCell>
-                <TableCell align="center"></TableCell>
-                <TableCell align="center"></TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {this.state.show_list.map(item => (
-                <TableRow key={item[0]}>
-                  <TableCell component="th" scope="row">
-                    {(item[1].image_url)?
-                    <img src={item[1].image_url} width="80"/>
-                    :
-                    <img src="image/no_image.png" width="80"/>
-                  }
-                  </TableCell>
-                  <TableCell >{item[1].name}</TableCell>
-                  <TableCell align="center">{item[1].modelNumber}</TableCell>
-                  <TableCell align="center">{item[1].size}</TableCell>
-                  <TableCell align="center">{item[1].color}</TableCell>
-                  <TableCell align="center">{item[1].stockNumber}</TableCell>
-                  <TableCell align="center">{item[1].price}</TableCell>
-                  {/*<TableCell align="center">{item[1].lotSize}</TableCell>*/}
-                  <TableCell align="center">{item[1].category}</TableCell>
-                  <TableCell align="center">
-                    <Link to=""></Link>
-                    <IconButton aria-label="update" onClick={this.detailsDoc.bind(this, item[0])}>        
-                      <EditIcon />
-                    </IconButton>
-                  </TableCell>
-                  <TableCell align="center">
-                    <IconButton aria-label="delete" onClick={this.deleteDoc.bind(this, item[0])}>
-                      <DeleteIcon />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </div>
-      )  
-    }
-    else{
-      return null
-    }
-  }
-
-  imageTemplate = (props) => {
-    if(props.visible){
-      return(
-      <div className="stock-list-image">
-      <Grid container spacing={1}>
-        {this.state.show_list.map(item => (
-            <Grid item xs={6} sm={4} md={3} lg={2} xl={1} key={item[0]}>
-              <div className="stock-list-image-item">
-                <span className="square-content">
-                {(item[1].image_url)?
-                  <img src={item[1].image_url} width="100%" onClick={this.detailsDoc.bind(this, item[0])} alt={item[1].name}/>
-                  :
-                  <img src="image/no_image.png" width="100%" onClick={this.detailsDoc.bind(this, item[0])} alt={item[1].name}/>
-                }
-                </span>
-              <p className="stock-list-image-name">{item[1].name}</p>
-              <p>{item[1].modelNumber} {item[1].size} {item[1].color}</p>
-              <p className="stock-list-image-stock">{item[1].stockNumber}</p>
-              </div>
-            </Grid>
-        ))}
-      </Grid>
-    </div>
-      )
-    }
-    else{
-      return null
-    }
-  }
-
-  categoryTemplate = () => {
-    return (
-      <div className="stock-list-categories">
-        {(this.state.isCategoryShow)?
-        <>
-        <div className="stock-list-categories-show">
-          {Object.keys(this.state.category_map).map((val, idx) => (
-          //{this.state.category_list.map((val, idx) => (
-          (val)?
-          <Chip label={this.state.category_map[val]} variant={this.state.selectedCategory === val ? "default":"outlined"} key={idx} color="primary" onClick={this.handleCategorySelect.bind(this, val)} />
-          :
-          null
-          ))}
-          <Chip label="No category" variant={this.state.selectedCategory === "" ? "default":"outlined"} key={-2} onClick={this.handleCategorySelectNone.bind(this)} />
-          <Chip label="All Category" variant={this.state.data_list.length===this.state.show_list.length? "default":"outlined"} key={-1} onClick={this.handleCategorySelectAll.bind(this)} />
-          </div>
-          {/*
-          <div className="stock-list-categories-expand" >
-            <ExpandLessIcon onClick={e => this.setState({isCategoryShow: false})}/>
-          </div>
-          */}
-        </>
-        :
-        <>
-        <div className="stock-list-categories-show">
-          <Chip label="All Categories" variant={this.state.data_list.length===this.state.show_list.length? "default":"outlined"} key={-1} onClick={this.handleCategorySelectAll.bind(this)} />
-        </div>
-        <div className="stock-list-categories-expand">
-          <ExpandMoreIcon className="stock-list-categories-expand" onClick={e => this.setState({isCategoryShow: true})}/>
-        </div>
-        </>
-        }
-
-      </div>
-    )
-  }
-
-  settingButtonTemplate = () => {
-    return(
-      <div className="stock-list-buttons">
-        <IconButton className="stock-list-view-button" aria-label="view change" onClick={this.settingColumn.bind(this)}>
-          {(this.state.visible === VisibleViewString.image)?
-          <ListIcon />
-          :
-          (this.state.visible === VisibleViewString.list)?
-          <ImageIcon />
-          :
-          null
-          }
-        </IconButton>
-
-        <IconButton className="stock-list-add-button" aria-label="add" onClick={this.addDoc.bind(this)}>
-          <AddIcon />
-        </IconButton>
-        {/*
-        <IconButton className="stock-list-setting-button" aria-label="setting" onClick={this.settingChange}>
-          <SettingsIcon />
-        </IconButton>
-        */}
-      </div>
-    )
-  }
-
   render(){
     if(!this.state.isUserDataLoaded && this.props.userID){
       this.getUserData()
@@ -343,33 +193,65 @@ export class StockList extends React.Component{
     return (
     <div className="stock-list-root">
 
-      {//<this.categoryTemplate/>
-      }
-      <CategorySelectionShow category_map={this.state.category_map} data_list={this.state.data_list} show_list={this.state.show_list} selectedCategory={this.state.selectedCategory} handleCategorySelect={this.handleCategorySelect.bind(this)} handleCategorySelectNone={this.handleCategorySelectNone.bind(this)} handleCategorySelectAll={this.handleCategorySelectAll.bind(this)}/>
+      <CategorySelectionShow 
+        category_map={this.state.category_map} 
+        data_list={this.state.data_list} 
+        show_list={this.state.show_list} 
+        selectedCategory={this.state.selectedCategory} 
+        handleCategorySelect={this.handleCategorySelect.bind(this)} 
+        handleCategorySelectNone={this.handleCategorySelectNone.bind(this)} 
+        handleCategorySelectAll={this.handleCategorySelectAll.bind(this)}
+      />
 
-      {//<this.settingButtonTemplate/>
-      }
-      {<StockListSettingButtonsShow current_view={this.state.visible} settingColumn={this.settingColumn.bind(this)} addDoc={this.addDoc.bind(this)}/>}
+      <StockListSettingButtonsShow 
+        current_view={this.state.current_view} 
+        settingColumn={this.settingColumn.bind(this)} 
+        addDoc={this.addDoc.bind(this)}
+      />
+
+      <StockContentsListShow 
+        visible={this.state.current_view===VisibleViewString.list} 
+        show_list={this.state.show_list} 
+        detailsDoc={this.detailsDoc.bind(this)} 
+        deleteDoc={this.deleteDoc.bind(this)} 
+      />
+
+      <StockContentsImageShow 
+        visible={this.state.current_view===VisibleViewString.image} 
+        show_list={this.state.show_list} 
+        detailsDoc={this.detailsDoc.bind(this)}
+      />      
 
       {
-      //<this.listTemplate visible={this.state.visible===VisibleViewString.list} />
+      <StockDetailsUpdateModalView
+        userID={this.props.userID}
+        detailsItemID={this.state.detailsItemID}
+        wantToAddItem={this.state.addItem}
+        modalOpen={this.state.modalopen}
+        category_list={this.state.category_list}
+        category_map={this.state.category_map}
+        canUserAddDocs={this.canUserAddDocs.bind(this)}
+        handleClose={this.handleClose.bind(this)}
+        handleSubmitClose={this.handleSubmitClose.bind(this)}
+      />
       }
-      <StockContentsListShow visible={this.state.visible===VisibleViewString.list} show_list={this.state.show_list} detailsDoc={this.detailsDoc.bind(this)} deleteDoc={this.deleteDoc.bind(this)} />
-      <StockContentsImageShow visible={this.state.visible===VisibleViewString.image} show_list={this.state.show_list} detailsDoc={this.detailsDoc.bind(this)}/>      
-      {
-      //<this.imageTemplate visible={this.state.visible===VisibleViewString.image} />
-      }
-
 
       {/* 詳細・更新モーダル */}
       <div className="stock-list-details-modal">
-      {((/*this.state.detailsItem && */this.state.detailsItemID) || (this.state.addItem && this.state.data_list.length <= MAX_USER_ITEMS))?
+      {/*((this.state.detailsItemID) || (this.state.addItem && this.state.data_list.length <= MAX_USER_ITEMS))?
       <ModalWrapper
-      open={this.state.modalopen}
-      handleClose={this.handleClose.bind(this)}
-      content={<StockContents item_id={this.state.detailsItemID} userID={this.props.userID} category_list={this.state.category_list} category_map={this.state.category_map} handleClose={this.handleSubmitClose.bind(this)}/>}
-     />:null
-       }
+        open={this.state.modalopen}
+        handleClose={this.handleClose.bind(this)}
+        content={
+        <StockContents
+          item_id={this.state.detailsItemID} 
+          userID={this.props.userID} 
+          category_list={this.state.category_list} 
+          category_map={this.state.category_map} 
+          handleClose={this.handleSubmitClose.bind(this)}
+        />}
+      />:null
+        */}
       </div>
 
 
@@ -383,6 +265,42 @@ const VisibleViewString = {
   image: 1,
 }
 
+
+const StockDetailsUpdateModalView = (props) => {
+  const { userID, detailsItemID, wantToAddItem, modalOpen, category_list, category_map } = props
+
+  if((detailsItemID) || (wantToAddItem && props.canUserAddDocs())){
+    return (
+      <ModalWrapper
+        open={modalOpen}
+        handleClose={props.handleClose}
+        content={
+          <StockContents 
+            item_id={detailsItemID} 
+            userID={userID} 
+            category_list={category_list} 
+            category_map={category_map} 
+            handleClose={props.handleSubmitClose}
+          />}
+      />
+    )
+  }
+  else{
+    return null
+  }
+}
+
+StockDetailsUpdateModalView.propTypes = {
+  userID: PropTypes.string,
+  detailsItemID: PropTypes.string,
+  wantToAddItem: PropTypes.bool,
+  modalopen: PropTypes.bool,
+  category_list: PropTypes.array,
+  category_map: PropTypes.object,
+  canUserAddDocs: PropTypes.func,
+  handleClose: PropTypes.func,
+  handleSubmitClose: PropTypes.func,
+}
 
 const StockListSettingButtonsShow = (props) => {
   const { current_view } = props
