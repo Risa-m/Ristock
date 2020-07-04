@@ -4,13 +4,13 @@ import './App.css';
 
 import firebase from './firebase';
 
-import { Home } from './view/Home.js'
-import { StockList } from './view/StockList'
-import { SignUp } from './view/SignUp';
-import Auth from './components/Auth.js'
-import { Login } from './components/Login.js'
-import ModalWrapper from './components/ModalWrapper'
-import { SettingContents } from './components/SettingContents'
+import { Home } from 'view/Home.js'
+import { StockList } from 'view/StockList'
+import { SignUp } from 'view/SignUp';
+import Auth from 'components/Auth.js'
+import { Login } from 'components/Login.js'
+import ModalWrapper from 'components/ModalWrapper'
+import { SettingContents } from 'components/SettingContents'
 
 import Drawer from '@material-ui/core/Drawer';
 import IconButton from '@material-ui/core/IconButton';
@@ -88,7 +88,6 @@ class App extends React.Component {
 
   stockListRefresh(){
     if(this.state.settingChanged){
-      console.log("stock list refresh")
       this.stockListRef.current.getDocs();
       this.setState({settingChanged: false})
     }
