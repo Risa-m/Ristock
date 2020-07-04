@@ -178,11 +178,6 @@ export class StockList extends React.Component{
     this.setState({show_list: selected_list, selectedCategory: val})
   }
 
-  // 各種設定画面を開く
-  settingChange = () => {
-
-  }
-
 
   listTemplate = (props) => {
     if(props.visible){
@@ -352,9 +347,13 @@ export class StockList extends React.Component{
       }
       <CategorySelectionShow category_map={this.state.category_map} data_list={this.state.data_list} show_list={this.state.show_list} selectedCategory={this.state.selectedCategory} handleCategorySelect={this.handleCategorySelect.bind(this)} handleCategorySelectNone={this.handleCategorySelectNone.bind(this)} handleCategorySelectAll={this.handleCategorySelectAll.bind(this)}/>
 
-      <this.settingButtonTemplate/>
+      {//<this.settingButtonTemplate/>
+      }
+      {<StockListSettingButtonsShow current_view={this.state.visible} settingColumn={this.settingColumn.bind(this)} addDoc={this.addDoc.bind(this)}/>}
 
-      <this.listTemplate visible={this.state.visible===VisibleViewString.list} />
+      {
+      //<this.listTemplate visible={this.state.visible===VisibleViewString.list} />
+      }
       <StockContentsListShow visible={this.state.visible===VisibleViewString.list} show_list={this.state.show_list} detailsDoc={this.detailsDoc.bind(this)} deleteDoc={this.deleteDoc.bind(this)} />
       <StockContentsImageShow visible={this.state.visible===VisibleViewString.image} show_list={this.state.show_list} detailsDoc={this.detailsDoc.bind(this)}/>      
       {
@@ -382,6 +381,41 @@ export class StockList extends React.Component{
 const VisibleViewString = {
   list: 0,
   image: 1,
+}
+
+
+const StockListSettingButtonsShow = (props) => {
+  const { current_view } = props
+
+  const listViewButton = (current_view) => {
+    if(current_view === VisibleViewString.image){
+      return <ListIcon />
+    }
+    else if(current_view === VisibleViewString.list){
+      return <ImageIcon />
+    }
+    else {
+      return null
+    }
+  }
+
+  return(
+    <div className="stock-list-buttons">
+      <IconButton className="stock-list-view-button" aria-label="view change" onClick={() => props.settingColumn()}>
+        {listViewButton(current_view)}
+      </IconButton>
+
+      <IconButton className="stock-list-add-button" aria-label="add" onClick={() => props.addDoc()}>
+        <AddIcon />
+      </IconButton>
+    </div>
+  )
+}
+
+StockListSettingButtonsShow.protoTypes = {
+  current_view: PropTypes.bool,
+  settingColumn: PropTypes.func,
+  addDoc: PropTypes.func
 }
 
 
