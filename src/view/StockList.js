@@ -355,6 +355,7 @@ export class StockList extends React.Component{
       <this.settingButtonTemplate/>
 
       <this.listTemplate visible={this.state.visible===VisibleViewString.list} />
+      <StockContentsListShow visible={this.state.visible===VisibleViewString.list} show_list={this.state.show_list} detailsDoc={this.detailsDoc.bind(this)} deleteDoc={this.deleteDoc.bind(this)} />
       <StockContentsImageShow visible={this.state.visible===VisibleViewString.image} show_list={this.state.show_list} detailsDoc={this.detailsDoc.bind(this)}/>      
       {
       //<this.imageTemplate visible={this.state.visible===VisibleViewString.image} />
@@ -428,6 +429,83 @@ CategorySelectionShow.propTypes = {
   handleCategorySelectAll: PropTypes.func,
   data_list: PropTypes.array,
   show_list: PropTypes.array,
+}
+
+const StockContentsListShow = (props) => {
+  const { visible, show_list } = props
+
+  const cellNameToLabels = [
+    {label: "名称", value: "name"},
+    {label: "型番", value: "modelNumber"},
+    {label: "サイズ", value: "size"},
+    {label: "色", value: "color"},
+    {label: "数　(個)", value: "stockNumber"},
+    {label: "価格　(円)", value: "price"},
+    {label: "カテゴリー", value: "category"},
+  ]
+
+  const itemThumbnailImage = (image_url, thumbSize) => {
+    if(image_url){
+      return <img src={image_url} width={thumbSize}/>
+    }
+    else {
+      return <img src="image/no_image.png" width={thumbSize}/>
+    }
+  }
+
+  if(visible){
+    return (
+      <div className="stock-list-table">
+      <TableContainer component={Paper}>
+        <Table aria-label="simple table">
+          <TableHead>
+            <TableRow>
+              <TableCell>{/* image */}</TableCell>
+              {cellNameToLabels.map((cellName, idx) => (
+                  <TableCell align="center" key={idx}>{cellName.label}</TableCell>  
+                ))}
+              <TableCell align="center">{/* detail */}</TableCell>
+              <TableCell align="center">{/* delete */}</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {show_list.map(item => (
+              <TableRow key={item[0]}>
+                <TableCell >{itemThumbnailImage(item[1].image_url, 80)}</TableCell>
+
+                {cellNameToLabels.map((cellName, idx) => (
+                  <TableCell align="center" key={idx}>{item[1][cellName.value]}</TableCell>  
+                ))}
+
+                <TableCell align="center">
+                  <IconButton aria-label="update" onClick={() => props.detailsDoc(item[0])}>        
+                    <EditIcon />
+                  </IconButton>
+                </TableCell>
+                <TableCell align="center">
+                  <IconButton aria-label="delete" onClick={() => props.deleteDoc(item[0])}>
+                    <DeleteIcon />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </div>
+    )  
+  }
+  else{
+    return null
+  }
+}
+
+
+StockContentsListShow.propTypes = {
+  visible: PropTypes.bool,
+  show_list: PropTypes.array,
+  detailsDoc: PropTypes.func,
+  deleteDoc: PropTypes.func,
 }
 
 
