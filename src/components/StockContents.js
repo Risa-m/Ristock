@@ -150,7 +150,6 @@ export class StockContents extends React.Component{
 
     // カテゴリ側にitemIDを登録
     if(this.state.old_category_id !== this.state.category_id){
-      console.log("DB category update")
       if(this.state.old_category_id !== ""){
         // もとのカテゴリからitemIDを削除
         let oldCategoryRef = db.collection('users')
