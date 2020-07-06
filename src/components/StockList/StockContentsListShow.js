@@ -2,6 +2,8 @@ import React from 'react'
 import 'asset/views.css';
 import PropTypes from 'prop-types';
 
+import cellNameToLabels from 'components/cellNameToLabels'
+
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -17,6 +19,7 @@ import EditIcon from '@material-ui/icons/Edit';
 export const StockContentsListShow = (props) => {
   const { visible, show_list } = props
 
+  /*
   const cellNameToLabels = [
     {label: "名称", value: "name"},
     {label: "型番", value: "modelNumber"},
@@ -26,6 +29,7 @@ export const StockContentsListShow = (props) => {
     {label: "価格　(円)", value: "price"},
     {label: "カテゴリー", value: "category"},
   ]
+  */
 
   const itemThumbnailImage = (image_url, thumbSize) => {
     if(image_url){

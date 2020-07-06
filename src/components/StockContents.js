@@ -1,8 +1,10 @@
-import React from 'react'
+import React, { useState } from 'react'
 import firebase, { db } from '../firebase'
 import './components.css'
+import PropTypes from 'prop-types';
 
-import { resizeImage } from './ResizeImage';
+import { resizeImage } from 'components/ResizeImage';
+import cellNameToLabels from 'components/cellNameToLabels';
 
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
@@ -247,6 +249,10 @@ export class StockContents extends React.Component{
     this.setState({isAddCategoryOpen: true})
   }
 
+  addCategoryClose(){
+    this.setState({isAddCategoryOpen: false})
+  }
+
   handleCategoryChanege(event) {
     //let new_id = Object.keys(this.state.category_map).filter(val => val === event.target.value)
     this.setState({category : this.state.category_map[event.target.value], category_id: event.target.value})
@@ -354,7 +360,7 @@ export class StockContents extends React.Component{
           <IconButton aria-label="add-category" className="stock-form-category-add-button" onClick={this.addCategoryHandler.bind(this)}>
             <DoneIcon fontSize="small" />
           </IconButton>
-          <IconButton aria-label="add-category" className="stock-form-category-add-button" onClick={e => {this.setState({isAddCategoryOpen: false})}}>
+          <IconButton aria-label="add-category" className="stock-form-category-add-button" onClick={this.addCategoryClose.bind(this)}>
             <CloseIcon fontSize="small" />
           </IconButton>
           </div>
@@ -384,6 +390,11 @@ export class StockContents extends React.Component{
         </Grid>
 
         <Grid item xs={12} sm={6}>
+        <ImageUploadView 
+          image_url={this.state.image_url}
+          local_image_src={this.state.local_image_src}
+          imageChangeHandler={this.imageChangeHandler.bind(this)}/>
+        {/*
         <input
             accept="image/*"
             id="contained-button-file"
@@ -402,6 +413,7 @@ export class StockContents extends React.Component{
           :(this.state.local_image_src)?
           <img src={this.state.local_image_src} className="stock-form-image-show"/>
           :null}
+          */}
         </Grid>
       </Grid>
       </form>
@@ -446,3 +458,46 @@ export class StockContents extends React.Component{
     )
   }
 }
+
+
+const ImageUploadView = (props) => {
+  const { image_url, local_image_src } = props
+
+  const UploadedImage = () => {
+    if(image_url && !local_image_src){
+      return <img src={image_url} className="stock-form-image-show"/>
+    }
+    else if(local_image_src) {
+      return <img src={local_image_src} className="stock-form-image-show"/>
+    }
+    else {
+      return null
+    }
+  }
+
+  return (
+    <>
+    <input
+        accept="image/*"
+        id="contained-button-file"
+        type="file"
+        className="image-input"
+        onChange={e => props.imageChangeHandler(e)}
+      />
+      <label htmlFor="contained-button-file">
+        <Button variant="contained" color="primary" component="span">
+          Upload
+          <AddPhotoAlternateIcon />
+        </Button>
+      </label>
+      {UploadedImage()}
+    </>
+  )
+}
+
+ImageUploadView.propTypes = {
+  image_url: PropTypes.string,
+  local_image_src: PropTypes.string,
+  imageChangeHandler: PropTypes.func,
+}
+
