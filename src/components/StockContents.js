@@ -353,9 +353,9 @@ export class StockContents extends React.Component{
 
 
         <Grid item xs={12} sm={6}>
+          {/*
           {(this.state.isAddCategoryOpen)?
           <div className="stock-form-category-add">
-          {/* カテゴリ追加 */}
           <TextField id="standard-basic" className="stock-form-category-add-text" value={this.state.addCategoryText} label="Add Category" InputProps={{ inputProps: { maxLength: MAX_TEXT_INPUT_LENGTH} }} onChange={this.handleChanege.bind(this, "addCategoryText")}/>
           <IconButton aria-label="add-category" className="stock-form-category-add-button" onClick={this.addCategoryHandler.bind(this)}>
             <DoneIcon fontSize="small" />
@@ -366,7 +366,6 @@ export class StockContents extends React.Component{
           </div>
           :
           <>
-          {/* カテゴリ選択 */}
           {<TextField
               id="standard-select"
               className="stock-form-category-select"
@@ -376,8 +375,8 @@ export class StockContents extends React.Component{
               onChange={this.handleCategoryChanege.bind(this)}
             >
               {Object.keys(this.state.category_map).map((category_id, idx) => (
-                <MenuItem key={idx} value={category_id /* event.target.value */}>
-                  {this.state.category_map[category_id]/* dropdownに表示する項目 */}
+                <MenuItem key={idx} value={category_id}>
+                  {this.state.category_map[category_id]}
                 </MenuItem>
               ))}
             </TextField>
@@ -386,7 +385,19 @@ export class StockContents extends React.Component{
             <AddIcon fontSize="small" />
           </IconButton>
           </>
-          }
+          */}
+          <CategorySelectionView 
+            isAddCategoryOpen={this.state.isAddCategoryOpen}
+            addCategoryText={this.state.addCategoryText}
+            addCategoryHandler={this.addCategoryHandler.bind(this)}
+            addCategoryOpen={this.addCategoryOpen.bind(this)}
+            addCategoryClose={this.addCategoryClose.bind(this)}
+            handleCategoryChanege={this.handleCategoryChanege.bind(this)}
+            category_map={this.state.category_map}
+            category_id={this.state.category_id}
+            handleValueChanege={this.handleChanege.bind(this)}
+          />
+
         </Grid>
 
         <Grid item xs={12} sm={6}>
@@ -394,26 +405,6 @@ export class StockContents extends React.Component{
           image_url={this.state.image_url}
           local_image_src={this.state.local_image_src}
           imageChangeHandler={this.imageChangeHandler.bind(this)}/>
-        {/*
-        <input
-            accept="image/*"
-            id="contained-button-file"
-            type="file"
-            className="image-input"
-            onChange={e => this.imageChangeHandler(e)}
-          />
-          <label htmlFor="contained-button-file">
-            <Button variant="contained" color="primary" component="span">
-              Upload
-              <AddPhotoAlternateIcon />
-            </Button>
-          </label>
-          {(this.state.image_url && !this.state.local_image_src)?
-          <img src={this.state.image_url} className="stock-form-image-show"/>
-          :(this.state.local_image_src)?
-          <img src={this.state.local_image_src} className="stock-form-image-show"/>
-          :null}
-          */}
         </Grid>
       </Grid>
       </form>
@@ -459,6 +450,79 @@ export class StockContents extends React.Component{
   }
 }
 
+
+
+const CategorySelectionView = (props) => {
+  const { isAddCategoryOpen, addCategoryText, category_map, category_id } = props
+
+  if(isAddCategoryOpen){
+    return (
+      <>
+      <div className="stock-form-category-add">
+        <TextField 
+          id="standard-basic" 
+          className="stock-form-category-add-text" 
+          value={addCategoryText} 
+          label="Add Category" 
+          InputProps={{ inputProps: { maxLength: MAX_TEXT_INPUT_LENGTH} }} 
+          onChange={(event) => props.handleValueChanege("addCategoryText", event)}/>
+        <IconButton 
+          aria-label="add-category" 
+          className="stock-form-category-add-button" 
+          onClick={() => props.addCategoryHandler()}>
+          <DoneIcon fontSize="small" />
+        </IconButton>
+        <IconButton 
+          aria-label="add-category" 
+          className="stock-form-category-add-button" 
+          onClick={() => props.addCategoryClose()}>
+          <CloseIcon fontSize="small" />
+        </IconButton>
+      </div>
+      </>
+    )
+  }
+  // カテゴリ選択
+  else {
+    return (
+      <>
+      <TextField
+          id="standard-select"
+          className="stock-form-category-select"
+          select
+          label="カテゴリー"
+          value={category_id}
+          onChange={event => props.handleCategoryChanege(event)}
+      >
+        {Object.keys(category_map).map((category_id, idx) => (
+          <MenuItem key={idx} value={category_id /* event.target.value */}>
+            {category_map[category_id]/* dropdownに表示する項目 */}
+          </MenuItem>
+        ))}
+      </TextField>
+      <IconButton 
+        aria-label="add-category" 
+        className="stock-form-category-select-button" 
+        onClick={() => props.addCategoryOpen()}>
+        <AddIcon fontSize="small" />
+      </IconButton>
+      </>
+    )
+  }
+}
+
+
+CategorySelectionView.propTypes = {
+  isAddCategoryOpen: PropTypes.bool,
+  addCategoryText: PropTypes.string,
+  addCategoryHandler: PropTypes.func,
+  addCategoryOpen: PropTypes.func,
+  addCategoryClose: PropTypes.func,
+  handleCategoryChanege: PropTypes.func,
+  category_map: PropTypes.object,
+  category_id: PropTypes.string,
+  handleValueChanege: PropTypes.func,
+}
 
 const ImageUploadView = (props) => {
   const { image_url, local_image_src } = props
