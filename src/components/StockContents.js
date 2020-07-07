@@ -321,38 +321,24 @@ export class StockContents extends React.Component{
 
   gridTemplate = () => {  
     return (
+      <>
+      {/*
       <form className="stock-form" noValidate autoComplete="off">
       <Grid container spacing={3}>
+      */}
         
-        {/*
-        <Grid item xs={12} sm={6}>
-          <TextField id="standard-basic" className="stock-form-text" value={this.state.name} InputProps={{ inputProps: { maxLength: MAX_TEXT_INPUT_LENGTH} }} label="名前" onChange={this.handleChanege.bind(this, "name")}/> 
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField id="standard-basic" className="stock-form-text" value={this.state.modelNumber} InputProps={{ inputProps: { maxLength: MAX_TEXT_INPUT_LENGTH} }} label="型番" onChange={this.handleChanege.bind(this, "modelNumber")}/> 
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField id="standard-basic" className="stock-form-text" value={this.state.size} InputProps={{ inputProps: { maxLength: MAX_TEXT_INPUT_LENGTH} }} label="サイズ" onChange={this.handleChanege.bind(this, "size")}/> 
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField id="standard-basic" className="stock-form-text" value={this.state.color} InputProps={{ inputProps: { maxLength: MAX_TEXT_INPUT_LENGTH} }} label="色" onChange={this.handleChanege.bind(this, "color")}/> 
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField id="standard-number" className="stock-form-text" type="number" value={this.state.stockNumber} InputProps={{ inputProps: { min: 0} }} label="残数" onChange={this.handleChanege.bind(this, "stockNumber")} InputLabelProps={{shrink: true,}}/> 
-          {//<this.phonePlusMinusTemplate property="stockNumber"/>
-          }
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField id="standard-number" className="stock-form-text" type="number" value={this.state.price} label="価格" InputProps={{ inputProps: { min: 0} }} onChange={this.handleChanege.bind(this, "price")} InputLabelProps={{shrink: true,}}/> 
-        </Grid>
-        */}
-        {
-        <StockContentDetailsView 
+        <StockContentGridView 
           handleValueChanege={this.handleChanege.bind(this)}
-          {...this.state}/>
-        }
+          addCategoryHandler={this.addCategoryHandler.bind(this)}
+          addCategoryOpen={this.addCategoryOpen.bind(this)}
+          addCategoryClose={this.addCategoryClose.bind(this)}
+          handleCategoryChanege={this.handleCategoryChanege.bind(this)}
+          handleValueChanege={this.handleChanege.bind(this)}
+          imageChangeHandler={this.imageChangeHandler.bind(this)}
+          {...this.state}
+        />
 
-
+        {/*
         <Grid item xs={12} sm={6}>
           <CategorySelectionView 
             isAddCategoryOpen={this.state.isAddCategoryOpen}
@@ -376,6 +362,8 @@ export class StockContents extends React.Component{
         </Grid>
       </Grid>
       </form>
+        */}
+        </>
     )
   
   }
@@ -419,77 +407,86 @@ export class StockContents extends React.Component{
 }
 
 
-const StockContentDetailsView = (props) => {
+const StockContentTextField = (props) => {
+  const { obj } = props
+
+  if(obj.type === "string"){
+    return (
+      <TextField 
+        id="standard-basic" 
+        className="stock-form-text" 
+        value={props[obj.value]} 
+        InputProps={{ inputProps: { maxLength: MAX_TEXT_INPUT_LENGTH } }} 
+        label={obj.label}
+        onChange={(event) => props.handleValueChanege(obj.value, event)}/> 
+    )  
+  }
+  else if(obj.type === "number"){
+    return (
+        <TextField 
+          id="standard-number" 
+          className="stock-form-text" 
+          type="number" 
+          value={props[obj.value]} 
+          InputProps={{ inputProps: { min: 0} }} 
+          label={obj.label} 
+          onChange={(event) => props.handleValueChanege(obj.value, event)} 
+          InputLabelProps={{shrink: true,}}/> 
+    )  
+  }
+  else {
+    return null
+  }
+}
+StockContentTextField.propTypes = {
+  handleValueChanege: PropTypes.func,
+  obj: PropTypes.object,
+}
+
+
+const StockContentGridView = (props) => {
   const { isAddCategoryOpen, addCategoryText, category_map, category_id, image_url, local_image_src } = props
 
-  const ValueTextField = (obj) => {
-    if(obj.type === "string"){
-      return (
-        <TextField 
-          id="standard-basic" 
-          className="stock-form-text" 
-          value={props[obj.value]} 
-          InputProps={{ inputProps: { maxLength: MAX_TEXT_INPUT_LENGTH } }} 
-          label={obj.label}
-          onChange={(event) => props.handleValueChanege(obj.value, event)}/> 
-      )  
-    }
-    else if(obj.type === "number"){
-      return (
-          <TextField 
-            id="standard-number" 
-            className="stock-form-text" 
-            type="number" 
-            value={props[obj.value]} 
-            InputProps={{ inputProps: { min: 0} }} 
-            label={obj.label} 
-            onChange={(event) => props.handleValueChanege(obj.value, event)} 
-            InputLabelProps={{shrink: true,}}/> 
-      )  
-    }
-    else {
-      return null
-    }
-  }
-
   return (
-    <>
-      {cellNameToLabels
-        .filter(obj => obj.value !== "category")
-        .map((obj, idx) => (
-          <Grid item xs={12} sm={6} key={idx}>
-            {ValueTextField(obj)}
-          </Grid>
-        )
-      )}
+    <form className="stock-form" noValidate autoComplete="off">
+      <Grid container spacing={3}>
+        
+        {cellNameToLabels
+          .filter(obj => obj.value !== "category")
+          .map((obj, idx) => (
+            <Grid item xs={12} sm={6} key={idx}>
+              <StockContentTextField obj={obj} {...props} />
+            </Grid>
+          )
+        )}
 
-      {/*
-      <Grid item xs={12} sm={6}>
-        <CategorySelectionView 
-          isAddCategoryOpen={isAddCategoryOpen}
-          addCategoryText={addCategoryText}
-          addCategoryHandler={props.addCategoryHandler}
-          addCategoryOpen={props.addCategoryOpen}
-          addCategoryClose={props.addCategoryClose}
-          handleCategoryChanege={props.handleCategoryChanege}
-          category_map={category_map}
-          category_id={category_id}
-          handleValueChanege={props.handleChanege}
-        />
-      </Grid>
+        <Grid item xs={12} sm={6}>
+          <CategorySelectionView 
+            isAddCategoryOpen={isAddCategoryOpen}
+            addCategoryText={addCategoryText}
+            addCategoryHandler={props.addCategoryHandler}
+            addCategoryOpen={props.addCategoryOpen}
+            addCategoryClose={props.addCategoryClose}
+            handleCategoryChanege={props.handleCategoryChanege}
+            category_map={category_map}
+            category_id={category_id}
+            handleValueChanege={props.handleValueChanege}
+          />
+        </Grid>
 
-      <Grid item xs={12} sm={6}>
-        <ImageUploadView 
-          image_url={image_url}
-          local_image_src={local_image_src}
-          imageChangeHandler={props.imageChangeHandler}/>
+        <Grid item xs={12} sm={6}>
+          <ImageUploadView 
+            image_url={image_url}
+            local_image_src={local_image_src}
+            imageChangeHandler={props.imageChangeHandler}/>
+        </Grid>
+
       </Grid>
-      */}
-    </>
+    </form>
   )
 }
 
-StockContentDetailsView.propTypes = {
+StockContentGridView.propTypes = {
   addCategoryHandler: PropTypes.func,
   addCategoryOpen: PropTypes.func,
   addCategoryClose: PropTypes.func,
@@ -498,6 +495,7 @@ StockContentDetailsView.propTypes = {
   image_url: PropTypes.string,
   local_image_src: PropTypes.string,
   imageChangeHandler: PropTypes.func,
+  handleValueChanege: PropTypes.func,
 }
 
 
