@@ -96,9 +96,23 @@ export class StockContents extends React.Component{
     }
   }
 
-  // form が変更されたとき、stateも更新
-  handleChanege(property, event) {
-    this.setState({ [property] : event.target.value})
+  callbacks = {
+    handleChanege: (property, event) => {
+      // form が変更されたとき、stateも更新
+      this.setState({[property]: event.target.value})
+    },
+    handleCategoryChanege: (event) => {
+      //let new_id = Object.keys(this.state.category_map).filter(val => val === event.target.value)
+      this.setState({category : this.state.category_map[event.target.value], category_id: event.target.value})
+    },
+    handleImageChange: async (event) => {
+      const { imageFile, imageUri } = await resizeImage(event, IMAGE_MAX_SIZE)
+      this.setState({
+        local_image: imageFile,
+        local_image_src: imageUri,
+      })  
+    }
+  
   }
 
 
@@ -244,17 +258,13 @@ export class StockContents extends React.Component{
     this.props.handleClose(this.state)
   }
 
-  addCategoryOpen(){
-    this.setState({isAddCategoryOpen: true})
-  }
-
-  addCategoryClose(){
-    this.setState({isAddCategoryOpen: false})
-  }
-
-  handleCategoryChanege(event) {
-    //let new_id = Object.keys(this.state.category_map).filter(val => val === event.target.value)
-    this.setState({category : this.state.category_map[event.target.value], category_id: event.target.value})
+  modal = {
+    addCategoryOpen: () => {
+      this.setState({isAddCategoryOpen: true})
+    },
+    addCategoryClose: () => {
+      this.setState({isAddCategoryOpen: false})
+    }
   }
 
   addCategoryHandler(){
@@ -301,14 +311,6 @@ export class StockContents extends React.Component{
     }
   }
 
-  async imageChangeHandler(e) {
-    const { imageFile, imageUri } = await resizeImage(e, IMAGE_MAX_SIZE);
-    this.setState({
-      local_image: imageFile,
-      local_image_src: imageUri,
-    });
-  }
-
   
   phonePlusMinusTemplate = (props) => {
     return (
@@ -319,65 +321,31 @@ export class StockContents extends React.Component{
     )
   }
 
-  gridTemplate = () => {  
-    return (
-      <>
-      {/*
-      <form className="stock-form" noValidate autoComplete="off">
-      <Grid container spacing={3}>
-      */}
-        
-        <StockContentGridView 
-          handleValueChanege={this.handleChanege.bind(this)}
-          addCategoryHandler={this.addCategoryHandler.bind(this)}
-          addCategoryOpen={this.addCategoryOpen.bind(this)}
-          addCategoryClose={this.addCategoryClose.bind(this)}
-          handleCategoryChanege={this.handleCategoryChanege.bind(this)}
-          handleValueChanege={this.handleChanege.bind(this)}
-          imageChangeHandler={this.imageChangeHandler.bind(this)}
-          {...this.state}
-        />
-
-        {/*
-        <Grid item xs={12} sm={6}>
-          <CategorySelectionView 
-            isAddCategoryOpen={this.state.isAddCategoryOpen}
-            addCategoryText={this.state.addCategoryText}
-            addCategoryHandler={this.addCategoryHandler.bind(this)}
-            addCategoryOpen={this.addCategoryOpen.bind(this)}
-            addCategoryClose={this.addCategoryClose.bind(this)}
-            handleCategoryChanege={this.handleCategoryChanege.bind(this)}
-            category_map={this.state.category_map}
-            category_id={this.state.category_id}
-            handleValueChanege={this.handleChanege.bind(this)}
-          />
-
-        </Grid>
-
-        <Grid item xs={12} sm={6}>
-        <ImageUploadView 
-          image_url={this.state.image_url}
-          local_image_src={this.state.local_image_src}
-          imageChangeHandler={this.imageChangeHandler.bind(this)}/>
-        </Grid>
-      </Grid>
-      </form>
-        */}
-        </>
-    )
-  
-  }
 
   render(){
     // Add
     if(this.props.userID && (!this.state.item_id || !this.state.data)){
       return (
       <div className="stock-add-root">
-      <p></p>
-      <this.gridTemplate />
+        <StockContentGridView 
+          handleValueChanege={this.callbacks.handleChanege}
+          addCategoryHandler={this.addCategoryHandler.bind(this)}
+          addCategoryOpen={this.modal.addCategoryOpen}
+          addCategoryClose={this.modal.addCategoryClose}
+          handleValueChanege={this.callbacks.handleChanege}
+          handleCategoryChanege={this.callbacks.handleCategoryChanege}
+          imageChangeHandler={this.callbacks.handleImageChange}
+          {...this.state}
+        />
 
       <div className="add-stock-submit-button">
-        <Button variant="outlined" onClick={this.handleAddSubmit.bind(this)} disabled={!(this.state.name) || this.state.submitButtonCheck}>Save</Button>
+        <Button 
+          variant="outlined" 
+          onClick={this.handleAddSubmit.bind(this)} 
+          disabled={!(this.state.name) || this.state.submitButtonCheck}
+        >
+          Save
+        </Button>
       </div>
     </div>
     )
@@ -389,10 +357,25 @@ export class StockContents extends React.Component{
       return (
         <div className="stock-detail-root">
 
-          <this.gridTemplate />
+        <StockContentGridView 
+          handleValueChanege={this.callbacks.handleChanege}
+          addCategoryHandler={this.addCategoryHandler.bind(this)}
+          addCategoryOpen={this.modal.addCategoryOpen}
+          addCategoryClose={this.modal.addCategoryClose}
+          handleValueChanege={this.callbacks.handleChanege}
+          handleCategoryChanege={this.callbacks.handleCategoryChanege}
+          imageChangeHandler={this.callbacks.handleImageChange}
+          {...this.state}
+        />
 
         <div className="update-stock-submit-button">
-          <Button variant="outlined" onClick={this.handleUpdateSubmit.bind(this)} disabled={!(this.state.name) || this.state.submitButtonCheck}>Save</Button>
+          <Button 
+          variant="outlined" 
+          onClick={this.handleUpdateSubmit.bind(this)} 
+          disabled={!(this.state.name) || this.state.submitButtonCheck}
+          >
+            Save
+          </Button>
         </div>
 
       </div> 
