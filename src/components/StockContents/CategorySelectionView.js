@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import 'components/components.css'
 import PropTypes from 'prop-types';
 
@@ -14,29 +14,40 @@ import CloseIcon from '@material-ui/icons/Close';
 const MAX_TEXT_INPUT_LENGTH = 20
 
 export const CategorySelectionView = (props) => {
-  const { isAddCategoryOpen, addCategoryText, category_map, category_id } = props
+  const { category_map, category_id } = props
+  const [ createCategoryOpen, setCreateCategoryOpen ] = useState(false)
+  const [ categoryName, setCategoryName] = useState("")
 
-  if(isAddCategoryOpen){
+  const createNewCategory = async () => {
+    await props.addCategoryHandler(categoryName)
+    setCreateCategoryOpen(false)
+  }
+
+  const handleCategoryNameChange = (event) => {
+    setCategoryName(event.target.value)
+  }
+
+  if(createCategoryOpen){
     return (
       <>
       <div className="stock-form-category-add">
         <TextField 
           id="standard-basic" 
           className="stock-form-category-add-text" 
-          value={addCategoryText} 
+          value={categoryName} 
           label="Add Category" 
           InputProps={{ inputProps: { maxLength: MAX_TEXT_INPUT_LENGTH} }} 
-          onChange={(event) => props.handleValueChanege("addCategoryText", event)}/>
+          onChange={(event) => handleCategoryNameChange(event)}/>
         <IconButton 
           aria-label="add-category" 
           className="stock-form-category-add-button" 
-          onClick={() => props.addCategoryHandler()}>
+          onClick={() => createNewCategory()}>
           <DoneIcon fontSize="small" />
         </IconButton>
         <IconButton 
           aria-label="add-category" 
           className="stock-form-category-add-button" 
-          onClick={() => props.addCategoryClose()}>
+          onClick={() => setCreateCategoryOpen(false)}>
           <CloseIcon fontSize="small" />
         </IconButton>
       </div>
@@ -64,7 +75,7 @@ export const CategorySelectionView = (props) => {
       <IconButton 
         aria-label="add-category" 
         className="stock-form-category-select-button" 
-        onClick={() => props.addCategoryOpen()}>
+        onClick={() => setCreateCategoryOpen(true)}>
         <AddIcon fontSize="small" />
       </IconButton>
       </>
@@ -74,11 +85,7 @@ export const CategorySelectionView = (props) => {
 
 
 CategorySelectionView.propTypes = {
-  isAddCategoryOpen: PropTypes.bool,
-  addCategoryText: PropTypes.string,
   addCategoryHandler: PropTypes.func,
-  addCategoryOpen: PropTypes.func,
-  addCategoryClose: PropTypes.func,
   handleCategoryChanege: PropTypes.func,
   category_map: PropTypes.object,
   category_id: PropTypes.string,

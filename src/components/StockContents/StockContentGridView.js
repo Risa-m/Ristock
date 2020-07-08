@@ -10,7 +10,7 @@ import { StockContentTextField } from 'components/StockContents/StockContentText
 import Grid from '@material-ui/core/Grid';
 
 export const StockContentGridView = (props) => {
-  const { isAddCategoryOpen, addCategoryText, category_map, category_id, image_url, local_image_src } = props
+  const { category_map, category_id, image_url, local_image_src } = props
 
   return (
     <form className="stock-form" noValidate autoComplete="off">
@@ -27,11 +27,7 @@ export const StockContentGridView = (props) => {
 
         <Grid item xs={12} sm={6}>
           <CategorySelectionView 
-            isAddCategoryOpen={isAddCategoryOpen}
-            addCategoryText={addCategoryText}
             addCategoryHandler={props.addCategoryHandler}
-            addCategoryOpen={props.addCategoryOpen}
-            addCategoryClose={props.addCategoryClose}
             handleCategoryChanege={props.handleCategoryChanege}
             category_map={category_map}
             category_id={category_id}
@@ -53,8 +49,6 @@ export const StockContentGridView = (props) => {
 
 StockContentGridView.propTypes = {
   addCategoryHandler: PropTypes.func,
-  addCategoryOpen: PropTypes.func,
-  addCategoryClose: PropTypes.func,
   category_map: PropTypes.object,
   category_id: PropTypes.string,
   image_url: PropTypes.string,

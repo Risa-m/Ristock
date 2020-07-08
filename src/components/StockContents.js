@@ -57,33 +57,6 @@ export class StockContents extends React.Component{
     await this.db.getDocs(this.props.userID, this.state.item_id)
   }
 
-  /*
-  // userID と itemIDからデータをDBから取得し、stateに保存
-  async getDocs(){
-    if(this.props.userID && this.state.item_id){
-      let itemRef = db.collection('users')
-                      .doc(this.props.userID)
-                      .collection('stock_items')
-                      .doc(this.state.item_id)
-      let doc = await itemRef.get()
-      this.setState({
-        data: doc.data(),
-        name: doc.data().name,
-        modelNumber: doc.data().modelNumber,
-        size: doc.data().size,
-        color: doc.data().color,
-        stockNumber: doc.data().stockNumber,
-        price: doc.data().price,
-        lotSize: doc.data().lotSize,
-        old_category_id: doc.data().category_id || "",
-        category_id: doc.data().category_id || "",
-        category: this.state.category_map[doc.data().category_id] || "",
-        image_url: doc.data().image_url || "",
-      })
-    }
-  }
-  */
-
   callbacks = {
     handleChanege: (property, event) => {
       // form が変更されたとき、stateも更新
@@ -294,23 +267,12 @@ export class StockContents extends React.Component{
     this.props.handleClose(this.state)
   }
 
-  newCategoryView = {
-    addCategoryOpen: () => {
-      this.setState({isAddCategoryOpen: true})
-    },
-    addCategoryClose: () => {
-      this.setState({isAddCategoryOpen: false})
-    }
-  }
+  createNewCategory = async (categoryName) => {
+    if(categoryName !== "" && Object.keys(this.state.category_map).length < MAX_CATEGORY_SIZE){
 
-  createNewCategory = async () => {
-    if(this.state.addCategoryText !== "" && Object.keys(this.state.category_map).length < MAX_CATEGORY_SIZE){
+      this.setState({category: categoryName})      
 
-      this.setState({category: this.state.addCategoryText})      
-
-      await this.db.createCategory(this.props.userID, this.state.addCategoryText)
-
-      this.newCategoryView.addCategoryClose()
+      await this.db.createCategory(this.props.userID, categoryName)
     }
   }
 
@@ -333,8 +295,6 @@ export class StockContents extends React.Component{
         <StockContentGridView 
           handleValueChanege={this.callbacks.handleChanege}
           addCategoryHandler={this.createNewCategory}
-          addCategoryOpen={this.newCategoryView.addCategoryOpen}
-          addCategoryClose={this.newCategoryView.addCategoryClose}
           handleValueChanege={this.callbacks.handleChanege}
           handleCategoryChanege={this.callbacks.handleCategoryChanege}
           imageChangeHandler={this.callbacks.handleImageChange}
@@ -363,8 +323,6 @@ export class StockContents extends React.Component{
         <StockContentGridView 
           handleValueChanege={this.callbacks.handleChanege}
           addCategoryHandler={this.createNewCategory}
-          addCategoryOpen={this.newCategoryView.addCategoryOpen}
-          addCategoryClose={this.newCategoryView.addCategoryClose}
           handleValueChanege={this.callbacks.handleChanege}
           handleCategoryChanege={this.callbacks.handleCategoryChanege}
           imageChangeHandler={this.callbacks.handleImageChange}
