@@ -18,7 +18,6 @@ export class StockContents extends React.Component{
   /*
   props: 
     item_id: 詳細表示するアイテムの固有ID
-    category_list: 全カテゴリのリスト
     userID: ユーザー固有ID
     handleClose: Submitしたときにデータを渡す
   */
@@ -47,7 +46,6 @@ export class StockContents extends React.Component{
 
       isAddCategoryOpen: false,
       addCategoryText: "",
-      category_list: this.props.category_list, // 全category 名前のリスト
       category_map: this.props.category_map, // 全categoryの{id: name}
 
       submitButtonCheck: false,
@@ -56,9 +54,10 @@ export class StockContents extends React.Component{
 
   // mount されたときにデータをDBから取得
   async componentDidMount() {
-    await this.getDocs()
+    await this.db.getDocs(this.props.userID, this.state.item_id)
   }
 
+  /*
   // userID と itemIDからデータをDBから取得し、stateに保存
   async getDocs(){
     if(this.props.userID && this.state.item_id){
@@ -83,6 +82,7 @@ export class StockContents extends React.Component{
       })
     }
   }
+  */
 
   callbacks = {
     handleChanege: (property, event) => {
@@ -104,6 +104,29 @@ export class StockContents extends React.Component{
   }
 
   db = {
+    getDocs: async (userID, itemID) => {
+      if(userID && itemID){
+        let itemRef = db.collection('users')
+                        .doc(userID)
+                        .collection('stock_items')
+                        .doc(itemID)
+        let doc = await itemRef.get()
+        this.setState({
+          data: doc.data(),
+          name: doc.data().name,
+          modelNumber: doc.data().modelNumber,
+          size: doc.data().size,
+          color: doc.data().color,
+          stockNumber: doc.data().stockNumber,
+          price: doc.data().price,
+          lotSize: doc.data().lotSize,
+          old_category_id: doc.data().category_id || "",
+          category_id: doc.data().category_id || "",
+          category: this.state.category_map[doc.data().category_id] || "",
+          image_url: doc.data().image_url || "",
+        })
+      }  
+    },
     imageUpload: async (userID, itemID) => {
       // 画像ファイルの保存
       let itemRef = db.collection('users')
@@ -146,7 +169,6 @@ export class StockContents extends React.Component{
         created_at: firebase.firestore.FieldValue.serverTimestamp(),
         updated_at: firebase.firestore.FieldValue.serverTimestamp()
       }).then(ref => {
-        //console.log('Added document with ID: ', ref.id);
         this.setState({item_id: ref.id})  
       })
     },
@@ -166,11 +188,7 @@ export class StockContents extends React.Component{
         category: this.state.category,
         category_id: this.state.category_id,
         updated_at: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(ref => {
-        // undefined
-        //console.log('Updated document : ', ref);
       })
-      return itemRef
     },
     addCategory: async (userID, itemID, categoryID) => {
       // カテゴリにitemIDを追加
@@ -184,7 +202,8 @@ export class StockContents extends React.Component{
         let newCetegoryItems = newCetegoryData.item_id || []
         newCetegoryItems.push(itemID)
         newCategoryRef.update({
-          item_id: newCetegoryItems
+          item_id: newCetegoryItems,
+          updated_at: firebase.firestore.FieldValue.serverTimestamp()    
         })
       }
     },
@@ -202,7 +221,8 @@ export class StockContents extends React.Component{
           let oldCategoryItems = oldCetegoryData.item_id || []
           oldCategoryItems = oldCategoryItems.filter(item => item !== itemID)
           oldCategoryRef.update({
-            item_id: oldCategoryItems
+            item_id: oldCategoryItems,
+            updated_at: firebase.firestore.FieldValue.serverTimestamp()    
           })
         }
 
@@ -216,93 +236,43 @@ export class StockContents extends React.Component{
         let newCategoryItems = newCetegoryData.item_id || []
         newCategoryItems.push(itemID)
         newCategoryRef.update({
-          item_id: newCategoryItems
+          item_id: newCategoryItems,
+          updated_at: firebase.firestore.FieldValue.serverTimestamp()    
         })
+      }
+    },
+    createCategory: async (userID, categoryName) => {
+      let search = Object.keys(this.state.category_map).filter(val => this.state.category_map[val] === categoryName)
+      if(search.length === 0){
+        console.log("create category")
+        let userRef = db.collection('users').doc(userID)
+        let categoryRef = userRef.collection('categories')
+        await categoryRef.add({
+          name: categoryName,
+          item_id: [],
+          created_at: firebase.firestore.FieldValue.serverTimestamp(),
+          updated_at: firebase.firestore.FieldValue.serverTimestamp()    
+        }).then(ref => {
+          // カテゴリ名とIDの紐づけ
+            let new_category_map = JSON.parse(JSON.stringify(this.state.category_map)) // deep copy
+            // category_mapに[id, name]を追加
+            let new_category_id = ref.id
+            new_category_map[new_category_id] = categoryName
+            userRef.update({ category_map: new_category_map })
+
+            this.setState({category_map: new_category_map, category_id: new_category_id})
+        })
+      }else{
+        this.setState({category_id: search[0]})
       }
     }
   }
 
 
   // update されたとき、DBを更新してモーダルに通知
-  async handleUpdateSubmit(event){
+  handleUpdateSubmit = async (event) => {
 
     this.setState({submitButtonCheck: true})
-
-    /*
-    // 画像ファイルの保存
-    const imageUploadPromise = new Promise((resolve, reject) => {
-      if(this.state.local_image){
-        let storageRef = firebase.storage().ref().child(`users/${this.props.userID}/${this.state.item_id}.jpg`);
-        storageRef.put(this.state.local_image)
-        .then(snapshot => {
-          snapshot.ref.getDownloadURL().then(url => {
-            this.setState({image_url: url})
-            resolve()
-          })
-        });
-      }
-      else{
-        resolve()
-      }
-    })
-    
-    await imageUploadPromise
-    */
-    // DBの参照
-    /*
-    let itemRef = db.collection('users')
-    .doc(this.props.userID)
-    .collection('stock_items')
-    .doc(this.state.item_id)
-
-    await itemRef.update({
-      name: this.state.name,
-      modelNumber: this.state.modelNumber,
-      size: this.state.size,
-      color: this.state.color,
-      stockNumber: this.state.stockNumber,
-      price: this.state.price,
-      lotSize: this.state.lotSize,
-      category: this.state.category,
-      category_id: this.state.category_id,
-      image_url: this.state.image_url,
-      updated_at: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(ref => {
-      // undefined
-      //console.log('Updated document : ', ref);
-    });
-
-    // カテゴリ側にitemIDを登録
-    if(this.state.old_category_id !== this.state.category_id){
-      if(this.state.old_category_id !== ""){
-        // もとのカテゴリからitemIDを削除
-        let oldCategoryRef = db.collection('users')
-        .doc(this.props.userID)
-        .collection('categories')
-        .doc(this.state.old_category_id)
-        let oldCetegoryData = (await oldCategoryRef.get()).data()
-        // DBからそのカテゴリが登録されているitemIDのリストを取得
-        let oldCetegoryItems = oldCetegoryData.item_id || []
-        let oldCategoryList = oldCetegoryItems.filter(item => item !== this.state.category_id)
-        oldCategoryRef.update({
-          item_id: oldCategoryList
-        })
-      }
-
-      // 新しいカテゴリにitemIDを追加
-      let newCategoryRef = db.collection('users')
-      .doc(this.props.userID)
-      .collection('categories')
-      .doc(this.state.category_id)
-      let newCetegoryData = (await newCategoryRef.get()).data()
-      // DBからそのカテゴリが登録されているitemIDのリストを取得
-      let newCetegoryItems = newCetegoryData.item_id || []
-      newCetegoryItems.push(this.state.category_id)
-      newCategoryRef.update({
-        item_id: newCetegoryItems
-      })
-    }
-    */
 
     await this.db.updateStockItems(this.props.userID, this.state.item_id)
     await this.db.imageUpload(this.props.userID, this.state.item_id)
@@ -313,7 +283,7 @@ export class StockContents extends React.Component{
 
 
   // add されたとき、DBに追加してモーダルに通知
-  async handleAddSubmit(event){
+  handleAddSubmit = async (event) => {
 
     this.setState({submitButtonCheck: true})
 
@@ -321,68 +291,10 @@ export class StockContents extends React.Component{
     await this.db.imageUpload(this.props.userID, this.state.item_id)
     await this.db.addCategory(this.props.userID, this.state.item_id, this.state.category_id)
 
-    /*
-    let addDoc = db.collection('users').doc(this.props.userID).collection('stock_items')
-    await addDoc.add({
-      name: this.state.name,
-      modelNumber: this.state.modelNumber,
-      size: this.state.size,
-      color: this.state.color,
-      stockNumber: this.state.stockNumber,
-      price: this.state.price,
-      lotSize: this.state.lotSize,
-      category: this.state.category,
-      category_id: this.state.category_id,
-      created_at: firebase.firestore.FieldValue.serverTimestamp(),
-      updated_at: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(ref => {
-      //console.log('Added document with ID: ', ref.id);
-      this.setState({item_id: ref.id})  
-    });
-    
-    */
-    /*
-   if(this.state.category_id !== ""){
-    // カテゴリにitemIDを追加
-    let newCategoryRef = db.collection('users')
-    .doc(this.props.userID)
-    .collection('categories')
-    .doc(this.state.category_id)
-    let newCetegoryData = (await newCategoryRef.get()).data()
-    // DBからそのカテゴリが登録されているitemIDのリストを取得
-    let newCetegoryItems = newCetegoryData.item_id || []
-    newCetegoryItems.push(this.state.category_id)
-    
-    newCategoryRef.update({
-      item_id: newCetegoryItems
-    })
-   }
-
-
-    // 画像をstorageに保存
-    const imageUploadPromise = new Promise((resolve, reject) => {
-      if(this.state.local_image){
-        let storageRef = firebase.storage().ref().child(`users/${this.props.userID}/${this.state.item_id}.jpg`);
-        storageRef.put(this.state.local_image)
-        .then(snapshot => {
-          snapshot.ref.getDownloadURL().then(url => {
-            addDoc.doc(this.state.item_id).set({image_url: url}, { merge: true });
-            this.setState({image_url: url})
-            resolve()
-          })
-        });
-      }
-      else{
-        resolve()
-      }
-    })    
-    await imageUploadPromise
-    */
-
     this.props.handleClose(this.state)
   }
 
-  modal = {
+  newCategoryView = {
     addCategoryOpen: () => {
       this.setState({isAddCategoryOpen: true})
     },
@@ -391,47 +303,14 @@ export class StockContents extends React.Component{
     }
   }
 
-  addCategoryHandler(){
-    if(this.state.addCategoryText !== ""){
-      let new_list = this.state.category_list.slice()
-      new_list.push(this.state.addCategoryText)
+  createNewCategory = async () => {
+    if(this.state.addCategoryText !== "" && Object.keys(this.state.category_map).length < MAX_CATEGORY_SIZE){
 
-  
-      if(new_list.length <= MAX_CATEGORY_SIZE){
-        this.setState({category_list: new_list, category: this.state.addCategoryText})
-        
-        var userRef = db.collection('users').doc(this.props.userID)
-        /*
-        categoryListRef.update({
-            category: firebase.firestore.FieldValue.arrayUnion(this.state.addCategoryText)
-        })
-        */
+      this.setState({category: this.state.addCategoryText})      
 
-        // category_itemの追加
-        // カテゴリ名が存在していないときのみ追加する
-        if(!(this.state.addCategoryText in this.state.category_map)){
-          var categoryDoc = userRef.collection('categories')
-          categoryDoc.add({
-            name: this.state.addCategoryText,
-            item_id: [],
-            created_at: firebase.firestore.FieldValue.serverTimestamp(),
-            updated_at: firebase.firestore.FieldValue.serverTimestamp()    
-          }).then(ref => {
-            // カテゴリ名とIDの紐づけ
-              let new_category_map = JSON.parse(JSON.stringify(this.state.category_map))
-              new_category_map[ref.id] = this.state.addCategoryText
-              userRef.update({ category_map: new_category_map })
+      await this.db.createCategory(this.props.userID, this.state.addCategoryText)
 
-              //let new_category_id = this.state.category_id
-              //new_category_id.push(ref.id)
-              let new_category_id = ref.id
-              this.setState({category_map: new_category_map, category_id: new_category_id})
-          })
-        }
-
-        // カテゴリ追加の表示を閉じる
-        this.setState({isAddCategoryOpen: false})
-      }  
+      this.newCategoryView.addCategoryClose()
     }
   }
 
@@ -453,9 +332,9 @@ export class StockContents extends React.Component{
       <div className="stock-add-root">
         <StockContentGridView 
           handleValueChanege={this.callbacks.handleChanege}
-          addCategoryHandler={this.addCategoryHandler.bind(this)}
-          addCategoryOpen={this.modal.addCategoryOpen}
-          addCategoryClose={this.modal.addCategoryClose}
+          addCategoryHandler={this.createNewCategory}
+          addCategoryOpen={this.newCategoryView.addCategoryOpen}
+          addCategoryClose={this.newCategoryView.addCategoryClose}
           handleValueChanege={this.callbacks.handleChanege}
           handleCategoryChanege={this.callbacks.handleCategoryChanege}
           imageChangeHandler={this.callbacks.handleImageChange}
@@ -465,7 +344,7 @@ export class StockContents extends React.Component{
       <div className="add-stock-submit-button">
         <Button 
           variant="outlined" 
-          onClick={this.handleAddSubmit.bind(this)} 
+          onClick={this.handleAddSubmit} 
           disabled={!(this.state.name) || this.state.submitButtonCheck}
         >
           Save
@@ -483,9 +362,9 @@ export class StockContents extends React.Component{
 
         <StockContentGridView 
           handleValueChanege={this.callbacks.handleChanege}
-          addCategoryHandler={this.addCategoryHandler.bind(this)}
-          addCategoryOpen={this.modal.addCategoryOpen}
-          addCategoryClose={this.modal.addCategoryClose}
+          addCategoryHandler={this.createNewCategory}
+          addCategoryOpen={this.newCategoryView.addCategoryOpen}
+          addCategoryClose={this.newCategoryView.addCategoryClose}
           handleValueChanege={this.callbacks.handleChanege}
           handleCategoryChanege={this.callbacks.handleCategoryChanege}
           imageChangeHandler={this.callbacks.handleImageChange}
@@ -495,7 +374,7 @@ export class StockContents extends React.Component{
         <div className="update-stock-submit-button">
           <Button 
           variant="outlined" 
-          onClick={this.handleUpdateSubmit.bind(this)} 
+          onClick={this.handleUpdateSubmit} 
           disabled={!(this.state.name) || this.state.submitButtonCheck}
           >
             Save
