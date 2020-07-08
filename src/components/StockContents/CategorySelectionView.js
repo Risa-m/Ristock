@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import 'components/components.css'
+import 'asset/components.css'
 import PropTypes from 'prop-types';
 
 
@@ -18,8 +18,8 @@ export const CategorySelectionView = (props) => {
   const [ createCategoryOpen, setCreateCategoryOpen ] = useState(false)
   const [ categoryName, setCategoryName] = useState("")
 
-  const createNewCategory = async () => {
-    await props.addCategoryHandler(categoryName)
+  const handleCreateNewCategory = async () => {
+    await props.createNewCategory(categoryName)
     setCreateCategoryOpen(false)
   }
 
@@ -41,7 +41,7 @@ export const CategorySelectionView = (props) => {
         <IconButton 
           aria-label="add-category" 
           className="stock-form-category-add-button" 
-          onClick={() => createNewCategory()}>
+          onClick={() => handleCreateNewCategory()}>
           <DoneIcon fontSize="small" />
         </IconButton>
         <IconButton 
@@ -85,7 +85,7 @@ export const CategorySelectionView = (props) => {
 
 
 CategorySelectionView.propTypes = {
-  addCategoryHandler: PropTypes.func,
+  createNewCategory: PropTypes.func,
   handleCategoryChanege: PropTypes.func,
   category_map: PropTypes.object,
   category_id: PropTypes.string,

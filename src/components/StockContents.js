@@ -44,8 +44,6 @@ export class StockContents extends React.Component{
       local_image: null,
       local_image_src: null,
 
-      isAddCategoryOpen: false,
-      addCategoryText: "",
       category_map: this.props.category_map, // 全categoryの{id: name}
 
       submitButtonCheck: false,
@@ -217,7 +215,6 @@ export class StockContents extends React.Component{
     createCategory: async (userID, categoryName) => {
       let search = Object.keys(this.state.category_map).filter(val => this.state.category_map[val] === categoryName)
       if(search.length === 0){
-        console.log("create category")
         let userRef = db.collection('users').doc(userID)
         let categoryRef = userRef.collection('categories')
         await categoryRef.add({
@@ -294,7 +291,7 @@ export class StockContents extends React.Component{
       <div className="stock-add-root">
         <StockContentGridView 
           handleValueChanege={this.callbacks.handleChanege}
-          addCategoryHandler={this.createNewCategory}
+          createNewCategory={this.createNewCategory}
           handleValueChanege={this.callbacks.handleChanege}
           handleCategoryChanege={this.callbacks.handleCategoryChanege}
           imageChangeHandler={this.callbacks.handleImageChange}
@@ -322,7 +319,7 @@ export class StockContents extends React.Component{
 
         <StockContentGridView 
           handleValueChanege={this.callbacks.handleChanege}
-          addCategoryHandler={this.createNewCategory}
+          createNewCategory={this.createNewCategory}
           handleValueChanege={this.callbacks.handleChanege}
           handleCategoryChanege={this.callbacks.handleCategoryChanege}
           imageChangeHandler={this.callbacks.handleImageChange}

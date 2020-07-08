@@ -19,18 +19,6 @@ import EditIcon from '@material-ui/icons/Edit';
 export const StockContentsListShow = (props) => {
   const { visible, show_list } = props
 
-  /*
-  const cellNameToLabels = [
-    {label: "名称", value: "name"},
-    {label: "型番", value: "modelNumber"},
-    {label: "サイズ", value: "size"},
-    {label: "色", value: "color"},
-    {label: "数　(個)", value: "stockNumber"},
-    {label: "価格　(円)", value: "price"},
-    {label: "カテゴリー", value: "category"},
-  ]
-  */
-
   const itemThumbnailImage = (image_url, thumbSize) => {
     if(image_url){
       return <img src={image_url} width={thumbSize}/>

@@ -1,5 +1,5 @@
 import React from 'react'
-import 'components/components.css'
+import 'asset/components.css'
 import PropTypes from 'prop-types';
 
 import cellNameToLabels from 'components/cellNameToLabels';
@@ -27,7 +27,7 @@ export const StockContentGridView = (props) => {
 
         <Grid item xs={12} sm={6}>
           <CategorySelectionView 
-            addCategoryHandler={props.addCategoryHandler}
+            createNewCategory={props.createNewCategory}
             handleCategoryChanege={props.handleCategoryChanege}
             category_map={category_map}
             category_id={category_id}
@@ -48,7 +48,7 @@ export const StockContentGridView = (props) => {
 }
 
 StockContentGridView.propTypes = {
-  addCategoryHandler: PropTypes.func,
+  createNewCategory: PropTypes.func,
   category_map: PropTypes.object,
   category_id: PropTypes.string,
   image_url: PropTypes.string,
