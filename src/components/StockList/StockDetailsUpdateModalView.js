@@ -10,18 +10,21 @@ export const StockDetailsUpdateModalView = (props) => {
 
   if((detailsItemID) || (wantToAddItem && props.canUserAddDocs())){
     return (
-      <ModalWrapper
-        open={modalOpen}
-        handleClose={props.handleClose}
-        content={
-          <StockContents 
-            item_id={detailsItemID} 
-            userID={userID} 
-            category_list={category_list} 
-            category_map={category_map} 
-            handleClose={props.handleSubmitClose}
-          />}
-      />
+      <div className="stock-list-details-modal">
+        <ModalWrapper
+          open={modalOpen}
+          handleClose={props.handleClose}
+          content={
+            <StockContents 
+              item_id={detailsItemID} 
+              userID={userID} 
+              category_list={category_list} 
+              category_map={category_map} 
+              handleClose={props.handleSubmitClose}
+              categoryChanged={props.categoryChanged}
+            />}
+        />
+      </div>
     )
   }
   else{
@@ -39,5 +42,6 @@ StockDetailsUpdateModalView.propTypes = {
   canUserAddDocs: PropTypes.func,
   handleClose: PropTypes.func,
   handleSubmitClose: PropTypes.func,
+  categoryChanged: PropTypes.func,
 }
 

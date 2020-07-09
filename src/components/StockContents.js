@@ -231,6 +231,7 @@ export class StockContents extends React.Component{
             userRef.update({ category_map: new_category_map })
 
             this.setState({category_map: new_category_map, category_id: new_category_id})
+            this.props.categoryChanged(new_category_map)
         })
       }else{
         this.setState({category_id: search[0]})

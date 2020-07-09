@@ -137,6 +137,9 @@ export class StockList extends React.Component{
       else{
         this.setState({current_view: 0})
       }  
+    },
+    categoryChanged: (new_category_map) => {
+      this.setState({category_map: new_category_map})
     }
   }
 
@@ -203,8 +206,6 @@ export class StockList extends React.Component{
         detailsDoc={this.docs.details}
       />      
 
-      {
-      <div className="stock-list-details-modal">
       <StockDetailsUpdateModalView
         userID={this.props.userID}
         detailsItemID={this.state.detailsItemID}
@@ -215,9 +216,8 @@ export class StockList extends React.Component{
         canUserAddDocs={this.check.canUserAddDocs}
         handleClose={this.modals.handleClose}
         handleSubmitClose={this.modals.handleSubmitClose}
+        categoryChanged={this.view.categoryChanged}
       />
-      </div>
-      }
     </div>
     )
   }
