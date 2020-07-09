@@ -1,20 +1,10 @@
 import React from 'react'
-import firebase, { db } from '../firebase'
+import { db } from '../firebase'
 import 'asset/components.css'
 
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import CategoryIcon from '@material-ui/icons/Category';
-
-import IconButton from '@material-ui/core/IconButton';
-import AddIcon from '@material-ui/icons/Add';
-
-import Chip from '@material-ui/core/Chip';
-
-const MAX_CATEGORY_SIZE = 100
-const MAX_TEXT_INPUT_LENGTH = 20
+import SettingViewChoice from 'components/Settings/SettingViewChoice'
+import { SettingTopView } from 'components/Settings/SettingTopView'
+import { SettingOfCategoryView } from 'components/Settings/SettingOfCategoryView'
 
 export class SettingContents extends React.Component{
   constructor(props){
@@ -23,7 +13,7 @@ export class SettingContents extends React.Component{
     this.state = {
       item_id: props.item_id,
       data: null,
-      visible: settingChoice.top,
+      visible: SettingViewChoice.top,
       category_list: [""],
       category_map: {},
     }
@@ -31,84 +21,78 @@ export class SettingContents extends React.Component{
 
   // mount されたときにデータをDBから取得
   async componentDidMount() {
-    await this.getDocs()
+    //await this.getDocs()
+    await this.db.get(this.props.userID)
   }
 
-  async getDocs(){
-    if(this.props.userID){
-      // DBからカテゴリリストの取得
-      var categoryRef = db.collection('users').doc(this.props.userID)
-      let userDoc = await categoryRef.get()
-      let categoryList = (userDoc.data()).category || [""]  
-      let categoryMap = (userDoc.data()).category_map || {}
-      this.setState({category_list: categoryList, category_map: categoryMap})
+  db = {
+    get: async (userID) => {
+      if(this.props.userID){
+        // DBからカテゴリリストの取得
+        var categoryRef = db.collection('users').doc(userID)
+        let userDoc = await categoryRef.get()
+        let categoryList = (userDoc.data()).category || [""]  
+        let categoryMap = (userDoc.data()).category_map || {}
+        this.setState({category_list: categoryList, category_map: categoryMap})
+      }  
+    },
+    deleteCategory: async (userID, categoryID) => {
+      let new_category_map = JSON.parse(JSON.stringify(this.state.category_map)) // deep copy
+      delete new_category_map[categoryID]
+      this.setState({category_map: new_category_map})
+
+      // category_mapからcategory_idを削除
+      await db.collection('users').doc(userID)
+              .update({category_map: new_category_map})
+  
+      // item側からcategory_idを削除
+      // category_idが削除したいものと一致しているitemを取得
+      let ItemContainsCategoryShots = await db.collection('users')
+                                              .doc(userID)
+                                              .collection('stock_items')
+                                              .where('category_id', '==', categoryID)
+                                              .get()
+      if(ItemContainsCategoryShots && !ItemContainsCategoryShots.empty){
+        ItemContainsCategoryShots.forEach(doc => {
+          doc.ref.update({
+            category_id: ""
+          })
+        })  
+      }
+      // カテゴリのドキュメントをDBから削除
+      await db.collection('users').doc(userID)
+              .collection('categories').doc(categoryID).delete()
+  
+      this.props.handleSettingChanged()
+    },
+    changeCategoryName: async () => {
+
     }
-  }
 
+  }
   // form が変更されたとき、stateも更新
-  handleChanege(property, event) {
+  handleChanege = (property, event) => {
     this.setState({ [property] : event.target.value})
   }
 
-  viewChange(new_view){
+  viewChange = (new_view) => {
     this.setState({visible: new_view})
   }
-
-  async handleCategoryDelete(categoryID){
-    let new_category_map = this.state.category_map
-    delete new_category_map[categoryID]
-    this.setState({category_map: new_category_map})
-    // category_mapからcategory_idを削除
-    await db.collection('users').doc(this.props.userID).update({category_map: new_category_map})
-
-    // item側からcategory_idを削除
-    let ItemContainsCategoryShots = await db.collection('users').doc(this.props.userID).collection('stock_items').where('category_id', '==', categoryID).get()
-    if(ItemContainsCategoryShots && !ItemContainsCategoryShots.empty)
-    ItemContainsCategoryShots.forEach(doc => {
-      doc.ref.update({
-        category_id: ""
-      })
-    })
-    // カテゴリのドキュメントをDBから削除
-    await db.collection('users').doc(this.props.userID).collection('categories').doc(categoryID).delete()
-
-    this.props.handleSettingChanged()
-  }
-
-  addCategoryHandler(){
-
-  }
-
-
 
   render(){
     if(this.props.userID){
       // カテゴリの設定
-      if(this.state.visible === settingChoice.top){
+      if(this.state.visible === SettingViewChoice.top){
         return (
-          <>
-            <List component="nav" aria-label="">
-              <ListItem button onClick={this.viewChange.bind(this, settingChoice.category)}>
-                <ListItemIcon>
-                  <CategoryIcon />
-                </ListItemIcon>
-                <ListItemText primary="Category Setting" />
-              </ListItem>
-            </List>
-          </>
+          <SettingTopView viewChange={this.viewChange}/>
         )
       }
-      else if(this.state.visible === settingChoice.category){
+      else if(this.state.visible === SettingViewChoice.category){
         return (
-          <div className="setting-category-chips">
-            {Object.keys(this.state.category_map).map((val, idx) => (
-            (val)?
-            <Chip label={this.state.category_map[val]} variant={"default"} key={idx} color="primary" onDelete={this.handleCategoryDelete.bind(this, val)}/>
-            :null
-            ))}
-          {//<Chip icon={<AddIcon/>} label="Add" onClick={this.addCategoryHandler.bind(this)} style={{maxWidth: "100%", padding: "0"}}/>
-          }
-          </div>
+          <SettingOfCategoryView 
+            userID={this.props.userID}
+            category_map={this.state.category_map} 
+            handleCategoryDelete={this.db.deleteCategory}/>
         )
       }
       else{
@@ -124,8 +108,3 @@ export class SettingContents extends React.Component{
   }
 }
 
-
-const settingChoice = {
-  top: 0,
-  category: 1,
-}

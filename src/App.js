@@ -55,21 +55,21 @@ class App extends React.Component {
   modal = {
     settingModalOpen: () => {
       this.setState({
-        isSettingModalOpen: true
+        isSettingModalOpen: true,
+        settingChanged: false,
       })
     },  
     settingModalClose: () => {
+      this.stockListRefresh()
       this.setState({
         isSettingModalOpen: false
       })
-      //this.stockListRefresh()
     }
   }
 
-
   stockListRefresh(){
     if(this.state.settingChanged){
-      this.stockListRef.current.getDocs();
+      this.stockListRef.current.docs.get();
       this.setState({settingChanged: false})
     }
   }
