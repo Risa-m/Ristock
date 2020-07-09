@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from "react-router-dom";
-import './views.css';
+import 'asset/views.css';
 import Button from '@material-ui/core/Button';
 
 export class Home extends React.Component {

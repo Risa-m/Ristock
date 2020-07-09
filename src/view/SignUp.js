@@ -1,7 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import firebase, { db } from '../firebase'
-import './views.css';
+import 'asset/views.css';
 
 export class SignUp extends React.Component{ 
   constructor(){

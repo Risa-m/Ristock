@@ -1,6 +1,6 @@
 import React from 'react'
 import firebase, { db } from '../firebase'
-import './components.css'
+import 'asset/components.css'
 
 import { resizeImage } from 'components/ResizeImage';
 import { StockContentGridView } from 'components/StockContents/StockContentGridView';

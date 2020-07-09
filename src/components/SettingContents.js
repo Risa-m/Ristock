@@ -1,6 +1,6 @@
 import React from 'react'
 import firebase, { db } from '../firebase'
-import './components.css'
+import 'asset/components.css'
 
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';

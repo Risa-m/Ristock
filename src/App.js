@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Route, Link, Switch } from 'react-router-dom'
-import './App.css';
+import 'asset/App.css';
 
 import firebase from './firebase';
 
@@ -9,16 +9,10 @@ import { StockList } from 'view/StockList'
 import { SignUp } from 'view/SignUp';
 import Auth from 'components/Auth.js'
 import { Login } from 'components/Login.js'
-import ModalWrapper from 'components/ModalWrapper'
-import { SettingContents } from 'components/SettingContents'
 
-import Drawer from '@material-ui/core/Drawer';
-import IconButton from '@material-ui/core/IconButton';
-
-import MenuIcon from '@material-ui/icons/Menu';
-import SettingsIcon from '@material-ui/icons/Settings';
-import HomeIcon from '@material-ui/icons/Home';
-import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+import { AppMenuForPhone } from 'components/AppMenu/AppMenuForPhone'
+import { AppMenuForPC } from 'components/AppMenu/AppMenuForPC'
+import { SettingModal } from 'components/AppMenu/SettingModal'
 
 class App extends React.Component {
   constructor(){
@@ -37,7 +31,6 @@ class App extends React.Component {
     }
 
     this.stockListRef = React.createRef();
-
 
     this.setUser = this.setUser.bind(this)
     this.setUserID = this.setUserID.bind(this)
@@ -73,17 +66,17 @@ class App extends React.Component {
 
 
 
-  handleSettingChanged() {
+  handleSettingChanged = () => {
     this.setState({
       settingChanged: true
     })
   }
 
-  handleSettingModalClose(){
+  handleSettingModalClose = () => {
     this.setState({
       settingModalOpen: false,
     })
-    this.stockListRefresh()
+    //this.stockListRefresh()
   }
 
   stockListRefresh(){
@@ -99,23 +92,7 @@ class App extends React.Component {
       leftDrawerOpen: false,
     })
   }
-
-  settingModal = () => {
-    if(this.state.user){
-      return (
-        <div className="stock-setting-modal">
-        <ModalWrapper
-        open={this.state.settingModalOpen}
-        handleClose={this.handleSettingModalClose.bind(this)}
-        content={<SettingContents userID={this.state.userID} handleClose={this.handleSettingModalClose.bind(this)} handleSettingChanged={this.handleSettingChanged.bind(this)}/>}
-        />
-        </div>
-      )
-    }else{
-      return <></>
-    }
-  }
-
+  /*
   leftMenuList = () => {
     if(this.state.user){
       return (
@@ -166,9 +143,6 @@ class App extends React.Component {
           <div className="App-menu-side-item">
             <Link to="/stocks" >
               My page
-              {/*(this.state.user.email)?
-            <p style={{fontSize: "0.7em", paddingLeft: "10px"}}>{this.state.user.email}</p>
-              :null*/}
             </Link>
           </div>
 
@@ -192,7 +166,7 @@ class App extends React.Component {
       )
     }
   }
-
+  */
 
   render(){
     return (
@@ -200,22 +174,39 @@ class App extends React.Component {
     <div className="App-root">
       <div className="App-header">
 
-        <div className="App-phone-menu" onClick={this.toggleDrawer(true)}><MenuIcon /*fontSize="large"*//></div>
+        <AppMenuForPhone 
+          userID={this.state.userID} 
+          user={this.state.user} 
+          settingChangeModalOpen={this.settingChangeModalOpen}
+          logout={this.logout.bind(this)}/>
+        {/*
+        <div className="App-phone-menu" onClick={this.toggleDrawer(true)}><MenuIcon /></div>
           <Drawer anchor="left" open={this.state.leftDrawerOpen} onClose={this.toggleDrawer(false)}>
             <this.leftMenuList/>
           </Drawer>
-
+        */}
         <div className="App-title">
           <Link to="/">
             <h1>Ristock</h1><span className="title-beta">β</span>
             <img src="icon.png" alt="Ristock" className="App-title-logo"/>
           </Link>
         </div>
+        {/*
         <div className="App-pc-menu">
           <this.rightMenuList/>
-          </div>
         </div>
-        <this.settingModal/>
+        */}
+        <AppMenuForPC 
+          userID={this.state.userID} 
+          settingChangeModalOpen={this.settingChangeModalOpen}
+          logout={this.logout.bind(this)}/>
+      </div>
+        <SettingModal 
+          userID={this.state.userID} 
+          modalOpen={this.state.settingModalOpen}
+          settingChanged={this.handleSettingChanged}
+          setModalClose={this.handleSettingModalClose}
+          />
       <div className="App-view">
         <Switch>
           <Route exact path='/' render={props =><Home user={this.state.user} userID={this.state.userID}  {...props}/>} />
@@ -240,3 +231,4 @@ class App extends React.Component {
 }
 
 export default App;
+

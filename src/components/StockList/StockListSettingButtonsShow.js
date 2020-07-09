@@ -37,8 +37,8 @@ export const StockListSettingButtonsShow = (props) => {
   )
 }
 
-StockListSettingButtonsShow.protoTypes = {
-  current_view: PropTypes.bool,
+StockListSettingButtonsShow.propTypes = {
+  current_view: PropTypes.number,
   settingColumn: PropTypes.func,
   addDoc: PropTypes.func
 }
