@@ -36,8 +36,8 @@ export class SettingContents extends React.Component{
         this.setState({category_list: categoryList, category_map: categoryMap})
       }  
     },
-    deleteCategory: async (userID, categoryID) => {
-      let new_category_map = JSON.parse(JSON.stringify(this.state.category_map)) // deep copy
+    deleteCategory: async (userID, categoryID, category_map) => {
+      let new_category_map = JSON.parse(JSON.stringify(category_map)) // deep copy
       delete new_category_map[categoryID]
       this.setState({category_map: new_category_map})
 
@@ -65,7 +65,21 @@ export class SettingContents extends React.Component{
   
       this.props.handleSettingChanged()
     },
-    changeCategoryName: async () => {
+    changeCategoryName: async (userID, categoryID, newCategoryName, category_map) => {
+      if(newCategoryName !== ""){
+        let userRef = db.collection('users').doc(userID)
+        let categoryRef = userRef.collection('categories').doc(categoryID)
+        await categoryRef.update({
+          name: newCategoryName,
+          updated_at: firebase.firestore.FieldValue.serverTimestamp()
+        })
+        let new_category_map = JSON.parse(JSON.stringify(category_map)) // deep copy
+        new_category_map[categoryID] = newCategoryName
+        userRef.update({ category_map: new_category_map })
+
+        this.setState({category_map: new_category_map})
+        this.props.handleSettingChanged()
+      }
 
     },
     createNewCategory: async (userID, categoryName, category_map) => {

@@ -26,8 +26,11 @@ export const SettingOfCategoryView = (props) => {
   const [ isCreate, setCanCreate ] = useState(false)
 
   const createNewCategory = () => {
-    props.handleCategoryCreate(userID, newCategoryName, category_map)
-    setCanCreate(false)
+    let search = Object.keys(category_map).filter(val => category_map[val] === newCategoryName)
+    if(search.length === 0){
+      props.handleCategoryCreate(userID, newCategoryName, category_map)
+      setCanCreate(false)  
+    }
   }
 
   const showCreateCategoryField = () => {
@@ -61,6 +64,7 @@ export const SettingOfCategoryView = (props) => {
     }
 
   }
+
   return (
     <div className="setting-category-chips">
       <div onClick={() => props.viewChange(SettingViewChoice.top)}>
@@ -90,6 +94,7 @@ export const SettingOfCategoryView = (props) => {
             category_map={category_map}
             handleCategoryDelete={props.handleCategoryDelete}
             handleCategoryRename={props.handleCategoryRename}
+            key={val}
             />
         ))}
       </List>
@@ -118,9 +123,11 @@ const EditableCategoryItemView = (props) => {
   }
 
   const categoryNameChanged = () => {
-    // TODO: 親に変更を通知してDB更新
-    props.handleCategoryRename(userID, categoryID, categoryName)
-    setCanEdit(false)
+    let search = Object.keys(category_map).filter(val => category_map[val] === categoryName)
+    if(search.length === 0){
+      props.handleCategoryRename(userID, categoryID, categoryName, category_map)
+      setCanEdit(false)
+    }
   }
 
   const ItemView = (isEdit) => {
@@ -157,7 +164,7 @@ const EditableCategoryItemView = (props) => {
         </ListItemIcon>
         <ListItemIcon>
           <IconButton aria-label="delete" 
-            onClick={() => props.handleCategoryDelete(userID, categoryID)} 
+            onClick={() => props.handleCategoryDelete(userID, categoryID, category_map)} 
             style={{padding: "6px", verticalAlign: "middle"}}>
             <DeleteIcon fontSize="small"/>
           </IconButton>
