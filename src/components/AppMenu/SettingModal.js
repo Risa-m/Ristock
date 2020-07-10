@@ -16,32 +16,31 @@ export const SettingModal = (props) => {
 
   const settingChanged = () => {
     props.settingChanged()
-    handleModalClose()
   }
 
   useEffect(() => {
     setModalOpen(modalOpen)
   }, [modalOpen])
 
-    if(userID){
-      return (
-        <div className="stock-setting-modal">
-          <ModalWrapper
-            open={isModalOpen}
-            handleClose={handleModalClose}
-            content={
-              <SettingContents 
-                userID={userID} 
-                handleClose={handleModalClose} 
-                handleSettingChanged={settingChanged}
-              />
-            }
-          />
-        </div>
-      )
-    }else{
-      return <></>
-    }
+  if(userID){
+    return (
+      <div className="stock-setting-modal">
+        <ModalWrapper
+          open={isModalOpen}
+          handleClose={handleModalClose}
+          content={
+            <SettingContents 
+              userID={userID} 
+              handleClose={handleModalClose} 
+              handleSettingChanged={settingChanged}
+            />
+          }
+        />
+      </div>
+    )
+  }else{
+    return <></>
+  }
 }
 
 SettingModal.propTypes = {

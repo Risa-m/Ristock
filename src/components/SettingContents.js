@@ -67,6 +67,9 @@ export class SettingContents extends React.Component{
     },
     changeCategoryName: async () => {
 
+    },
+    createNewCategory: () => {
+
     }
 
   }
@@ -92,7 +95,11 @@ export class SettingContents extends React.Component{
           <SettingOfCategoryView 
             userID={this.props.userID}
             category_map={this.state.category_map} 
-            handleCategoryDelete={this.db.deleteCategory}/>
+            viewChange={this.viewChange}
+            handleCategoryDelete={this.db.deleteCategory}
+            handleCategoryRename={this.db.changeCategoryName}
+            handleCategoryCreate={this.db.createNewCategory}
+            />
         )
       }
       else{
