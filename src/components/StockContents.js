@@ -11,7 +11,7 @@ import AddRoundedIcon from '@material-ui/icons/AddRounded';
 import RemoveRoundedIcon from '@material-ui/icons/RemoveRounded';
 
 
-const MAX_CATEGORY_SIZE = 100
+const MAX_CATEGORY_SIZE = 30
 const IMAGE_MAX_SIZE = 512
 
 export class StockContents extends React.Component{

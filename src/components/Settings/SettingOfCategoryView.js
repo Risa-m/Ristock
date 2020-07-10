@@ -123,7 +123,8 @@ const EditableCategoryItemView = (props) => {
   }
 
   const categoryNameChanged = () => {
-    let search = Object.keys(category_map).filter(val => category_map[val] === categoryName)
+    // 他のカテゴリ名と被ってないかチェック（元々の名前を除く）
+    let search = Object.keys(category_map).filter(val => (val !== categoryID && category_map[val] === categoryName))
     if(search.length === 0){
       props.handleCategoryRename(userID, categoryID, categoryName, category_map)
       setCanEdit(false)
@@ -180,6 +181,7 @@ const EditableCategoryItemView = (props) => {
   return (
     <ListItem 
       onMouseEnter={() => setsettingIconsShow(true)} 
+      onTouchStart={() => setsettingIconsShow(true)}
       onMouseLeave={() => setsettingIconsShow(false)}>
         {ItemView(isEdit)}
         {itemSettingShow(isEdit, categoryID)}

@@ -196,6 +196,7 @@ export class StockList extends React.Component{
       <StockContentsListShow 
         visible={this.state.current_view===VisibleViewString.list} 
         show_list={this.state.show_list} 
+        category_map={this.state.category_map}
         detailsDoc={this.docs.details} 
         deleteDoc={this.docs.delete} 
       />

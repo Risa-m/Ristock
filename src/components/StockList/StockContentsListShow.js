@@ -17,7 +17,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 
 export const StockContentsListShow = (props) => {
-  const { visible, show_list } = props
+  const { visible, show_list, category_map } = props
 
   const itemThumbnailImage = (image_url, thumbSize) => {
     if(image_url){
@@ -48,9 +48,11 @@ export const StockContentsListShow = (props) => {
               <TableRow key={item[0]}>
                 <TableCell >{itemThumbnailImage(item[1].image_url, 80)}</TableCell>
 
-                {cellNameToLabels.map((cellName, idx) => (
+                {cellNameToLabels.filter(obj => obj.value !== "category").map((cellName, idx) => (
                   <TableCell align="center" key={idx}>{item[1][cellName.value]}</TableCell>  
                 ))}
+
+                <TableCell align="center">{category_map[item[1].category_id]}</TableCell>  
 
                 <TableCell align="center">
                   <IconButton aria-label="update" onClick={() => props.detailsDoc(item[0])}>        
