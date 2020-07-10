@@ -26,7 +26,7 @@ export const SettingOfCategoryView = (props) => {
   const [ isCreate, setCanCreate ] = useState(false)
 
   const createNewCategory = () => {
-    // TODO:親に変更を通知
+    props.handleCategoryCreate(userID, newCategoryName, category_map)
     setCanCreate(false)
   }
 
