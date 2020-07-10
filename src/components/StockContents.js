@@ -1,27 +1,26 @@
 import React from 'react'
 import firebase, { db } from '../firebase'
-import './components.css'
+import 'asset/components.css'
 
-import { resizeImage } from './ResizeImage';
+import { resizeImage } from 'components/ResizeImage';
+import { StockContentGridView } from 'components/StockContents/StockContentGridView';
 
-import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
-import Grid from '@material-ui/core/Grid';
-import MenuItem from '@material-ui/core/MenuItem';
 
-import IconButton from '@material-ui/core/IconButton';
-import AddIcon from '@material-ui/icons/Add';
-import DoneIcon from '@material-ui/icons/Done';
-import CloseIcon from '@material-ui/icons/Close';
-
-import AddPhotoAlternateIcon from "@material-ui/icons/AddPhotoAlternate";
+import AddRoundedIcon from '@material-ui/icons/AddRounded';
+import RemoveRoundedIcon from '@material-ui/icons/RemoveRounded';
 
 
-const MAX_CATEGORY_SIZE = 100
-const MAX_TEXT_INPUT_LENGTH = 20
+const MAX_CATEGORY_SIZE = 30
 const IMAGE_MAX_SIZE = 512
 
 export class StockContents extends React.Component{
+  /*
+  props: 
+    item_id: 詳細表示するアイテムの固有ID
+    userID: ユーザー固有ID
+    handleClose: Submitしたときにデータを渡す
+  */
   constructor(props){
     super(props)
 
@@ -37,15 +36,15 @@ export class StockContents extends React.Component{
       stockNumber: 0,
       price: 0,
       lotSize: 0,
-      category: "",
-      image_url: "",
+      category: [],  // 表示名
+      old_category_id: "",
+      category_id: "", // カテゴリーのid TODO: リスト化
+      image_url: "",      
 
       local_image: null,
       local_image_src: null,
 
-      isAddCategoryOpen: false,
-      addCategoryText: "",
-      category_list: this.props.category_list,
+      category_map: this.props.category_map, // 全categoryの{id: name}
 
       submitButtonCheck: false,
     }
@@ -53,259 +52,261 @@ export class StockContents extends React.Component{
 
   // mount されたときにデータをDBから取得
   async componentDidMount() {
-    await this.getDocs()
+    await this.db.getDocs(this.props.userID, this.state.item_id)
   }
 
-  // userID と itemIDからデータをDBから取得し、stateに保存
-  async getDocs(){
-    if(this.props.userID && this.state.item_id){
-      let itemRef = db.collection('users')
-                      .doc(this.props.userID)
-                      .collection('stock_items')
-                      .doc(this.state.item_id)
-      let doc = await itemRef.get()
-      this.setState({data: doc.data()})
-
+  callbacks = {
+    handleChanege: (property, event) => {
+      // form が変更されたとき、stateも更新
+      this.setState({[property]: event.target.value})
+    },
+    handleCategoryChanege: (event) => {
+      //let new_id = Object.keys(this.state.category_map).filter(val => val === event.target.value)
+      this.setState({category : this.state.category_map[event.target.value], category_id: event.target.value})
+    },
+    handleImageChange: async (event) => {
+      const { imageFile, imageUri } = await resizeImage(event, IMAGE_MAX_SIZE)
       this.setState({
-        name: this.state.data.name,
-        modelNumber: this.state.data.modelNumber,
-        size: this.state.data.size,
-        color: this.state.data.color,
-        stockNumber: this.state.data.stockNumber,
-        price: this.state.data.price,
-        lotSize: this.state.data.lotSize,
-        category: this.state.data.category,
-        image_url: this.state.data.image_url || "",
-      })
+        local_image: imageFile,
+        local_image_src: imageUri,
+      })  
     }
+  
   }
 
-  // form が変更されたとき、stateも更新
-  handleChanege(property, event) {
-    this.setState({ [property] : event.target.value})
+  db = {
+    getDocs: async (userID, itemID) => {
+      if(userID && itemID){
+        let itemRef = db.collection('users')
+                        .doc(userID)
+                        .collection('stock_items')
+                        .doc(itemID)
+        let doc = await itemRef.get()
+        this.setState({
+          data: doc.data(),
+          name: doc.data().name,
+          modelNumber: doc.data().modelNumber,
+          size: doc.data().size,
+          color: doc.data().color,
+          stockNumber: doc.data().stockNumber,
+          price: doc.data().price,
+          lotSize: doc.data().lotSize,
+          old_category_id: doc.data().category_id || "",
+          category_id: doc.data().category_id || "",
+          category: this.state.category_map[doc.data().category_id] || "",
+          image_url: doc.data().image_url || "",
+        })
+      }  
+    },
+    imageUpload: async (userID, itemID) => {
+      // 画像ファイルの保存
+      let itemRef = db.collection('users')
+                      .doc(userID)
+                      .collection('stock_items')
+                      .doc(itemID)
+
+      const imageUploadPromise = new Promise((resolve, reject) => {
+        if(this.state.local_image){
+          let storageRef = firebase.storage().ref().child(`users/${userID}/${itemID}.jpg`);
+          storageRef.put(this.state.local_image)
+          .then(snapshot => {
+            snapshot.ref.getDownloadURL().then(url => {
+              itemRef.set({image_url: url}, { merge: true });
+              this.setState({image_url: url})
+              resolve()
+            })
+          });
+        }
+        else{
+          resolve()
+        }
+      })
+      await imageUploadPromise
+    },
+    addStockItems: async (userID) => {
+      let addDoc = db.collection('users')
+                    .doc(userID)
+                    .collection('stock_items')
+      await addDoc.add({
+        name: this.state.name,
+        modelNumber: this.state.modelNumber,
+        size: this.state.size,
+        color: this.state.color,
+        stockNumber: this.state.stockNumber,
+        price: this.state.price,
+        lotSize: this.state.lotSize,
+        category: this.state.category,
+        category_id: this.state.category_id,
+        created_at: firebase.firestore.FieldValue.serverTimestamp(),
+        updated_at: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(ref => {
+        this.setState({item_id: ref.id})  
+      })
+    },
+    updateStockItems: async (userID, itemID) => {
+      let itemRef = db.collection('users')
+                      .doc(userID)
+                      .collection('stock_items')
+                      .doc(itemID)
+      await itemRef.update({
+        name: this.state.name,
+        modelNumber: this.state.modelNumber,
+        size: this.state.size,
+        color: this.state.color,
+        stockNumber: this.state.stockNumber,
+        price: this.state.price,
+        lotSize: this.state.lotSize,
+        category: this.state.category,
+        category_id: this.state.category_id,
+        updated_at: firebase.firestore.FieldValue.serverTimestamp()
+      })
+    },
+    addCategory: async (userID, itemID, categoryID) => {
+      // カテゴリにitemIDを追加
+      if(this.state.category_id !== ""){
+        let newCategoryRef = db.collection('users')
+                              .doc(userID)
+                              .collection('categories')
+                              .doc(categoryID)
+        let newCetegoryData = (await newCategoryRef.get()).data()
+        // DBからそのカテゴリが登録されているitemIDのリストを取得
+        let newCetegoryItems = newCetegoryData.item_id || []
+        newCetegoryItems.push(itemID)
+        newCategoryRef.update({
+          item_id: newCetegoryItems,
+          updated_at: firebase.firestore.FieldValue.serverTimestamp()    
+        })
+      }
+    },
+    updateCategory: async (userID, itemID, oldCategoryID, newcategoryID) => {
+      // カテゴリ側にitemIDを登録
+      if(oldCategoryID !== newcategoryID){
+        if(oldCategoryID !== ""){
+          // もとのカテゴリからitemIDを削除
+          let oldCategoryRef = db.collection('users')
+                                .doc(userID)
+                                .collection('categories')
+                                .doc(oldCategoryID)
+          let oldCetegoryData = (await oldCategoryRef.get()).data()
+          // DBからそのカテゴリが登録されているitemIDのリストを取得
+          let oldCategoryItems = oldCetegoryData.item_id || []
+          oldCategoryItems = oldCategoryItems.filter(item => item !== itemID)
+          oldCategoryRef.update({
+            item_id: oldCategoryItems,
+            updated_at: firebase.firestore.FieldValue.serverTimestamp()    
+          })
+        }
+
+        // 新しいカテゴリにitemIDを追加
+        let newCategoryRef = db.collection('users')
+                              .doc(userID)
+                              .collection('categories')
+                              .doc(newcategoryID)
+        let newCetegoryData = (await newCategoryRef.get()).data()
+        // DBからそのカテゴリが登録されているitemIDのリストを取得
+        let newCategoryItems = newCetegoryData.item_id || []
+        newCategoryItems.push(itemID)
+        newCategoryRef.update({
+          item_id: newCategoryItems,
+          updated_at: firebase.firestore.FieldValue.serverTimestamp()    
+        })
+      }
+    },
+    createCategory: async (userID, categoryName) => {
+      let search = Object.keys(this.state.category_map).filter(val => this.state.category_map[val] === categoryName)
+      if(search.length === 0){
+        let userRef = db.collection('users').doc(userID)
+        let categoryRef = userRef.collection('categories')
+        await categoryRef.add({
+          name: categoryName,
+          item_id: [],
+          created_at: firebase.firestore.FieldValue.serverTimestamp(),
+          updated_at: firebase.firestore.FieldValue.serverTimestamp()    
+        }).then(ref => {
+          // カテゴリ名とIDの紐づけ
+            let new_category_map = JSON.parse(JSON.stringify(this.state.category_map)) // deep copy
+            // category_mapに[id, name]を追加
+            let new_category_id = ref.id
+            new_category_map[new_category_id] = categoryName
+            userRef.update({ category_map: new_category_map })
+
+            this.setState({category_map: new_category_map, category_id: new_category_id})
+            this.props.categoryChanged(new_category_map)
+        })
+      }else{
+        this.setState({category_id: search[0]})
+      }
+    }
   }
 
 
   // update されたとき、DBを更新してモーダルに通知
-  async handleUpdateSubmit(event){
+  handleUpdateSubmit = async (event) => {
 
     this.setState({submitButtonCheck: true})
 
-    // 画像ファイルの保存    
-    const imageUploadPromise = new Promise((resolve, reject) => {
-      if(this.state.local_image){
-        let storageRef = firebase.storage().ref().child(`users/${this.props.userID}/${this.state.item_id}.jpg`);
-        storageRef.put(this.state.local_image)
-        .then(snapshot => {
-          snapshot.ref.getDownloadURL().then(url => {
-            this.setState({image_url: url})
-            resolve()
-          })
-        });
-      }
-      else{
-        resolve()
-      }
-    })
-    
-    await imageUploadPromise
-
-    // DBの参照
-    let itemRef = db.collection('users')
-    .doc(this.props.userID)
-    .collection('stock_items')
-    .doc(this.state.item_id)
-
-    await itemRef.update({
-      name: this.state.name,
-      modelNumber: this.state.modelNumber,
-      size: this.state.size,
-      color: this.state.color,
-      stockNumber: this.state.stockNumber,
-      price: this.state.price,
-      lotSize: this.state.lotSize,
-      category: this.state.category,
-      image_url: this.state.image_url,
-      updated_at: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(ref => {
-      // undefined
-      //console.log('Updated document : ', ref);
-    });
+    await this.db.updateStockItems(this.props.userID, this.state.item_id)
+    await this.db.imageUpload(this.props.userID, this.state.item_id)
+    await this.db.updateCategory(this.props.userID, this.state.item_id, this.state.old_category_id, this.state.category_id)
 
     this.props.handleClose(this.state)
   }
 
 
   // add されたとき、DBに追加してモーダルに通知
-  async handleAddSubmit(event){
+  handleAddSubmit = async (event) => {
 
     this.setState({submitButtonCheck: true})
 
-    let addDoc = db.collection('users').doc(this.props.userID).collection('stock_items')
-    await addDoc.add({
-      name: this.state.name,
-      modelNumber: this.state.modelNumber,
-      size: this.state.size,
-      color: this.state.color,
-      stockNumber: this.state.stockNumber,
-      price: this.state.price,
-      lotSize: this.state.lotSize,
-      category: this.state.category,
-      created_at: firebase.firestore.FieldValue.serverTimestamp(),
-      updated_at: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(ref => {
-      //console.log('Added document with ID: ', ref.id);
-      this.setState({item_id: ref.id})  
-    });
-        
-    const imageUploadPromise = new Promise((resolve, reject) => {
-      if(this.state.local_image){
-        let storageRef = firebase.storage().ref().child(`users/${this.props.userID}/${this.state.item_id}.jpg`);
-        storageRef.put(this.state.local_image)
-        .then(snapshot => {
-          snapshot.ref.getDownloadURL().then(url => {
-            addDoc.doc(this.state.item_id).set({image_url: url}, { merge: true });
-            this.setState({image_url: url})
-            resolve()
-          })
-        });
-      }
-      else{
-        resolve()
-      }
-    })    
-    await imageUploadPromise
+    await this.db.addStockItems(this.props.userID)
+    await this.db.imageUpload(this.props.userID, this.state.item_id)
+    await this.db.addCategory(this.props.userID, this.state.item_id, this.state.category_id)
 
     this.props.handleClose(this.state)
   }
 
-  addCategoryOpen(){
-    this.setState({isAddCategoryOpen: true})
-  }
+  createNewCategory = async (categoryName) => {
+    if(categoryName !== "" && Object.keys(this.state.category_map).length < MAX_CATEGORY_SIZE){
 
-  addCategoryHandler(){
-    if(this.state.addCategoryText !== ""){
-      let new_list = this.state.category_list.slice()
-      new_list.push(this.state.addCategoryText)
-      this.setState({isAddCategoryOpen: false})
-  
-      if(new_list.length <= MAX_CATEGORY_SIZE){
-        this.setState({category_list: new_list, category: this.state.addCategoryText})
-        var categoryRef = db.collection('users').doc(this.props.userID)
-        categoryRef.update({
-            category: firebase.firestore.FieldValue.arrayUnion(this.state.addCategoryText)
-        });
-      }  
+      this.setState({category: categoryName})      
+
+      await this.db.createCategory(this.props.userID, categoryName)
     }
   }
 
-  async imageChangeHandler(e) {
-    const { imageFile, imageUri } = await resizeImage(e, IMAGE_MAX_SIZE);
-    this.setState({
-      local_image: imageFile,
-      local_image_src: imageUri,
-    });
-  }
-
-  gridTemplate = () => {  
-    return (
-      <form className="stock-form" noValidate autoComplete="off">
-      <Grid container spacing={3}>
-        <Grid item xs={12} sm={6}>
-          <TextField id="standard-basic" className="stock-form-text" value={this.state.name} InputProps={{ inputProps: { maxLength: MAX_TEXT_INPUT_LENGTH} }} label="名前" onChange={this.handleChanege.bind(this, "name")}/> 
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField id="standard-basic" className="stock-form-text" value={this.state.modelNumber} InputProps={{ inputProps: { maxLength: MAX_TEXT_INPUT_LENGTH} }} label="型番" onChange={this.handleChanege.bind(this, "modelNumber")}/> 
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField id="standard-basic" className="stock-form-text" value={this.state.size} InputProps={{ inputProps: { maxLength: MAX_TEXT_INPUT_LENGTH} }} label="サイズ" onChange={this.handleChanege.bind(this, "size")}/> 
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField id="standard-basic" className="stock-form-text" value={this.state.color} InputProps={{ inputProps: { maxLength: MAX_TEXT_INPUT_LENGTH} }} label="色" onChange={this.handleChanege.bind(this, "color")}/> 
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField id="standard-number" className="stock-form-text" type="number" value={this.state.stockNumber} InputProps={{ inputProps: { min: 0} }} label="残数" onChange={this.handleChanege.bind(this, "stockNumber")} InputLabelProps={{shrink: true,}}/> 
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField id="standard-number" className="stock-form-text" type="number" value={this.state.price} label="価格" InputProps={{ inputProps: { min: 0} }} onChange={this.handleChanege.bind(this, "price")} InputLabelProps={{shrink: true,}}/> 
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField id="standard-number" className="stock-form-text" type="number" value={this.state.lotSize} label="入り数" InputProps={{ inputProps: { min: 0} }} onChange={this.handleChanege.bind(this, "lotSize")} InputLabelProps={{shrink: true,}}/> 
-        </Grid>
-
-        <Grid item xs={12} sm={6}>
-          {(this.state.isAddCategoryOpen)?
-          <div className="stock-form-category-add">
-          {/* カテゴリ追加 */}
-          <TextField id="standard-basic" className="stock-form-category-add-text" value={this.state.addCategoryText} label="Add Category" InputProps={{ inputProps: { maxLength: MAX_TEXT_INPUT_LENGTH} }} onChange={this.handleChanege.bind(this, "addCategoryText")}/>
-          <IconButton aria-label="add-category" className="stock-form-category-add-button" onClick={this.addCategoryHandler.bind(this)}>
-            <DoneIcon fontSize="small" />
-          </IconButton>
-          <IconButton aria-label="add-category" className="stock-form-category-add-button" onClick={e => {this.setState({isAddCategoryOpen: false})}}>
-            <CloseIcon fontSize="small" />
-          </IconButton>
-          </div>
-          :
-          <>
-          {/* カテゴリ選択 */}
-          {<TextField
-              id="standard-select"
-              className="stock-form-category-select"
-              select
-              label="カテゴリー"
-              value={this.state.category}
-              onChange={this.handleChanege.bind(this, "category")}
-            >
-              {this.state.category_list.map((category, idx) => (
-                <MenuItem key={idx} value={category}>
-                  {category}
-                </MenuItem>
-              ))}
-            </TextField>
-            }    
-          <IconButton aria-label="add-category" className="stock-form-category-select-button" onClick={this.addCategoryOpen.bind(this)}>
-            <AddIcon fontSize="small" />
-          </IconButton>
-          </>
-          }
-        </Grid>
-
-        <Grid item xs={12} sm={6}>
-        <input
-            accept="image/*"
-            id="contained-button-file"
-            type="file"
-            className="image-input"
-            onChange={e => this.imageChangeHandler(e)}
-          />
-          <label htmlFor="contained-button-file">
-            <Button variant="contained" color="primary" component="span">
-              Upload
-              <AddPhotoAlternateIcon />
-            </Button>
-          </label>
-          {(this.state.image_url && !this.state.local_image_src)?
-          <img src={this.state.image_url} className="stock-form-image-show"/>
-          :(this.state.local_image_src)?
-          <img src={this.state.local_image_src} className="stock-form-image-show"/>
-          :null}
-        </Grid>
-      </Grid>
-      </form>
-    )
   
+  phonePlusMinusTemplate = (props) => {
+    return (
+      <div className="stock-form-phone-view">
+        <div className="stock-form-phone-view-item" onClick={() => this.setState({[props.property]: (this.state[props.property]+1)})}><AddRoundedIcon /></div>
+        <div className="stock-form-phone-view-item" onClick={() => (this.state[props.property] > 0)? this.setState({[props.property]: (this.state[props.property]-1)}):null}><RemoveRoundedIcon /></div>
+      </div>
+    )
   }
+
 
   render(){
     // Add
     if(this.props.userID && (!this.state.item_id || !this.state.data)){
       return (
       <div className="stock-add-root">
-      <p></p>
-      <this.gridTemplate />
+        <StockContentGridView 
+          handleValueChanege={this.callbacks.handleChanege}
+          createNewCategory={this.createNewCategory}
+          handleValueChanege={this.callbacks.handleChanege}
+          handleCategoryChanege={this.callbacks.handleCategoryChanege}
+          imageChangeHandler={this.callbacks.handleImageChange}
+          {...this.state}
+        />
 
       <div className="add-stock-submit-button">
-        <Button variant="outlined" onClick={this.handleAddSubmit.bind(this)} disabled={!(this.state.name) || this.state.submitButtonCheck}>Save</Button>
+        <Button 
+          variant="outlined" 
+          onClick={this.handleAddSubmit} 
+          disabled={!(this.state.name) || this.state.submitButtonCheck}
+        >
+          Save
+        </Button>
       </div>
     </div>
     )
@@ -316,12 +317,24 @@ export class StockContents extends React.Component{
     if(this.props.userID && this.state.data){
       return (
         <div className="stock-detail-root">
-        <p></p>
 
-          <this.gridTemplate />
+        <StockContentGridView 
+          handleValueChanege={this.callbacks.handleChanege}
+          createNewCategory={this.createNewCategory}
+          handleValueChanege={this.callbacks.handleChanege}
+          handleCategoryChanege={this.callbacks.handleCategoryChanege}
+          imageChangeHandler={this.callbacks.handleImageChange}
+          {...this.state}
+        />
 
         <div className="update-stock-submit-button">
-          <Button variant="outlined" onClick={this.handleUpdateSubmit.bind(this)} disabled={!(this.state.name) || this.state.submitButtonCheck}>Save</Button>
+          <Button 
+          variant="outlined" 
+          onClick={this.handleUpdateSubmit} 
+          disabled={!(this.state.name) || this.state.submitButtonCheck}
+          >
+            Save
+          </Button>
         </div>
 
       </div> 
@@ -334,3 +347,4 @@ export class StockContents extends React.Component{
     )
   }
 }
+
