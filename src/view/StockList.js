@@ -9,7 +9,7 @@ import { StockDetailsUpdateModalView } from 'components/StockList/StockDetailsUp
 import { StockListSettingButtonsShow } from 'components/StockList/StockListSettingButtonsShow';
 import VisibleViewString from 'components/StockList/VisibleViewString';
 
-const MAX_USER_ITEMS = 1000
+const MAX_USER_ITEMS = 50
 
 export class StockList extends React.Component{ 
   /*
