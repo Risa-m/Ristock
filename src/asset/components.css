@@ -7,6 +7,13 @@
   margin-top: 10px;
 }
 
+.update-stock-submit-button {
+  margin-top: 10px;
+  position: relative;
+  display: inline-block;
+  z-index: 1;
+}
+
 .add-stock-root {
   width: 90%;
   margin: auto;
@@ -49,6 +56,13 @@
   height: 50px;
   padding: 10px;
   vertical-align: middle;
+}
+
+.zoom-image-view{
+  height: 200px;
+  padding: 10px;
+  vertical-align: middle;
+  z-index: 10;
 }
 
 .category-setting-error-message {

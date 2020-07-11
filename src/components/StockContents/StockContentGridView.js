@@ -1,6 +1,8 @@
-import React from 'react'
+import React, { useState } from 'react'
 import 'asset/components.css'
 import PropTypes from 'prop-types';
+
+import Paper from '@material-ui/core/Paper';
 
 import cellNameToLabels from 'components/cellNameToLabels';
 import { ImageUploadView } from 'components/StockContents/ImageUploadView';
@@ -11,6 +13,33 @@ import Grid from '@material-ui/core/Grid';
 
 export const StockContentGridView = (props) => {
   const { category_map, category_id, image_url, local_image_src } = props
+
+  const [ zoomView, setZoomView ] = useState(false)
+  const [ mouseX, setMouseX ] = useState(-300)
+  const [ mouseY, setMouseY ] = useState(-300)
+  
+  const handleMouseMove = (event) => {
+    if(zoomView){
+      const bounds = event.target.getBoundingClientRect()
+      setMouseX(event.clientX - bounds.left + bounds.width)
+      setMouseY(event.clientY - bounds.top + bounds.height)
+    }
+  }
+
+  const handleTouchMove = (event) => {
+    if(zoomView){
+      for (let i = 0; i < event.changedTouches.length; ++i) {
+        const touch = event.changedTouches[i]
+        const bounds = touch.target.getBoundingClientRect()
+        setMouseX(touch.clientX - (bounds.left/2))
+        setMouseY(touch.clientY - (bounds.top/2))
+      }
+    }
+  }
+
+  const showZoomView = (isVisible) => {
+    setZoomView(isVisible)
+  }
 
   return (
     <form className="stock-form" noValidate autoComplete="off">
@@ -40,8 +69,20 @@ export const StockContentGridView = (props) => {
           <ImageUploadView 
             image_url={image_url}
             local_image_src={local_image_src}
-            imageChangeHandler={props.imageChangeHandler}/>
+            imageChangeHandler={props.imageChangeHandler}
+            showZoomView={showZoomView}
+            handleMouseMove={handleMouseMove}
+            handleTouchMove={handleTouchMove}
+          />
         </Grid>
+
+        <ImageView 
+          image_url={image_url}
+          local_image_src={local_image_src}
+          isVisible={zoomView}
+          mouseX={mouseX}
+          mouseY={mouseY}
+        />
 
       </Grid>
     </form>
@@ -59,3 +100,30 @@ StockContentGridView.propTypes = {
   handleCategoryChange: PropTypes.func,
 }
 
+
+const ImageView = (props) => {
+  const { image_url, local_image_src, isVisible, mouseX, mouseY } = props
+
+  const uploadedImage = () => {
+    if(image_url && !local_image_src){
+      return <img src={image_url} className="zoom-image-view"/>
+    }
+    else if(local_image_src) {
+      return <img src={local_image_src} className="zoom-image-view"/>
+    }
+    else {
+      return null
+    }
+  }
+
+  if(isVisible){
+    return (
+      <Paper variant="outlined" style={{padding: "5px", position: "absolute", left: mouseX, top: mouseY, zIndex: "10"}}>
+        {uploadedImage()}
+    </Paper>  
+    )
+  }
+  else{
+    return null
+  }
+}

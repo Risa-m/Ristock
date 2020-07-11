@@ -40,7 +40,7 @@ export class StockContents extends React.Component{
       newCategoryName: "",
       old_category_id: "",
       category_id: "", // カテゴリーのid TODO: リスト化
-      image_url: "",      
+      image_url: "", 
 
       local_image: null,
       local_image_src: null,
@@ -344,7 +344,6 @@ export class StockContents extends React.Component{
           handleNewCategoryNameChange={this.callbacks.handleNewCategoryNameChange}
           {...this.state}
         />
-
         <div className="update-stock-submit-button">
           <Button 
           variant="outlined" 
