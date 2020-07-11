@@ -32,6 +32,7 @@ export const StockContentGridView = (props) => {
             category_map={category_map}
             category_id={category_id}
             handleValueChanege={props.handleValueChanege}
+            handleNewCategoryNameChange={props.handleNewCategoryNameChange}
           />
         </Grid>
 
@@ -55,5 +56,6 @@ StockContentGridView.propTypes = {
   local_image_src: PropTypes.string,
   imageChangeHandler: PropTypes.func,
   handleValueChanege: PropTypes.func,
+  handleCategoryChange: PropTypes.func,
 }
 

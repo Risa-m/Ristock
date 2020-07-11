@@ -37,6 +37,7 @@ export class StockContents extends React.Component{
       price: 0,
       lotSize: 0,
       category: [],  // 表示名
+      newCategoryName: "",
       old_category_id: "",
       category_id: "", // カテゴリーのid TODO: リスト化
       image_url: "",      
@@ -63,6 +64,9 @@ export class StockContents extends React.Component{
     handleCategoryChanege: (event) => {
       //let new_id = Object.keys(this.state.category_map).filter(val => val === event.target.value)
       this.setState({category : this.state.category_map[event.target.value], category_id: event.target.value})
+    },
+    handleNewCategoryNameChange: (categoryName) => {
+      this.setState({newCategoryName: categoryName})
     },
     handleImageChange: async (event) => {
       const { imageFile, imageUri } = await resizeImage(event, IMAGE_MAX_SIZE)
@@ -124,6 +128,7 @@ export class StockContents extends React.Component{
       await imageUploadPromise
     },
     addStockItems: async (userID) => {
+      await this.db.checkCreateCategory(userID, this.state.category_map, this.state.newCategoryName)
       let addDoc = db.collection('users')
                     .doc(userID)
                     .collection('stock_items')
@@ -144,6 +149,7 @@ export class StockContents extends React.Component{
       })
     },
     updateStockItems: async (userID, itemID) => {
+      await this.db.checkCreateCategory(userID, this.state.category_map, this.state.newCategoryName)
       let itemRef = db.collection('users')
                       .doc(userID)
                       .collection('stock_items')
@@ -210,6 +216,17 @@ export class StockContents extends React.Component{
           item_id: newCategoryItems,
           updated_at: firebase.firestore.FieldValue.serverTimestamp()    
         })
+      }
+    },
+    checkCreateCategory: async (userID, category_map, categoryName) => {
+      if(categoryName !== ""){
+        let search = Object.keys(category_map).filter(val => category_map[val] === categoryName)
+        if(search.length === 0){
+          await this.db.createCategory(userID, categoryName)
+        }
+        else {
+          this.setState({category_id: search[0]})
+        }
       }
     },
     createCategory: async (userID, categoryName) => {
@@ -324,6 +341,7 @@ export class StockContents extends React.Component{
           handleValueChanege={this.callbacks.handleChanege}
           handleCategoryChanege={this.callbacks.handleCategoryChanege}
           imageChangeHandler={this.callbacks.handleImageChange}
+          handleNewCategoryNameChange={this.callbacks.handleNewCategoryNameChange}
           {...this.state}
         />
 
