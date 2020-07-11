@@ -24,27 +24,43 @@ export const SettingOfCategoryView = (props) => {
   const { userID, category_map } = props
   const [ newCategoryName, setNewCategoryName ] = useState("")
   const [ isCreate, setCanCreate ] = useState(false)
+  const [ createError, setCreateError ] = useState(false)
 
   const createNewCategory = () => {
     let search = Object.keys(category_map).filter(val => category_map[val] === newCategoryName)
     if(search.length === 0){
+      setCreateError(false)
       props.handleCategoryCreate(userID, newCategoryName, category_map)
-      setCanCreate(false)  
+      setCanCreate(false)
+      setNewCategoryName("")
+    }
+    else{
+      setCreateError(true)
     }
   }
 
   const showCreateCategoryField = () => {
     setCanCreate(true)
+    setCreateError(false)
   }
 
   const handleCategoryNameChange = (event) => {
     setNewCategoryName(event.target.value)
   }
 
+  const showErrorMessage = (isError) => {
+    if(isError){
+      return <span className="category-setting-error-message">既に登録されています。</span>
+    }
+    else{
+      return null
+    }
+  }
+
   const newCategoryField = (isCreate) => {
     if(isCreate){
       return (
-        <>
+        <div>
           <TextField 
             id="standard-basic" 
             value={newCategoryName}
@@ -55,8 +71,8 @@ export const SettingOfCategoryView = (props) => {
             style={{padding: "6px", verticalAlign: "middle"}}>
             <CheckIcon fontSize="small"/>
           </IconButton>
-
-        </>
+          {showErrorMessage(createError)}
+        </div>
       )  
     }
     else {

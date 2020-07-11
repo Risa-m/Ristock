@@ -50,3 +50,9 @@
   padding: 10px;
   vertical-align: middle;
 }
+
+.category-setting-error-message {
+  display: block;
+  color: #7c8993;
+  font-size: 0.8em;
+}
