@@ -69,7 +69,7 @@ class App extends React.Component {
 
   stockListRefresh(){
     if(this.state.settingChanged){
-      this.stockListRef.current.docs.get();
+      this.stockListRef.current.view.refresh();
       this.setState({settingChanged: false})
     }
   }

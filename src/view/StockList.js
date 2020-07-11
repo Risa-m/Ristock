@@ -58,7 +58,6 @@ export class StockList extends React.Component{
         return false
       }  
     }
-
   }
 
   docs = {
@@ -140,6 +139,10 @@ export class StockList extends React.Component{
     },
     categoryChanged: (new_category_map) => {
       this.setState({category_map: new_category_map})
+    },
+    refresh: () => {
+      this.docs.get()
+      this.categorySelect.all()
     }
   }
 
