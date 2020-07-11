@@ -148,16 +148,21 @@ export class StockList extends React.Component{
 
   categorySelect = {
     value: (val) => {
-      let selected_list = this.state.data_list.filter(value => {
-        /*
-        if((value[1]).category_id && (value[1].category_id).length > 0){
-          // 各項目のcategory_idのリストの中に、検索したいカテゴリIDが含まれているかどうかチェック
-          return ((value[1].category_id).indexOf(val) >= 0)
-        }
-        */
-       return value[1].category_id === val
-      })
-      this.setState({show_list: selected_list, selectedCategory: val})  
+      if(val === this.state.selectedCategory){
+        this.categorySelect.all()
+      }
+      else{
+        let selected_list = this.state.data_list.filter(value => {
+          /*
+          if((value[1]).category_id && (value[1].category_id).length > 0){
+            // 各項目のcategory_idのリストの中に、検索したいカテゴリIDが含まれているかどうかチェック
+            return ((value[1].category_id).indexOf(val) >= 0)
+          }
+          */
+         return value[1].category_id === val
+        })
+        this.setState({show_list: selected_list, selectedCategory: val})    
+      }
     },
     all: () => {
       this.setState({show_list: this.state.data_list, selectedCategory: " "})
