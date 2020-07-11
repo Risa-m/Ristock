@@ -56,3 +56,16 @@
   color: #7c8993;
   font-size: 0.8em;
 }
+
+.category-setting-text-field .category-setting-save-button {
+  color: #7c8993;
+  margin-left: 6px;
+  padding-left: 6px;
+  padding-right: 6px;
+  vertical-align: top;
+  text-transform: none;
+}
+
+.category-setting-text-field {
+
+}
