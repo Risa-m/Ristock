@@ -64,6 +64,7 @@ export const SettingOfCategoryView = (props) => {
         <div className="category-setting-text-field" style={{paddingTop: "6px"}}>
           <TextField 
             id="standard-basic" 
+            className="category-setting-text"
             value={newCategoryName}
             InputProps={{ inputProps: { maxLength: MAX_TEXT_INPUT_LENGTH} }} 
             onChange={(event) => handleCategoryNameChange(event)}/>
@@ -161,6 +162,7 @@ const EditableCategoryItemView = (props) => {
         <div className="category-setting-text-field">
           <TextField 
             id="standard-basic" 
+            className="category-setting-text"
             value={categoryName}
             InputProps={{ inputProps: { maxLength: MAX_TEXT_INPUT_LENGTH} }} 
             onChange={(event) => handleCategoryNameChange(event)}/>

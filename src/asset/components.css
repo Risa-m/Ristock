@@ -84,3 +84,7 @@
 .category-setting-text-field {
 
 }
+
+.category-setting-text {
+  max-width: calc(100% - 70px);
+}
