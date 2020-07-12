@@ -60,7 +60,8 @@
 
 .zoom-image-view{
   height: 200px;
-  padding: 10px;
+  padding: 0px;
+  border-radius: 5px;
   vertical-align: middle;
   z-index: 10;
 }

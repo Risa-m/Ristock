@@ -118,7 +118,7 @@ const ImageView = (props) => {
 
   if(isVisible){
     return (
-      <Paper variant="outlined" style={{padding: "5px", position: "absolute", left: mouseX, top: mouseY, zIndex: "10"}}>
+      <Paper variant="outlined" style={{padding: "0px", position: "absolute", left: mouseX, top: mouseY, zIndex: "10"}}>
         {uploadedImage()}
     </Paper>  
     )
