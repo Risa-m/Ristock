@@ -9,7 +9,7 @@ import { StockDetailsUpdateModalView } from 'components/StockList/StockDetailsUp
 import { StockListSettingButtonsShow } from 'components/StockList/StockListSettingButtonsShow';
 import VisibleViewString from 'components/StockList/VisibleViewString';
 
-const MAX_USER_ITEMS = 1000
+const MAX_USER_ITEMS = 50
 
 export class StockList extends React.Component{ 
   /*
@@ -58,7 +58,6 @@ export class StockList extends React.Component{
         return false
       }  
     }
-
   }
 
   docs = {
@@ -140,21 +139,30 @@ export class StockList extends React.Component{
     },
     categoryChanged: (new_category_map) => {
       this.setState({category_map: new_category_map})
+    },
+    refresh: () => {
+      this.docs.get()
+      this.categorySelect.all()
     }
   }
 
   categorySelect = {
     value: (val) => {
-      let selected_list = this.state.data_list.filter(value => {
-        /*
-        if((value[1]).category_id && (value[1].category_id).length > 0){
-          // 各項目のcategory_idのリストの中に、検索したいカテゴリIDが含まれているかどうかチェック
-          return ((value[1].category_id).indexOf(val) >= 0)
-        }
-        */
-       return value[1].category_id === val
-      })
-      this.setState({show_list: selected_list, selectedCategory: val})  
+      if(val === this.state.selectedCategory){
+        this.categorySelect.all()
+      }
+      else{
+        let selected_list = this.state.data_list.filter(value => {
+          /*
+          if((value[1]).category_id && (value[1].category_id).length > 0){
+            // 各項目のcategory_idのリストの中に、検索したいカテゴリIDが含まれているかどうかチェック
+            return ((value[1].category_id).indexOf(val) >= 0)
+          }
+          */
+         return value[1].category_id === val
+        })
+        this.setState({show_list: selected_list, selectedCategory: val})    
+      }
     },
     all: () => {
       this.setState({show_list: this.state.data_list, selectedCategory: " "})

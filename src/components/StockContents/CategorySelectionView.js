@@ -21,10 +21,17 @@ export const CategorySelectionView = (props) => {
   const handleCreateNewCategory = async () => {
     await props.createNewCategory(categoryName)
     setCreateCategoryOpen(false)
+    setCategoryName("")
   }
 
   const handleCategoryNameChange = (event) => {
     setCategoryName(event.target.value)
+    props.handleNewCategoryNameChange(event.target.value)
+  }
+
+  const closeCreateView = () => {
+    setCategoryName("")
+    setCreateCategoryOpen(false)
   }
 
   if(createCategoryOpen){
@@ -35,7 +42,7 @@ export const CategorySelectionView = (props) => {
           id="standard-basic" 
           className="stock-form-category-add-text" 
           value={categoryName} 
-          label="Add Category" 
+          label="新規カテゴリ" 
           InputProps={{ inputProps: { maxLength: MAX_TEXT_INPUT_LENGTH} }} 
           onChange={(event) => handleCategoryNameChange(event)}/>
         <IconButton 
@@ -47,7 +54,7 @@ export const CategorySelectionView = (props) => {
         <IconButton 
           aria-label="add-category" 
           className="stock-form-category-add-button" 
-          onClick={() => setCreateCategoryOpen(false)}>
+          onClick={() => closeCreateView()}>
           <CloseIcon fontSize="small" />
         </IconButton>
       </div>

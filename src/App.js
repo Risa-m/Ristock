@@ -69,7 +69,7 @@ class App extends React.Component {
 
   stockListRefresh(){
     if(this.state.settingChanged){
-      this.stockListRef.current.docs.get();
+      this.stockListRef.current.view.refresh();
       this.setState({settingChanged: false})
     }
   }
@@ -117,7 +117,7 @@ class App extends React.Component {
       </div>
       <div className="App-footer">
         <p className="copyright"><a href="https://github.com/Risa-m">&copy; 2020 Risa-m</a></p>
-        <p className="version" style={{fontSize: "0.6em", textAlign: "center"}}>version: 0.1.3</p>   
+        <p className="version" style={{fontSize: "0.6em", textAlign: "center"}}>version: 0.2.1</p>   
       </div>
     </div>
     </BrowserRouter>

@@ -7,6 +7,13 @@
   margin-top: 10px;
 }
 
+.update-stock-submit-button {
+  margin-top: 10px;
+  position: relative;
+  display: inline-block;
+  z-index: 1;
+}
+
 .add-stock-root {
   width: 90%;
   margin: auto;
@@ -49,4 +56,31 @@
   height: 50px;
   padding: 10px;
   vertical-align: middle;
+}
+
+.zoom-image-view{
+  height: 200px;
+  padding: 0px;
+  border-radius: 5px;
+  vertical-align: middle;
+  z-index: 10;
+}
+
+.category-setting-error-message {
+  display: block;
+  color: #7c8993;
+  font-size: 0.8em;
+}
+
+.category-setting-text-field .category-setting-save-button {
+  color: #7c8993;
+  margin-left: 6px;
+  padding-left: 6px;
+  padding-right: 6px;
+  vertical-align: top;
+  text-transform: none;
+}
+
+.category-setting-text-field {
+
 }

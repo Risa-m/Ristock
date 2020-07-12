@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import 'asset/components.css'
 import PropTypes from 'prop-types';
 
@@ -35,7 +35,17 @@ export const ImageUploadView = (props) => {
           <AddPhotoAlternateIcon />
         </Button>
       </label>
-      {UploadedImage()}
+      <div style={{display: "inline-block"}} 
+        onMouseEnter={() => props.showZoomView(true)}
+        onMouseLeave={() => props.showZoomView(false)}
+        onTouchStart={() => props.showZoomView(true)}
+        onTouchEnd={() => props.showZoomView(false)}
+        onTouchCancel={() => props.showZoomView(false)}
+        onMouseMove={(e) => props.handleMouseMove(e)}
+        onTouchMove={(e) => props.handleTouchMove(e)}
+        >
+        {UploadedImage()}
+      </div>
     </>
   )
 }

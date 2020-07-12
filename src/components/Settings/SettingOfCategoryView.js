@@ -11,6 +11,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import TextField from '@material-ui/core/TextField';
 import IconButton from '@material-ui/core/IconButton';
 import Divider from '@material-ui/core/Divider';
+import Button from '@material-ui/core/Button';
 
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -24,39 +25,57 @@ export const SettingOfCategoryView = (props) => {
   const { userID, category_map } = props
   const [ newCategoryName, setNewCategoryName ] = useState("")
   const [ isCreate, setCanCreate ] = useState(false)
+  const [ createError, setCreateError ] = useState(false)
 
   const createNewCategory = () => {
     let search = Object.keys(category_map).filter(val => category_map[val] === newCategoryName)
     if(search.length === 0){
+      setCreateError(false)
       props.handleCategoryCreate(userID, newCategoryName, category_map)
-      setCanCreate(false)  
+      setCanCreate(false)
+      setNewCategoryName("")
+    }
+    else{
+      setCreateError(true)
     }
   }
 
   const showCreateCategoryField = () => {
     setCanCreate(true)
+    setCreateError(false)
   }
 
   const handleCategoryNameChange = (event) => {
     setNewCategoryName(event.target.value)
   }
 
+  const showErrorMessage = (isError) => {
+    if(isError){
+      return <span className="category-setting-error-message">既に登録されています。</span>
+    }
+    else{
+      return null
+    }
+  }
+
   const newCategoryField = (isCreate) => {
     if(isCreate){
       return (
-        <>
+        <div className="category-setting-text-field" style={{paddingTop: "6px"}}>
           <TextField 
             id="standard-basic" 
             value={newCategoryName}
             InputProps={{ inputProps: { maxLength: MAX_TEXT_INPUT_LENGTH} }} 
             onChange={(event) => handleCategoryNameChange(event)}/>
-          <IconButton aria-label="ok"  
+          <Button 
+            className="category-setting-save-button"
+            variant="outlined" color="primary"
             onClick={() => createNewCategory()} 
-            style={{padding: "6px", verticalAlign: "middle"}}>
-            <CheckIcon fontSize="small"/>
-          </IconButton>
-
-        </>
+            size="small">
+            Save
+          </Button>
+          {showErrorMessage(createError)}
+        </div>
       )  
     }
     else {
@@ -94,6 +113,7 @@ export const SettingOfCategoryView = (props) => {
             category_map={category_map}
             handleCategoryDelete={props.handleCategoryDelete}
             handleCategoryRename={props.handleCategoryRename}
+            showErrorMessage={showErrorMessage}
             key={val}
             />
         ))}
@@ -117,6 +137,7 @@ const EditableCategoryItemView = (props) => {
   const [ isEdit, setCanEdit ] = useState(false)
   const [ categoryName, setCategoryName ] = useState(category_map[categoryID])
   const [ isSettingIconsShow, setsettingIconsShow ] = useState(false)
+  const [ renameError, setRenameError ] = useState(false)
 
   const handleCategoryNameChange = (event) => {
     setCategoryName(event.target.value)
@@ -127,29 +148,40 @@ const EditableCategoryItemView = (props) => {
     let search = Object.keys(category_map).filter(val => (val !== categoryID && category_map[val] === categoryName))
     if(search.length === 0){
       props.handleCategoryRename(userID, categoryID, categoryName, category_map)
+      setRenameError(false)
       setCanEdit(false)
+    }else{
+      setRenameError(true)
     }
   }
 
   const ItemView = (isEdit) => {
     if(isEdit){
       return (        
-        <>
+        <div className="category-setting-text-field">
           <TextField 
             id="standard-basic" 
             value={categoryName}
             InputProps={{ inputProps: { maxLength: MAX_TEXT_INPUT_LENGTH} }} 
             onChange={(event) => handleCategoryNameChange(event)}/>
-          <IconButton aria-label="ok"  
+          <Button 
+            className="category-setting-save-button"
+            variant="outlined" color="primary"
             onClick={() => categoryNameChanged()} 
-            style={{padding: "6px", verticalAlign: "middle"}}>
-            <CheckIcon fontSize="small"/>
-          </IconButton>
-        </>
+            size="small">
+            Save
+          </Button>
+          {props.showErrorMessage(renameError)}
+        </div>
       )
     }else{
       return <ListItemText primary={categoryName} />
     }  
+  }
+
+  const changeEditView = () => {
+    setRenameError(false)
+    setCanEdit(true)
   }
 
   const itemSettingShow = (isEdit, categoryID) => {
@@ -158,7 +190,7 @@ const EditableCategoryItemView = (props) => {
         <>
         <ListItemIcon>
           <IconButton aria-label="edit" 
-            onClick={() => setCanEdit(true)} 
+            onClick={() => changeEditView()} 
             style={{padding: "6px", verticalAlign: "middle"}}>
             <EditIcon fontSize="small"/>
           </IconButton>
