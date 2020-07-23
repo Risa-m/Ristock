@@ -97,5 +97,6 @@ CategorySelectionView.propTypes = {
   category_map: PropTypes.object,
   category_id: PropTypes.string,
   handleValueChanege: PropTypes.func,
+  handleNewCategoryNameChange: PropTypes.func,
 }
 

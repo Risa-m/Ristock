@@ -36,6 +36,7 @@ export const ImageUploadView = (props) => {
         </Button>
       </label>
       <div style={{display: "inline-block"}} 
+        onClick={() => props.showZoomView(false)}
         onMouseEnter={() => props.showZoomView(true)}
         onMouseLeave={() => props.showZoomView(false)}
         onTouchStart={() => props.showZoomView(true)}
