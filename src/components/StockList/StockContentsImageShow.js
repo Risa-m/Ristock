@@ -15,7 +15,27 @@ export const StockContentsImageShow = (props) => {
       return <img src="image/no_image.png" width="100%" onClick={() => props.detailsDoc(item[0])} alt={item[1].name}/>
     }
   }
-  
+
+  const createItemVIew = (show_list) => {
+    if(show_list.length === 0){
+      return (
+        <Grid item xs={6} sm={4} md={3} lg={2} xl={1} key={-1}>
+        <div className="stock-list-image-item">
+          <span className="square-content">
+            <img src="image/plus_item.png" width="100%" onClick={() => props.addDoc()} alt="add new item" />
+          </span>
+        <p className="stock-list-image-name">新規作成</p>
+        <p></p>
+        <p className="stock-list-image-stock"></p>
+        </div>
+      </Grid>
+      )
+    }
+    else {
+      return null
+    }
+  }
+
   if(visible){
     return(
     <div className="stock-list-image">
@@ -32,6 +52,7 @@ export const StockContentsImageShow = (props) => {
               </div>
             </Grid>
         ))}
+        {createItemVIew(show_list)}
       </Grid>
     </div>
     )
@@ -45,4 +66,5 @@ StockContentsImageShow.propTypes = {
   visible: PropTypes.bool,
   show_list: PropTypes.array,
   detailsDoc: PropTypes.func,
+  addDoc: PropTypes.func,
 }

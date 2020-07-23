@@ -213,6 +213,7 @@ export class StockList extends React.Component{
         visible={this.state.current_view===VisibleViewString.image} 
         show_list={this.state.show_list} 
         detailsDoc={this.docs.details}
+        addDoc={this.modals.addDocModalOpen}
       />      
 
       <StockDetailsUpdateModalView
