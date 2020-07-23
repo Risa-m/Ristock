@@ -158,3 +158,15 @@
 .copyright a {
   color: #7c8993;
 }
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+border-radius: 10px;
+}
+::-webkit-scrollbar-thumb {
+background-color: #afb1b3;
+border-radius: 10px;
+box-shadow:0 0 0 1px rgba(255, 255, 255, .3);
+}
