@@ -1,6 +1,9 @@
 import React from 'react'
 import firebase, { db } from '../firebase'
 import 'asset/views.css';
+import LoadingOverlay from 'react-loading-overlay';
+
+import Snackbar from '@material-ui/core/Snackbar';
 
 import { CategorySelectionShow } from 'components/StockList/CategorySelectionShow';
 import { StockContentsImageShow } from 'components/StockList/StockContentsImageShow';
@@ -34,6 +37,9 @@ export class StockList extends React.Component{
       addItem: false,
       modalopen: false,
       current_view: VisibleViewString.image,
+
+      loading: true,
+      feedbackopen: false,
     }
 
   }
@@ -73,7 +79,7 @@ export class StockList extends React.Component{
                         .collection('stock_items')
         let snapshots = await colRef.get()
         let docs = snapshots.docs.map(doc => [doc.id, doc.data()])
-        this.setState({data_list: docs, show_list : docs, category_map: categoryMap, category_list: categoryList}) 
+        this.setState({data_list: docs, show_list : docs, category_map: categoryMap, category_list: categoryList, loading: false}) 
       }  
     },
     delete: (docID) => {
@@ -91,6 +97,18 @@ export class StockList extends React.Component{
     },
     details: (docID) => {
       this.setState({detailsItemID: docID, modalopen:true})      
+    }
+  }
+
+  submit = {
+    imageUpload: () => {
+
+    },
+    addStockItems: () => {
+
+    },
+    updateStockItems: () => {
+      
     }
   }
 
@@ -123,6 +141,14 @@ export class StockList extends React.Component{
       }
       this.setState({data_list: newList, show_list: newList, category_list: props.category_list, category_map: props.category_map, selectedCategory: "all"})
       this.modals.handleClose()  
+    }
+  }
+
+  feedback = {
+    handleClose: () => {
+      this.setState({
+        feedbackopen: false
+      })
     }
   }
 
@@ -180,55 +206,66 @@ export class StockList extends React.Component{
   render(){
     if(!this.state.isUserDataLoaded && this.props.userID){
       this.check.getUserData()
+      return (
+        <LoadingOverlay
+        active={true}
+        spinner
+        text='Loading...'
+      >
+        <div style={{ height: '100vh', width: '100vw',   backgroundImage: `url("/image/top.jpg")` }}></div>
+      </ LoadingOverlay>
+      )
     }
 
-    return (
-    <div className="stock-list-root">
+    else{
+      return (
+      <div className="stock-list-root">
 
-      <CategorySelectionShow 
-        category_map={this.state.category_map} 
-        data_list={this.state.data_list} 
-        show_list={this.state.show_list} 
-        selectedCategory={this.state.selectedCategory} 
-        handleCategorySelect={this.categorySelect.value} 
-        handleCategorySelectNone={this.categorySelect.none} 
-        handleCategorySelectAll={this.categorySelect.all}
-      />
+        <CategorySelectionShow 
+          category_map={this.state.category_map} 
+          data_list={this.state.data_list} 
+          show_list={this.state.show_list} 
+          selectedCategory={this.state.selectedCategory} 
+          handleCategorySelect={this.categorySelect.value} 
+          handleCategorySelectNone={this.categorySelect.none} 
+          handleCategorySelectAll={this.categorySelect.all}
+        />
 
-      <StockListSettingButtonsShow 
-        current_view={this.state.current_view} 
-        settingColumn={this.view.columnChange} 
-        addDoc={this.modals.addDocModalOpen}
-      />
+        <StockListSettingButtonsShow 
+          current_view={this.state.current_view} 
+          settingColumn={this.view.columnChange} 
+          addDoc={this.modals.addDocModalOpen}
+        />
 
-      <StockContentsListShow 
-        visible={this.state.current_view===VisibleViewString.list} 
-        show_list={this.state.show_list} 
-        category_map={this.state.category_map}
-        detailsDoc={this.docs.details} 
-        deleteDoc={this.docs.delete} 
-      />
+        <StockContentsListShow 
+          visible={this.state.current_view===VisibleViewString.list} 
+          show_list={this.state.show_list} 
+          category_map={this.state.category_map}
+          detailsDoc={this.docs.details} 
+          deleteDoc={this.docs.delete} 
+        />
 
-      <StockContentsImageShow 
-        visible={this.state.current_view===VisibleViewString.image} 
-        show_list={this.state.show_list} 
-        detailsDoc={this.docs.details}
-        addDoc={this.modals.addDocModalOpen}
-      />      
+        <StockContentsImageShow 
+          visible={this.state.current_view===VisibleViewString.image} 
+          show_list={this.state.show_list} 
+          detailsDoc={this.docs.details}
+          addDoc={this.modals.addDocModalOpen}
+        />      
 
-      <StockDetailsUpdateModalView
-        userID={this.props.userID}
-        detailsItemID={this.state.detailsItemID}
-        wantToAddItem={this.state.addItem}
-        modalOpen={this.state.modalopen}
-        category_list={this.state.category_list}
-        category_map={this.state.category_map}
-        canUserAddDocs={this.check.canUserAddDocs}
-        handleClose={this.modals.handleClose}
-        handleSubmitClose={this.modals.handleSubmitClose}
-        categoryChanged={this.view.categoryChanged}
-      />
-    </div>
-    )
+        <StockDetailsUpdateModalView
+          userID={this.props.userID}
+          detailsItemID={this.state.detailsItemID}
+          wantToAddItem={this.state.addItem}
+          modalOpen={this.state.modalopen}
+          category_list={this.state.category_list}
+          category_map={this.state.category_map}
+          canUserAddDocs={this.check.canUserAddDocs}
+          handleClose={this.modals.handleClose}
+          handleSubmitClose={this.modals.handleSubmitClose}
+          categoryChanged={this.view.categoryChanged}
+        />
+      </div>
+      )
+    }
   }
 }
