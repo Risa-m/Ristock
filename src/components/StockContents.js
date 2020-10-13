@@ -1,6 +1,7 @@
 import React from 'react'
 import firebase, { db } from '../firebase'
 import 'asset/components.css'
+import PropTypes from 'prop-types';
 
 import { resizeImage } from 'components/ResizeImage';
 import { StockContentGridView } from 'components/StockContents/StockContentGridView';
@@ -102,6 +103,7 @@ export class StockContents extends React.Component{
         })
       }  
     },
+    /*
     imageUpload: async (userID, itemID) => {
       // 画像ファイルの保存
       let itemRef = db.collection('users')
@@ -253,10 +255,16 @@ export class StockContents extends React.Component{
       }else{
         this.setState({category_id: search[0]})
       }
-    }
+    }*/
   }
 
+  handleSubmit = async () => {
+    console.log("content submit")
+    this.setState({submitButtonCheck: true})
+    this.props.handleSubmitClose(this.state)
+  }
 
+  
   // update されたとき、DBを更新してモーダルに通知
   handleUpdateSubmit = async (event) => {
 
@@ -287,10 +295,11 @@ export class StockContents extends React.Component{
 
       this.setState({category: categoryName})      
 
-      await this.db.createCategory(this.props.userID, categoryName)
+      await this.props.createCategory(this.props.userID, categoryName)
     }
   }
 
+  
   
   phonePlusMinusTemplate = (props) => {
     return (
@@ -319,7 +328,7 @@ export class StockContents extends React.Component{
       <div className="add-stock-submit-button">
         <Button 
           variant="outlined" 
-          onClick={this.handleAddSubmit} 
+          onClick={this.handleSubmit} 
           disabled={!(this.state.name) || this.state.submitButtonCheck}
         >
           Save
@@ -347,7 +356,7 @@ export class StockContents extends React.Component{
         <div className="update-stock-submit-button">
           <Button 
           variant="outlined" 
-          onClick={this.handleUpdateSubmit} 
+          onClick={this.handleSubmit} 
           disabled={!(this.state.name) || this.state.submitButtonCheck}
           >
             Save
@@ -363,5 +372,13 @@ export class StockContents extends React.Component{
     </div>
     )
   }
+}
+
+StockContents.propTypes = {
+  item_id: PropTypes.string,
+  userID: PropTypes.string,
+  category_map: PropTypes.object,
+  handleClose: PropTypes.func,
+  categoryChanged: PropTypes.func,
 }
 

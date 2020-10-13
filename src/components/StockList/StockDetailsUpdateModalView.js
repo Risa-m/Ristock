@@ -21,7 +21,9 @@ export const StockDetailsUpdateModalView = (props) => {
               category_list={category_list} 
               category_map={category_map} 
               handleClose={props.handleSubmitClose}
+              handleSubmitClose={props.handleSubmitClose}
               categoryChanged={props.categoryChanged}
+              createCategory={props.createCategory}
             />}
         />
       </div>

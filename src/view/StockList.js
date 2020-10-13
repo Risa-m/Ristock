@@ -38,8 +38,14 @@ export class StockList extends React.Component{
       modalopen: false,
       current_view: VisibleViewString.image,
 
+      modal_content_id: null,
+      modal_content_category_id: null,
+
+      modal_content: {item_id: null, category_id: null},
+
       loading: true,
-      feedbackopen: false,
+      feedbackopen: true,
+      errorMessage: ""
     }
 
   }
@@ -71,7 +77,7 @@ export class StockList extends React.Component{
       if(this.props.userID){
         var categoryRef = db.collection('users').doc(this.props.userID)
         let categoryDoc = await categoryRef.get()
-        let categoryList = (categoryDoc.data()).category || [""]
+        //let categoryList = (categoryDoc.data()).category || [""]
         let categoryMap = (categoryDoc.data()).category_map || {}
   
         let colRef = db.collection('users')
@@ -79,7 +85,7 @@ export class StockList extends React.Component{
                         .collection('stock_items')
         let snapshots = await colRef.get()
         let docs = snapshots.docs.map(doc => [doc.id, doc.data()])
-        this.setState({data_list: docs, show_list : docs, category_map: categoryMap, category_list: categoryList, loading: false}) 
+        this.setState({data_list: docs, show_list : docs, category_map: categoryMap, loading: false}) 
       }  
     },
     delete: (docID) => {
@@ -101,14 +107,202 @@ export class StockList extends React.Component{
   }
 
   submit = {
-    imageUpload: () => {
-
+    handleUpdateSubmit: async (props) => {
+      await this.submit.setContentDataFromProp(props)
+      await this.db.updateStockItems(this.props.userID, props.item_id, this.state.modal_content)
+      await this.db.imageUpload(this.props.userID, props.item_id, this.state.modal_content)
+      await this.db.updateCategory(this.props.userID, props.item_id, this.state.modal_content.old_category_id, this.state.modal_content.category_id)  
     },
-    addStockItems: () => {
-
+    handleAddSubmit: async (props) => {
+      await this.submit.setContentDataFromProp(props)
+      await this.db.addStockItems(this.props.userID, this.state.modal_content)
+      await this.db.imageUpload(this.props.userID, this.state.modal_content.item_id, this.state.modal_content)
+      await this.db.addCategory(this.props.userID, this.state.modal_content.item_id, this.state.modal_content.category_id)
     },
-    updateStockItems: () => {
-      
+    setContentDataFromProp: (props) => {
+        let props_map = 
+        { item_id: props.item_id,
+          name: props.name,
+          modelNumber: props.modelNumber, 
+          size: props.size,
+          color: props.color,
+          stockNumber: props.stockNumber,
+          price: props.price,
+          lotSize: props.lotSize,
+          category: props.category, 
+          newCategoryName: props.newCategoryName,
+          old_category_id: props.old_category_id,
+          category_id: props.category_id,
+          image_url: props.image_url, 
+          local_image: props.local_image,
+          local_image_src: props.local_image_src,
+          category_map: props.category_map,
+        }
+        this.setState({modal_content: props_map})
+    }
+  }
+
+  db = {
+    imageUpload: async (userID, itemID, content) => {
+      // 画像ファイルの保存
+      let itemRef = db.collection('users')
+                      .doc(userID)
+                      .collection('stock_items')
+                      .doc(itemID)
+
+      const imageUploadPromise = new Promise((resolve, reject) => {
+        if(content.local_image){
+          let storageRef = firebase.storage().ref().child(`users/${userID}/${itemID}.jpg`);
+          storageRef.put(content.local_image)
+          .then(snapshot => {
+            snapshot.ref.getDownloadURL().then(url => {
+              itemRef.set({image_url: url}, { merge: true });
+              let new_content = content
+              new_content["image_url"] = url
+
+              this.setState({modal_content: new_content})
+              resolve()
+            })
+          });
+        }
+        else{
+          resolve()
+        }
+      })
+      await imageUploadPromise
+    },
+    addStockItems: async (userID, content) => {
+      await this.db.checkCreateCategory(userID, content.category_map, content.newCategoryName)
+      let addDoc = db.collection('users')
+                    .doc(userID)
+                    .collection('stock_items')
+      await addDoc.add({
+        name: content.name,
+        modelNumber: content.modelNumber,
+        size: content.size,
+        color: content.color,
+        stockNumber: content.stockNumber,
+        price: content.price,
+        lotSize: content.lotSize,
+        category: content.category,
+        category_id: content.category_id,
+        created_at: firebase.firestore.FieldValue.serverTimestamp(),
+        updated_at: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(ref => {
+        let new_content = content
+        new_content["item_id"] = ref.id
+        this.setState({modal_content: new_content})  
+      })
+    },
+    updateStockItems: async (userID, itemID, content) => {
+      await this.db.checkCreateCategory(userID, content.category_map, content.newCategoryName)
+      let itemRef = db.collection('users')
+                      .doc(userID)
+                      .collection('stock_items')
+                      .doc(itemID)
+      await itemRef.update({
+        name: content.name,
+        modelNumber: content.modelNumber,
+        size: content.size,
+        color: content.color,
+        stockNumber: content.stockNumber,
+        price: content.price,
+        lotSize: content.lotSize,
+        category: content.category,
+        category_id: content.category_id,
+        updated_at: firebase.firestore.FieldValue.serverTimestamp()
+      })
+    },
+    addCategory: async (userID, itemID, categoryID) => {
+      // カテゴリにitemIDを追加
+      if(categoryID !== ""){
+        let newCategoryRef = db.collection('users')
+                              .doc(userID)
+                              .collection('categories')
+                              .doc(categoryID)
+        let newCetegoryData = (await newCategoryRef.get()).data()
+        // DBからそのカテゴリが登録されているitemIDのリストを取得
+        let newCetegoryItems = newCetegoryData.item_id || []
+        newCetegoryItems.push(itemID)
+        newCategoryRef.update({
+          item_id: newCetegoryItems,
+          updated_at: firebase.firestore.FieldValue.serverTimestamp()    
+        })
+      }
+    },
+    updateCategory: async (userID, itemID, oldCategoryID, newcategoryID) => {
+      // カテゴリ側にitemIDを登録
+      if(oldCategoryID !== newcategoryID){
+        if(oldCategoryID !== ""){
+          // もとのカテゴリからitemIDを削除
+          let oldCategoryRef = db.collection('users')
+                                .doc(userID)
+                                .collection('categories')
+                                .doc(oldCategoryID)
+          let oldCetegoryData = (await oldCategoryRef.get()).data()
+          // DBからそのカテゴリが登録されているitemIDのリストを取得
+          let oldCategoryItems = oldCetegoryData.item_id || []
+          oldCategoryItems = oldCategoryItems.filter(item => item !== itemID)
+          oldCategoryRef.update({
+            item_id: oldCategoryItems,
+            updated_at: firebase.firestore.FieldValue.serverTimestamp()    
+          })
+        }
+
+        // 新しいカテゴリにitemIDを追加
+        let newCategoryRef = db.collection('users')
+                              .doc(userID)
+                              .collection('categories')
+                              .doc(newcategoryID)
+        let newCetegoryData = (await newCategoryRef.get()).data()
+        // DBからそのカテゴリが登録されているitemIDのリストを取得
+        let newCategoryItems = newCetegoryData.item_id || []
+        newCategoryItems.push(itemID)
+        newCategoryRef.update({
+          item_id: newCategoryItems,
+          updated_at: firebase.firestore.FieldValue.serverTimestamp()    
+        })
+      }
+    },
+    checkCreateCategory: async (userID, category_map, categoryName) => {
+      if(categoryName !== ""){
+        let search = Object.keys(category_map).filter(val => category_map[val] === categoryName)
+        if(search.length === 0){
+          await this.db.createCategory(userID, categoryName)
+        }
+        else {
+          this.setState({category_id: search[0]})
+        }
+      }
+    },
+    createCategory: async (userID, categoryName, content) => {
+      let search = Object.keys(content.category_map).filter(val => content.category_map[val] === categoryName)
+      if(search.length === 0){
+        let userRef = db.collection('users').doc(userID)
+        let categoryRef = userRef.collection('categories')
+        await categoryRef.add({
+          name: categoryName,
+          item_id: [],
+          created_at: firebase.firestore.FieldValue.serverTimestamp(),
+          updated_at: firebase.firestore.FieldValue.serverTimestamp()    
+        }).then(ref => {
+          // カテゴリ名とIDの紐づけ
+            let new_category_map = JSON.parse(JSON.stringify(content.category_map)) // deep copy
+            // category_mapに[id, name]を追加
+            let new_category_id = ref.id
+            new_category_map[new_category_id] = categoryName
+            userRef.update({ category_map: new_category_map })
+
+            let new_content = JSON.parse(JSON.stringify(content)) // deep copy
+            new_content["category_map"] = new_category_map
+            new_content["category_id"] = new_category_id
+
+            this.setState({modal_content: new_content})
+            this.props.categoryChanged(new_category_map)
+        })
+      }else{
+        this.setState({category_id: search[0]})
+      }
     }
   }
 
@@ -127,19 +321,21 @@ export class StockList extends React.Component{
       let newList = this.state.data_list.slice()
       // Add
       if(this.state.addItem){
-        newList.push([props.item_id, props])
+        await this.submit.handleAddSubmit(props)
+        newList.push([props.item_id, this.state.modal_content])
       }
       // Update
       else if(this.state.detailsItemID){
+        await this.submit.handleUpdateSubmit(props)
         newList = this.state.data_list.map(item => {
           if(item[0] === this.state.detailsItemID){
-            return [this.state.detailsItemID, props]
+            return [this.state.detailsItemID, this.state.modal_content]
           }else{
             return item
           }
         })
       }
-      this.setState({data_list: newList, show_list: newList, category_list: props.category_list, category_map: props.category_map, selectedCategory: "all"})
+      this.setState({data_list: newList, show_list: newList, selectedCategory: "all"})
       this.modals.handleClose()  
     }
   }
@@ -257,15 +453,29 @@ export class StockList extends React.Component{
           detailsItemID={this.state.detailsItemID}
           wantToAddItem={this.state.addItem}
           modalOpen={this.state.modalopen}
-          category_list={this.state.category_list}
           category_map={this.state.category_map}
           canUserAddDocs={this.check.canUserAddDocs}
           handleClose={this.modals.handleClose}
           handleSubmitClose={this.modals.handleSubmitClose}
           categoryChanged={this.view.categoryChanged}
+          createCategory={this.db.createCategory}
+        />
+
+        <Snackbar
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+          open={this.state.feedbackopen && this.state.errorMessage !== ""}
+          onClose={this.feedback.handleClose}
+          message={this.state.errorMessage}
+          autoHideDuration={6000}
         />
       </div>
       )
     }
   }
+}
+
+const ERROR_MESSAGE = {
+  ImageUploadError: "画像の保存に失敗しました。",
+  DBGetError: "",
+  DBSaveError: "保存に失敗しました。",
 }
