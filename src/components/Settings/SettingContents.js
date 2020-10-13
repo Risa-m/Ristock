@@ -1,5 +1,5 @@
 import React from 'react'
-import firebase, { db } from '../firebase'
+import firebase, { db } from '../../firebase'
 import 'asset/components.css'
 
 import SettingViewChoice from 'components/Settings/SettingViewChoice'

@@ -3,7 +3,7 @@ import 'asset/App.css';
 import PropTypes from 'prop-types';
 
 import ModalWrapper from 'components/ModalWrapper'
-import { SettingContents } from 'components/SettingContents'
+import { SettingContents } from 'components/Settings/SettingContents'
 
 export const SettingModal = (props) => {
   const { userID, modalOpen } = props
