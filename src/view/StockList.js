@@ -1,6 +1,7 @@
-import React from 'react'
+import React, {useState} from 'react'
 import firebase, { db } from '../firebase'
 import 'asset/views.css';
+import PropTypes from 'prop-types';
 import LoadingOverlay from 'react-loading-overlay';
 
 import Snackbar from '@material-ui/core/Snackbar';
@@ -75,18 +76,23 @@ export class StockList extends React.Component{
   docs = {
     get: async () =>  {
       if(this.props.userID){
-        var categoryRef = db.collection('users').doc(this.props.userID)
-        let categoryDoc = await categoryRef.get()
-        //let categoryList = (categoryDoc.data()).category || [""]
-        let categoryMap = (categoryDoc.data()).category_map || {}
-  
-        let colRef = db.collection('users')
-                        .doc(this.props.userID)
-                        .collection('stock_items')
-        let snapshots = await colRef.get()
-        let docs = snapshots.docs.map(doc => [doc.id, doc.data()])
-        this.setState({data_list: docs, show_list : docs, category_map: categoryMap, loading: false}) 
-      }  
+        await db.collection('users').doc(this.props.userID)
+                .get()
+                .then((categoryDoc) => {
+                  let categoryMap = (categoryDoc.data()).category_map || {}
+                  db.collection('users').doc(this.props.userID)
+                    .collection('stock_items')
+                    .get()
+                    .then((snapshots) => {
+                      let docs = snapshots.docs.map(doc => [doc.id, doc.data()])
+                      this.setState({data_list: docs, show_list : docs, category_map: categoryMap, loading: false})
+                    })
+                })
+                .catch(() => {
+                  console.log(ERROR_MESSAGE.DBGetError)
+                  this.setState({errorMessage: ERROR_MESSAGE.DBGetError, feedbackopen: true})                                    
+                })
+        }  
     },
     delete: (docID) => {
       if(this.props.userID){
@@ -169,7 +175,10 @@ export class StockList extends React.Component{
           resolve()
         }
       })
-      await imageUploadPromise
+      await imageUploadPromise.catch(() => {
+        console.log(ERROR_MESSAGE.ImageUploadError)
+        this.setState({errorMessage: ERROR_MESSAGE.ImageUploadError, feedbackopen: true})
+      })
     },
     addStockItems: async (userID, content) => {
       await this.db.checkCreateCategory(userID, content.category_map, content.newCategoryName)
@@ -214,12 +223,10 @@ export class StockList extends React.Component{
       })
     },
     addCategory: async (userID, itemID, categoryID) => {
-      // カテゴリにitemIDを追加
+      // カテゴリ側にitemIDを追加
       if(categoryID !== ""){
-        let newCategoryRef = db.collection('users')
-                              .doc(userID)
-                              .collection('categories')
-                              .doc(categoryID)
+        let newCategoryRef = db.collection('users').doc(userID)
+                              .collection('categories').doc(categoryID)
         let newCetegoryData = (await newCategoryRef.get()).data()
         // DBからそのカテゴリが登録されているitemIDのリストを取得
         let newCetegoryItems = newCetegoryData.item_id || []
@@ -231,16 +238,15 @@ export class StockList extends React.Component{
       }
     },
     updateCategory: async (userID, itemID, oldCategoryID, newcategoryID) => {
+      // 旧カテゴリ側からitemIDを削除し、新カテゴリ側にitemIDを追加
       // カテゴリ側にitemIDを登録
       if(oldCategoryID !== newcategoryID){
         if(oldCategoryID !== ""){
           // もとのカテゴリからitemIDを削除
-          let oldCategoryRef = db.collection('users')
-                                .doc(userID)
-                                .collection('categories')
-                                .doc(oldCategoryID)
+          let oldCategoryRef = db.collection('users').doc(userID)
+                                .collection('categories').doc(oldCategoryID)
           let oldCetegoryData = (await oldCategoryRef.get()).data()
-          // DBからそのカテゴリが登録されているitemIDのリストを取得
+          // DBからそのカテゴリが登録されているitemIDのリストを取得し、該当のitemIDを削除
           let oldCategoryItems = oldCetegoryData.item_id || []
           oldCategoryItems = oldCategoryItems.filter(item => item !== itemID)
           oldCategoryRef.update({
@@ -250,10 +256,8 @@ export class StockList extends React.Component{
         }
 
         // 新しいカテゴリにitemIDを追加
-        let newCategoryRef = db.collection('users')
-                              .doc(userID)
-                              .collection('categories')
-                              .doc(newcategoryID)
+        let newCategoryRef = db.collection('users').doc(userID)
+                              .collection('categories').doc(newcategoryID)
         let newCetegoryData = (await newCategoryRef.get()).data()
         // DBからそのカテゴリが登録されているitemIDのリストを取得
         let newCategoryItems = newCetegoryData.item_id || []
@@ -265,6 +269,7 @@ export class StockList extends React.Component{
       }
     },
     checkCreateCategory: async (userID, category_map, categoryName) => {
+      // カテゴリーが入力済みで未保存である場合に保存し、同名のカテゴリが既に存在している場合はそこに追加
       if(categoryName !== ""){
         let search = Object.keys(category_map).filter(val => category_map[val] === categoryName)
         if(search.length === 0){
@@ -276,8 +281,13 @@ export class StockList extends React.Component{
       }
     },
     createCategory: async (userID, categoryName, content) => {
+      // カテゴリの新規追加
+      // 既に同名のカテゴリがある場合はそちらを優先
       let search = Object.keys(content.category_map).filter(val => content.category_map[val] === categoryName)
-      if(search.length === 0){
+      if(search.length !== 0){
+        this.setState({category_id: search[0]})
+      }else {
+        // 新しいカテゴリをDBに登録し、categoryIDを作成
         let userRef = db.collection('users').doc(userID)
         let categoryRef = userRef.collection('categories')
         await categoryRef.add({
@@ -288,7 +298,7 @@ export class StockList extends React.Component{
         }).then(ref => {
           // カテゴリ名とIDの紐づけ
             let new_category_map = JSON.parse(JSON.stringify(content.category_map)) // deep copy
-            // category_mapに[id, name]を追加
+            // category_mapに[category_id, category_name]を追加
             let new_category_id = ref.id
             new_category_map[new_category_id] = categoryName
             userRef.update({ category_map: new_category_map })
@@ -300,8 +310,6 @@ export class StockList extends React.Component{
             this.setState({modal_content: new_content})
             this.props.categoryChanged(new_category_map)
         })
-      }else{
-        this.setState({category_id: search[0]})
       }
     }
   }
@@ -466,7 +474,7 @@ export class StockList extends React.Component{
           open={this.state.feedbackopen && this.state.errorMessage !== ""}
           onClose={this.feedback.handleClose}
           message={this.state.errorMessage}
-          autoHideDuration={6000}
+          autoHideDuration={10000}
         />
       </div>
       )
@@ -476,6 +484,6 @@ export class StockList extends React.Component{
 
 const ERROR_MESSAGE = {
   ImageUploadError: "画像の保存に失敗しました。",
-  DBGetError: "",
+  DBGetError: "データの取得に失敗しました。",
   DBSaveError: "保存に失敗しました。",
 }
