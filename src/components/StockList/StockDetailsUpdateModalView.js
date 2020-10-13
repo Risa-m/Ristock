@@ -2,7 +2,7 @@ import React from 'react'
 import 'asset/views.css';
 import PropTypes from 'prop-types';
 
-import { StockContents } from 'components/StockContents'
+import { StockContents } from 'components/StockContents/StockContents'
 import ModalWrapper from 'components/ModalWrapper'
 
 export const StockDetailsUpdateModalView = (props) => {

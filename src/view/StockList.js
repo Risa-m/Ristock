@@ -44,7 +44,7 @@ export class StockList extends React.Component{
       modal_content: {item_id: null, category_id: null},
 
       loading: true,
-      feedbackopen: true,
+      feedbackopen: false,
       errorMessage: ""
     }
 

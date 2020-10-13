@@ -1,5 +1,5 @@
 import React from 'react'
-import firebase, { db } from '../firebase'
+import firebase, { db } from '../../firebase'
 import 'asset/components.css'
 import PropTypes from 'prop-types';
 
@@ -54,7 +54,7 @@ export class StockContents extends React.Component{
 
   // mount されたときにデータをDBから取得
   async componentDidMount() {
-    await this.db.getDocs(this.props.userID, this.state.item_id)
+    await this.db.getDocs(this.props.userID, this.props.item_id)
   }
 
   callbacks = {
