@@ -489,12 +489,9 @@ const ERROR_MESSAGE = {
 }
 
 
-const ContentDB = (props) => {
-  // stateにはcontent_id, 各項目, map
-  const [state, setState] = useState(props)
-  const TIMEOUT_MS = 10000
-
-  const update_content = (content) =>  {
+/* DB登録のひな型 */
+const DBTemplate = {
+  update_content: (content) =>  {
     return {                
       name: content.name,
       modelNumber: content.modelNumber,
@@ -507,8 +504,8 @@ const ContentDB = (props) => {
       category_id: content.category_id,
       updated_at: firebase.firestore.FieldValue.serverTimestamp()
     }
-  }
-  const add_content = (content) => {
+  },
+  add_content: (content) => {
     return {
       name: content.name,
       modelNumber: content.modelNumber,
@@ -522,22 +519,32 @@ const ContentDB = (props) => {
       created_at: firebase.firestore.FieldValue.serverTimestamp(),
       updated_at: firebase.firestore.FieldValue.serverTimestamp()
     }
-  }
-  
-  const category_update_content = (itemIDList) => {
+  },
+  category_create_content: (newCategoryName) => {
     return {
-      item_id: itemIDList,
-      updated_at: firebase.firestore.FieldValue.serverTimestamp()    
-    }
-  }
-  const category_create_content = (categoryName) => {
+        name: newCategoryName,
+        item_id: [],
+        created_at: firebase.firestore.FieldValue.serverTimestamp(),
+        updated_at: firebase.firestore.FieldValue.serverTimestamp()    
+      }
+    },
+    category_update_content: (itemIDListToRegister) => {
     return {
-      name: categoryName,
-      item_id: [],
-      created_at: firebase.firestore.FieldValue.serverTimestamp(),
-      updated_at: firebase.firestore.FieldValue.serverTimestamp()    
+        item_id: itemIDListToRegister,
+        updated_at: firebase.firestore.FieldValue.serverTimestamp()    
+      }
     }
-  }
+}
+
+
+/** 
+ * 一つのアイテムの各項目・パラメータを保持
+ */
+const ContentDB = (props) => {
+  // stateにはcontent_id, 各項目, map
+  const [state, setState] = useState(props)
+  const TIMEOUT_MS = 10000
+
   const timeout = async (msec) => {
     return new Promise((_, reject) => setTimeout(reject, msec))
   }
@@ -545,7 +552,10 @@ const ContentDB = (props) => {
     return Promise.race([func(), timeout(timeout_ms)])
   }
 
-  const local = {
+  /* アイテムの各レコードを更新 
+  *  stateの更新
+  */
+  const _local = {
     setImageUrl: (url) => {
       setState({...state, image_url: url})
     },
@@ -563,133 +573,126 @@ const ContentDB = (props) => {
     }
   }
 
-  const submit = {
+  const ContentSubmit = {
+    addContent: async (userID) => {
+      await _database.createCategory(userID, state.newCategoryName)
+      await _database.addStockItems(userID)
+    },
+    updateContent: async (userID, itemID) => {
+      await _database.createCategory(userID, state.newCategoryName)
+      await _database.updateStockItems(userID, itemID)
+    },
     imageUpload: async (userID, itemID) => {
       if(state.local_image){
         try {
-          await database.imageUpload(userID, itemID)
-                        .then(url => {
-                          local.setImageUrl(url)
-                          database.imageRegister(userID, itemID, url)
-                        })
+          await _database.imageUpload(userID, itemID)
+                        .then(url => { _local.setImageUrl(url)
+                                       _database.imageRegister(userID, itemID, url)})
         } catch {
-          local.handleError()
+          _local.handleError()
         }
       }
     },
-    addContent: async (userID) => {
-      await database.createCategory(userID, state.newCategoryName)
-      await database.addStockItems(userID)
-    },
-    updateContent: async (userID, itemID) => {
-      await database.createCategory(userID, state.newCategoryName)
-      await database.updateStockItems(userID, itemID)
-    },
+  }
+
+  const categorySubmit = {
     createCategory: async (userID, categoryName) => {
       if(categoryName !== ""){
         // 同じ名前のカテゴリ名が既にないか検索
         let search = Object.keys(state.category_map).filter(val => state.category_map[val] === categoryName)
         if(search.length === 0){
           // なかった場合は新規作成
-          await database.createCategory(userID, categoryName)
+          await _database.createCategory(userID, categoryName)
                         .then((category_id, category_map) => {
-                          local.setCategoryID(category_id)
-                          local.updateCategoryMap(category_map)                
+                          _local.setCategoryID(category_id)
+                          _local.updateCategoryMap(category_map)
                         })
-                        .catch(local.handleError())
+                        .catch(_local.handleError())
           props.categoryChanged(state.category_map)
         }
         else {
           // 既にある場合はそのカテゴリIDを設定
-          local.setCategoryID(search[0])
+          _local.setCategoryID(search[0])
         }
       }
     },
     changeCategory: async (userID, itemID, oldCategoryID, newcategoryID) => {
       if(oldCategoryID !== newcategoryID){
-        await Promise.all([submit._updateCategory(userID, itemID, oldCategoryID),
-                           submit._updateCategory(userID, itemID, newcategoryID)])
+        await Promise.all([categorySubmit._updateCategory(userID, itemID, oldCategoryID),
+                           categorySubmit._updateCategory(userID, itemID, newcategoryID)])
         props.categoryChanged(state.category_map)
       }
     },
     _updateCategory: async (userID, itemID, categoryID) => {
       if(categoryID !== ""){
-        let itemList = await database.getCategoryData(userID, categoryID)
-                                        .then(data => {
-                                          (data.item_id || []).filter(item => item !== itemID)
-                                        })
-        await database.updateCategory(userID, categoryID, itemList)
+        let itemList = await _database.getCategoryData(userID, categoryID)
+                                     .then(data => {(data.item_id || []).filter(item => item !== itemID)})
+        await _database.updateCategory(userID, categoryID, itemList)
                       .then((category_id, category_map) => {
-                        local.setCategoryID(category_id)
-                        local.updateCategoryMap(category_map)                
+                        _local.setCategoryID(category_id)
+                        _local.updateCategoryMap(category_map)                
                       })
-                      .catch(local.handleError())
+                      .catch(_local.handleError())
       }
     }
   }
 
-  const database = {
+  const _database = {
+    /* 画像の保存と保存先urlの取得 */
     imageUpload: async (userID, itemID, image) => {
         let storageRef = firebase.storage().ref().child(`users/${userID}/${itemID}.jpg`)
-        let url = await setAccessTimeout(
-                          storageRef.put(image)
-                                    .then(snapshot => {
-                                      return snapshot.ref.getDownloadURL()
-                                    }), TIMEOUT_MS)
+        let url = await storageRef.put(image)
+                                    .then(snapshot => { return snapshot.ref.getDownloadURL()})
         return url
-    },
+    }, 
+    /* 画像URLをアイテムに登録 */
     imageRegister: async (userID, itemID, imageUrl) => {
       let itemRef = db.collection('users').doc(userID)
                       .collection('stock_items').doc(itemID)
-      return await setAccessTimeout(itemRef.set({image_url: imageUrl}, { merge: true }), TIMEOUT_MS)
+      return await itemRef.set({image_url: imageUrl}, { merge: true })
     },
-    updateCategoryMap:  async (userID, categoryMap, categoryID, categoryName) => {
+    /* カテゴリIDと名前の対応Mapの更新 */
+    _updateCategoryMap:  async (userID, categoryMap, categoryID, categoryName) => {
       // カテゴリ名とIDの紐づけ
       let new_category_map = JSON.parse(JSON.stringify(categoryMap)) // deep copy
       let new_category_id = categoryID
       new_category_map[new_category_id] = categoryName
-      db.collection('users').doc(userID)
-        .update({ category_map: new_category_map })
+      db.collection('users').doc(userID).update({ category_map: new_category_map })
       return (new_category_map, new_category_id)
     },
-    createCategoryForDB: async (userID, categoryName) => {
+    createNewCategoryContent: async (userID, categoryName) => {
       let userRef = db.collection('users').doc(userID)
       let categoryRef = userRef.collection('categories')
-      return await setAccessTimeout(
-        categoryRef
-        .add(category_create_content(categoryName))
-        .then(ref => {
-          return database.updateCategoryMap(state.category_map, ref.id, categoryName)
-      }), TIMEOUT_MS)
+      return await categoryRef.add(DBTemplate.category_create_content(categoryName))
+                              .then(ref => {
+                                return _database._updateCategoryMap(userID, state.category_map, ref.id, categoryName)
+                              })
     },
     addStockItems: async (userID) => {
       // 新しいアイテムをDBに登録して、そのIDをstateに登録
-      await setAccessTimeout(
-            db.collection('users').doc(userID)
+      await db.collection('users').doc(userID)
               .collection('stock_items')
-              .add(add_content(state))
-              .then(ref => local.setItemID(ref.id)), TIMEOUT_MS)
+              .add(DBTemplate.add_content(state))
+              .then(ref => _local.setItemID(ref.id))
     },
     updateStockItems: async (userID, itemID) => {
       // 指定されたIDをcontentの内容でDBに登録
-      await setAccessTimeout(
-            db.collection('users').doc(userID)
+      await db.collection('users').doc(userID)
               .collection('stock_items').doc(itemID)
-              .update(update_content(state)), TIMEOUT_MS)
+              .update(DBTemplate.update_content(state))
     },
     getCategoryData: async (userID, categoryID) => {
       if(categoryID !== ""){
         let categoryRef = db.collection('users').doc(userID)
                             .collection('categories').doc(categoryID)
-        return await setAccessTimeout(categoryRef.get(),TIMEOUT_MS)
-                                    .then(doc => doc.data(), TIMEOUT_MS)
+        return await categoryRef.get().then(doc => doc.data())
       }
     },
     updateCategory: async (userID, categoryID, categoryItemList) =>{
       if(categoryID !== ""){
         let categoryRef = db.collection('users').doc(userID)
                             .collection('categories').doc(categoryID)
-        await setAccessTimeout(categoryRef.update(category_update_content(categoryItemList)), TIMEOUT_MS)
+        await categoryRef.update(DBTemplate.category_update_content(categoryItemList))
       }
     },
   }
