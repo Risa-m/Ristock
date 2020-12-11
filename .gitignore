@@ -3,6 +3,7 @@
 /src/firebase/config.js
 .env
 design_memo.md
+/.firebase
 
 # dependencies
 /node_modules

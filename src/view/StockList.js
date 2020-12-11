@@ -536,6 +536,67 @@ const DBTemplate = {
     }
 }
 
+/** firebaseへの登録 */
+const AccessFireBase = () => {
+
+    /* 画像の保存と保存先urlの取得 */
+    imageUpload = async (userID, itemID, image) => {
+        let storageRef = firebase.storage().ref().child(`users/${userID}/${itemID}.jpg`)
+        let url = await storageRef.put(image)
+                                  .then(snapshot => { return snapshot.ref.getDownloadURL()})
+        return url
+    }
+    /* 画像URLをアイテムに登録 */
+    imageRegister = async (userID, itemID, imageUrl) => {
+      let itemRef = db.collection('users').doc(userID)
+                      .collection('stock_items').doc(itemID)
+      return await itemRef.set({image_url: imageUrl}, { merge: true })
+    }
+    /* カテゴリIDと名前の対応Mapの更新 */
+    _updateCategoryMap = async (userID, categoryMap, categoryID, categoryName) => {
+      // カテゴリ名とIDの紐づけ
+      let new_category_map = JSON.parse(JSON.stringify(categoryMap)) // deep copy
+      let new_category_id = categoryID
+      new_category_map[new_category_id] = categoryName
+      db.collection('users').doc(userID).update({ category_map: new_category_map })
+      return (new_category_map, new_category_id)
+    }
+    createNewCategoryContent = async (userID, categoryName) => {
+      let userRef = db.collection('users').doc(userID)
+      let categoryRef = userRef.collection('categories')
+      return await categoryRef.add(DBTemplate.category_create_content(categoryName))
+                              .then(ref => {
+                                return _database._updateCategoryMap(userID, state.category_map, ref.id, categoryName)
+                              })
+    }
+    addStockItems = async (userID) => {
+      // 新しいアイテムをDBに登録して、そのIDをstateに登録
+      await db.collection('users').doc(userID)
+              .collection('stock_items')
+              .add(DBTemplate.add_content(state))
+              .then(ref => _local.setItemID(ref.id))
+    },
+    updateStockItems = async (userID, itemID) => {
+      // 指定されたIDをcontentの内容でDBに登録
+      await db.collection('users').doc(userID)
+              .collection('stock_items').doc(itemID)
+              .update(DBTemplate.update_content(state))
+    }
+    getCategoryData = async (userID, categoryID) => {
+      if(categoryID !== ""){
+        let categoryRef = db.collection('users').doc(userID)
+                            .collection('categories').doc(categoryID)
+        return await categoryRef.get().then(doc => doc.data())
+      }
+    }
+    updateCategory = async (userID, categoryID, categoryItemList) =>{
+      if(categoryID !== ""){
+        let categoryRef = db.collection('users').doc(userID)
+                            .collection('categories').doc(categoryID)
+        await categoryRef.update(DBTemplate.category_update_content(categoryItemList))
+      }
+    }
+}
 
 /** 
  * 一つのアイテムの各項目・パラメータを保持
@@ -575,17 +636,26 @@ const ContentDB = (props) => {
 
   const ContentSubmit = {
     addContent: async (userID) => {
+      /** 新しくアイテムを追加する
+       * args: userID
+      */
       await _database.createCategory(userID, state.newCategoryName)
       await _database.addStockItems(userID)
     },
     updateContent: async (userID, itemID) => {
+      /** アイテムの内容を更新する
+       * args: userID, itemID
+      */
       await _database.createCategory(userID, state.newCategoryName)
       await _database.updateStockItems(userID, itemID)
     },
     imageUpload: async (userID, itemID) => {
+      /** 画像を登録する
+       * args: userID, itemID
+      */
       if(state.local_image){
         try {
-          await _database.imageUpload(userID, itemID)
+          await _database.imageUpload(userID, itemID, state.local_image)
                         .then(url => { _local.setImageUrl(url)
                                        _database.imageRegister(userID, itemID, url)})
         } catch {
@@ -637,65 +707,6 @@ const ContentDB = (props) => {
     }
   }
 
-  const _database = {
-    /* 画像の保存と保存先urlの取得 */
-    imageUpload: async (userID, itemID, image) => {
-        let storageRef = firebase.storage().ref().child(`users/${userID}/${itemID}.jpg`)
-        let url = await storageRef.put(image)
-                                    .then(snapshot => { return snapshot.ref.getDownloadURL()})
-        return url
-    }, 
-    /* 画像URLをアイテムに登録 */
-    imageRegister: async (userID, itemID, imageUrl) => {
-      let itemRef = db.collection('users').doc(userID)
-                      .collection('stock_items').doc(itemID)
-      return await itemRef.set({image_url: imageUrl}, { merge: true })
-    },
-    /* カテゴリIDと名前の対応Mapの更新 */
-    _updateCategoryMap:  async (userID, categoryMap, categoryID, categoryName) => {
-      // カテゴリ名とIDの紐づけ
-      let new_category_map = JSON.parse(JSON.stringify(categoryMap)) // deep copy
-      let new_category_id = categoryID
-      new_category_map[new_category_id] = categoryName
-      db.collection('users').doc(userID).update({ category_map: new_category_map })
-      return (new_category_map, new_category_id)
-    },
-    createNewCategoryContent: async (userID, categoryName) => {
-      let userRef = db.collection('users').doc(userID)
-      let categoryRef = userRef.collection('categories')
-      return await categoryRef.add(DBTemplate.category_create_content(categoryName))
-                              .then(ref => {
-                                return _database._updateCategoryMap(userID, state.category_map, ref.id, categoryName)
-                              })
-    },
-    addStockItems: async (userID) => {
-      // 新しいアイテムをDBに登録して、そのIDをstateに登録
-      await db.collection('users').doc(userID)
-              .collection('stock_items')
-              .add(DBTemplate.add_content(state))
-              .then(ref => _local.setItemID(ref.id))
-    },
-    updateStockItems: async (userID, itemID) => {
-      // 指定されたIDをcontentの内容でDBに登録
-      await db.collection('users').doc(userID)
-              .collection('stock_items').doc(itemID)
-              .update(DBTemplate.update_content(state))
-    },
-    getCategoryData: async (userID, categoryID) => {
-      if(categoryID !== ""){
-        let categoryRef = db.collection('users').doc(userID)
-                            .collection('categories').doc(categoryID)
-        return await categoryRef.get().then(doc => doc.data())
-      }
-    },
-    updateCategory: async (userID, categoryID, categoryItemList) =>{
-      if(categoryID !== ""){
-        let categoryRef = db.collection('users').doc(userID)
-                            .collection('categories').doc(categoryID)
-        await categoryRef.update(DBTemplate.category_update_content(categoryItemList))
-      }
-    },
-  }
 }
 ContentDB.defaultProps = {
   item_id: "",
