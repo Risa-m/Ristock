@@ -538,22 +538,21 @@ const DBTemplate = {
 
 /** firebaseへの登録 */
 const AccessFireBase = () => {
-
     /* 画像の保存と保存先urlの取得 */
-    imageUpload = async (userID, itemID, image) => {
+    const imageUpload = async (userID, itemID, image) => {
         let storageRef = firebase.storage().ref().child(`users/${userID}/${itemID}.jpg`)
         let url = await storageRef.put(image)
                                   .then(snapshot => { return snapshot.ref.getDownloadURL()})
         return url
     }
     /* 画像URLをアイテムに登録 */
-    imageRegister = async (userID, itemID, imageUrl) => {
+    const imageRegister = async (userID, itemID, imageUrl) => {
       let itemRef = db.collection('users').doc(userID)
                       .collection('stock_items').doc(itemID)
       return await itemRef.set({image_url: imageUrl}, { merge: true })
     }
     /* カテゴリIDと名前の対応Mapの更新 */
-    _updateCategoryMap = async (userID, categoryMap, categoryID, categoryName) => {
+    const _updateCategoryMap = async (userID, categoryMap, categoryID, categoryName) => {
       // カテゴリ名とIDの紐づけ
       let new_category_map = JSON.parse(JSON.stringify(categoryMap)) // deep copy
       let new_category_id = categoryID
@@ -561,35 +560,35 @@ const AccessFireBase = () => {
       db.collection('users').doc(userID).update({ category_map: new_category_map })
       return (new_category_map, new_category_id)
     }
-    createNewCategoryContent = async (userID, categoryName) => {
+    const createNewCategoryContent = async (userID, categoryName, categoryMap) => {
       let userRef = db.collection('users').doc(userID)
       let categoryRef = userRef.collection('categories')
       return await categoryRef.add(DBTemplate.category_create_content(categoryName))
                               .then(ref => {
-                                return _database._updateCategoryMap(userID, state.category_map, ref.id, categoryName)
+                                return _updateCategoryMap(userID, categoryMap, ref.id, categoryName)
                               })
     }
-    addStockItems = async (userID) => {
-      // 新しいアイテムをDBに登録して、そのIDをstateに登録
-      await db.collection('users').doc(userID)
+    const addStockItems = async (userID, contentItem) => {
+      // 新しいアイテムをDBに登録する
+      return await db.collection('users').doc(userID)
               .collection('stock_items')
-              .add(DBTemplate.add_content(state))
-              .then(ref => _local.setItemID(ref.id))
-    },
-    updateStockItems = async (userID, itemID) => {
+              .add(DBTemplate.add_content(contentItem))
+              .then(ref => {return ref.id})
+    }
+    const updateStockItems = async (userID, itemID, contentItem) => {
       // 指定されたIDをcontentの内容でDBに登録
       await db.collection('users').doc(userID)
               .collection('stock_items').doc(itemID)
-              .update(DBTemplate.update_content(state))
+              .update(DBTemplate.update_content(contentItem))
     }
-    getCategoryData = async (userID, categoryID) => {
+    const getCategoryData = async (userID, categoryID) => {
       if(categoryID !== ""){
         let categoryRef = db.collection('users').doc(userID)
                             .collection('categories').doc(categoryID)
         return await categoryRef.get().then(doc => doc.data())
       }
     }
-    updateCategory = async (userID, categoryID, categoryItemList) =>{
+    const updateCategory = async (userID, categoryID, categoryItemList) =>{
       if(categoryID !== ""){
         let categoryRef = db.collection('users').doc(userID)
                             .collection('categories').doc(categoryID)
@@ -601,7 +600,7 @@ const AccessFireBase = () => {
 /** 
  * 一つのアイテムの各項目・パラメータを保持
  */
-const ContentDB = (props) => {
+const ContentItem = (props) => {
   // stateにはcontent_id, 各項目, map
   const [state, setState] = useState(props)
   const TIMEOUT_MS = 10000
@@ -639,15 +638,15 @@ const ContentDB = (props) => {
       /** 新しくアイテムを追加する
        * args: userID
       */
-      await _database.createCategory(userID, state.newCategoryName)
-      await _database.addStockItems(userID)
+      await AccessFireBase.createCategory(userID, state.newCategoryName)
+      await AccessFireBase.addStockItems(userID)
     },
     updateContent: async (userID, itemID) => {
       /** アイテムの内容を更新する
        * args: userID, itemID
       */
-      await _database.createCategory(userID, state.newCategoryName)
-      await _database.updateStockItems(userID, itemID)
+      await AccessFireBase.createCategory(userID, state.newCategoryName)
+      await AccessFireBase.updateStockItems(userID, itemID)
     },
     imageUpload: async (userID, itemID) => {
       /** 画像を登録する
@@ -655,9 +654,9 @@ const ContentDB = (props) => {
       */
       if(state.local_image){
         try {
-          await _database.imageUpload(userID, itemID, state.local_image)
+          await AccessFireBase.imageUpload(userID, itemID, state.local_image)
                         .then(url => { _local.setImageUrl(url)
-                                       _database.imageRegister(userID, itemID, url)})
+                          AccessFireBase.imageRegister(userID, itemID, url)})
         } catch {
           _local.handleError()
         }
@@ -672,7 +671,7 @@ const ContentDB = (props) => {
         let search = Object.keys(state.category_map).filter(val => state.category_map[val] === categoryName)
         if(search.length === 0){
           // なかった場合は新規作成
-          await _database.createCategory(userID, categoryName)
+          await AccessFireBase.createCategory(userID, categoryName)
                         .then((category_id, category_map) => {
                           _local.setCategoryID(category_id)
                           _local.updateCategoryMap(category_map)
@@ -695,9 +694,9 @@ const ContentDB = (props) => {
     },
     _updateCategory: async (userID, itemID, categoryID) => {
       if(categoryID !== ""){
-        let itemList = await _database.getCategoryData(userID, categoryID)
+        let itemList = await AccessFireBase.getCategoryData(userID, categoryID)
                                      .then(data => {(data.item_id || []).filter(item => item !== itemID)})
-        await _database.updateCategory(userID, categoryID, itemList)
+        await AccessFireBase.updateCategory(userID, categoryID, itemList)
                       .then((category_id, category_map) => {
                         _local.setCategoryID(category_id)
                         _local.updateCategoryMap(category_map)                
@@ -708,7 +707,7 @@ const ContentDB = (props) => {
   }
 
 }
-ContentDB.defaultProps = {
+ContentItem.defaultProps = {
   item_id: "",
   id: "",
   name: "",
@@ -728,7 +727,7 @@ ContentDB.defaultProps = {
   category_map: {},
 }
 
-ContentDB.propTypes = {
+ContentItem.propTypes = {
   item_id: PropTypes.string,
   name: PropTypes.string,
   modelNumber: PropTypes.string, 
