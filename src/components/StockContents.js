@@ -4,6 +4,7 @@ import 'asset/components.css'
 
 import { resizeImage } from 'components/ResizeImage';
 import { StockContentGridView } from 'components/StockContents/StockContentGridView';
+import DBTemplate from 'components/DBTemplate';
 
 import Button from '@material-ui/core/Button';
 
@@ -132,19 +133,9 @@ export class StockContents extends React.Component{
       let addDoc = db.collection('users')
                     .doc(userID)
                     .collection('stock_items')
-      await addDoc.add({
-        name: this.state.name,
-        modelNumber: this.state.modelNumber,
-        size: this.state.size,
-        color: this.state.color,
-        stockNumber: this.state.stockNumber,
-        price: this.state.price,
-        lotSize: this.state.lotSize,
-        category: this.state.category,
-        category_id: this.state.category_id,
-        created_at: firebase.firestore.FieldValue.serverTimestamp(),
-        updated_at: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(ref => {
+      await addDoc.add(
+        DBTemplate.add_content(this.state)
+      ).then(ref => {
         this.setState({item_id: ref.id})  
       })
     },
@@ -154,18 +145,9 @@ export class StockContents extends React.Component{
                       .doc(userID)
                       .collection('stock_items')
                       .doc(itemID)
-      await itemRef.update({
-        name: this.state.name,
-        modelNumber: this.state.modelNumber,
-        size: this.state.size,
-        color: this.state.color,
-        stockNumber: this.state.stockNumber,
-        price: this.state.price,
-        lotSize: this.state.lotSize,
-        category: this.state.category,
-        category_id: this.state.category_id,
-        updated_at: firebase.firestore.FieldValue.serverTimestamp()
-      })
+      await itemRef.update(
+        DBTemplate.update_content(this.state)
+      )
     },
     addCategory: async (userID, itemID, categoryID) => {
       // カテゴリにitemIDを追加
@@ -174,14 +156,11 @@ export class StockContents extends React.Component{
                               .doc(userID)
                               .collection('categories')
                               .doc(categoryID)
-        let newCetegoryData = (await newCategoryRef.get()).data()
+        let newCategoryData = (await newCategoryRef.get()).data()
         // DBからそのカテゴリが登録されているitemIDのリストを取得
-        let newCetegoryItems = newCetegoryData.item_id || []
-        newCetegoryItems.push(itemID)
-        newCategoryRef.update({
-          item_id: newCetegoryItems,
-          updated_at: firebase.firestore.FieldValue.serverTimestamp()    
-        })
+        let newCategoryItems = newCategoryData.item_id || []
+        newCategoryItems.push(itemID)
+        newCategoryRef.update(DBTemplate.category_update_content(newCategoryItems))
       }
     },
     updateCategory: async (userID, itemID, oldCategoryID, newcategoryID) => {
@@ -197,10 +176,7 @@ export class StockContents extends React.Component{
           // DBからそのカテゴリが登録されているitemIDのリストを取得
           let oldCategoryItems = oldCetegoryData.item_id || []
           oldCategoryItems = oldCategoryItems.filter(item => item !== itemID)
-          oldCategoryRef.update({
-            item_id: oldCategoryItems,
-            updated_at: firebase.firestore.FieldValue.serverTimestamp()    
-          })
+          oldCategoryRef.update(DBTemplate.category_update_content(oldCategoryItems))
         }
 
         // 新しいカテゴリにitemIDを追加
@@ -212,10 +188,7 @@ export class StockContents extends React.Component{
         // DBからそのカテゴリが登録されているitemIDのリストを取得
         let newCategoryItems = newCetegoryData.item_id || []
         newCategoryItems.push(itemID)
-        newCategoryRef.update({
-          item_id: newCategoryItems,
-          updated_at: firebase.firestore.FieldValue.serverTimestamp()    
-        })
+        newCategoryRef.update(DBTemplate.category_update_content(newCategoryItems))
       }
     },
     checkCreateCategory: async (userID, category_map, categoryName) => {
@@ -234,12 +207,8 @@ export class StockContents extends React.Component{
       if(search.length === 0){
         let userRef = db.collection('users').doc(userID)
         let categoryRef = userRef.collection('categories')
-        await categoryRef.add({
-          name: categoryName,
-          item_id: [],
-          created_at: firebase.firestore.FieldValue.serverTimestamp(),
-          updated_at: firebase.firestore.FieldValue.serverTimestamp()    
-        }).then(ref => {
+        await categoryRef.add(DBTemplate.category_create_content(categoryName))
+        .then(ref => {
           // カテゴリ名とIDの紐づけ
             let new_category_map = JSON.parse(JSON.stringify(this.state.category_map)) // deep copy
             // category_mapに[id, name]を追加
