@@ -87,20 +87,7 @@ export class StockContents extends React.Component{
                         .collection('stock_items')
                         .doc(itemID)
         let doc = await itemRef.get()
-        this.setState({
-          data: doc.data(),
-          name: doc.data().name,
-          modelNumber: doc.data().modelNumber,
-          size: doc.data().size,
-          color: doc.data().color,
-          stockNumber: doc.data().stockNumber,
-          price: doc.data().price,
-          lotSize: doc.data().lotSize,
-          old_category_id: doc.data().category_id || "",
-          category_id: doc.data().category_id || "",
-          category: this.state.category_map[doc.data().category_id] || "",
-          image_url: doc.data().image_url || "",
-        })
+        this.setState(DBTemplate.get_content(doc.data(), this.state.category_map))
       }  
     },
     imageUpload: async (userID, itemID) => {

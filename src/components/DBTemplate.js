@@ -1,6 +1,22 @@
 import firebase from '../firebase'
 
 const DBTemplate = {
+  get_content: (data, category_map) => {
+    return {
+      data: data,
+      name: data.name,
+      modelNumber: data.modelNumber,
+      size: data.size,
+      color: data.color,
+      stockNumber: data.stockNumber,
+      price: data.price,
+      lotSize: data.lotSize,
+      old_category_id: data.category_id || "",
+      category_id: data.category_id || "",
+      category: category_map[data.category_id] || "",
+      image_url: data.image_url || "",
+    }
+  },
   update_content: (content) =>  {
     return {                
       name: content.name,
