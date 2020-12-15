@@ -42,28 +42,12 @@ export class SettingContents extends React.Component{
      this.setState({category_map: newCategoryMap})
      this.props.handleSettingChanged()
     },
-    createNewCategory: async (userID, categoryName, category_map) => {
-      let search = Object.keys(category_map).filter(val => category_map[val] === categoryName)
+    createNewCategory: async (userID, categoryName, categoryMap) => {
+      let search = Object.keys(categoryMap).filter(val => categoryMap[val] === categoryName)
       if(categoryName !== "" && search.length === 0){
-        let userRef = db.collection('users').doc(userID)
-        let categoryRef = userRef.collection('categories')
-        await categoryRef.add({
-          name: categoryName,
-          item_id: [],
-          created_at: firebase.firestore.FieldValue.serverTimestamp(),
-          updated_at: firebase.firestore.FieldValue.serverTimestamp()    
-        }).then(ref => {
-          // カテゴリ名とIDの紐づけ
-            let new_category_map = JSON.parse(JSON.stringify(category_map)) // deep copy
-            // category_mapに[id, name]を追加
-            let new_category_id = ref.id
-            new_category_map[new_category_id] = categoryName
-            userRef.update({ category_map: new_category_map })
-
-            this.setState({category_map: new_category_map})
-            this.props.handleSettingChanged()
-        })
-      }else{
+        let [_, newCategoryMap] = await AccessFireBase.createCategoryContent(userID, categoryName, this.state.category_map)
+        this.setState({category_map: newCategoryMap})
+        this.props.handleSettingChanged()
       }
     }
 
