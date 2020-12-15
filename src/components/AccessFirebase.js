@@ -68,6 +68,17 @@ const AccessFireBase = {
       await itemRef.update(DBTemplate.update_content(itemContent))
     }
   },
+  deleteItemContent: async (userID, itemID, itemContent) => {
+    if(userID && itemID){
+      if(itemContent.image_url){
+        let deleteRef = firebase.storage().ref().child(`users/${userID}/${itemID}.jpg`)
+        deleteRef.delete()  
+      }
+      await db.collection('users').doc(userID)
+              .collection('stock_items').doc(itemID)
+              .delete();
+    }
+  },
   getItemIDListOfCategory: async (userID, categoryID) => {
     if(userID && categoryID !== ""){
       let categoryRef = db.collection('users').doc(userID)
@@ -158,8 +169,6 @@ const AccessFireBase = {
       return categoryMap
     }
   }
-
-
 }
 
 

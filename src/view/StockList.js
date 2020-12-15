@@ -76,21 +76,20 @@ export class StockList extends React.Component{
         this.setState({data_list: pairOfItemIDAndData, show_list : pairOfItemIDAndData, category_map: categoryMap, loading: false}) 
       }  
     },
-    delete: (docID) => {
+    delete: async (itemID) => {
       if(this.props.userID){
-        let delete_item = this.state.data_list.filter(value => value[0] === docID)[0]
-        if(delete_item[1].image_url){
-          var deleteRef = firebase.storage().ref().child(`users/${this.props.userID}/${docID}.jpg`);
-          deleteRef.delete()
-        }
-        db.collection('users').doc(this.props.userID).collection('stock_items').doc(docID).delete();
-        let newDataList = this.state.data_list.filter(value => value[0] !== docID)
-        let newShowList = this.state.show_list.filter(value => value[0] !== docID)
+        let delete_item = this.state.data_list.filter(value => value[0] === itemID)[0]
+
+        await AccessFireBase.deleteItemContent(this.props.userID, delete_item[0], delete_item[1])
+
+        let newDataList = this.state.data_list.filter(value => value[0] !== itemID)
+        let newShowList = this.state.show_list.filter(value => value[0] !== itemID)
+        
         this.setState({data_list: newDataList, show_list: newShowList})
       }
     },
-    details: (docID) => {
-      this.setState({detailsItemID: docID, modalopen:true})      
+    details: (itemID) => {
+      this.setState({detailsItemID: itemID, modalopen:true})      
     }
   }
 
