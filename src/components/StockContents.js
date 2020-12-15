@@ -89,6 +89,7 @@ export class StockContents extends React.Component{
      if(this.state.local_image){
         let imageURL = await AccessFireBase.imageUploadToStrage(userID, itemID, this.state.local_image)
         await AccessFireBase.imageUrlRegister(userID, itemID, imageURL)
+        this.setState({image_url: imageURL})
      }
     },
     addStockItems: async (userID) => {
@@ -98,13 +99,7 @@ export class StockContents extends React.Component{
     },
     updateStockItems: async (userID, itemID) => {
       await this.db.checkCreateCategory(userID, this.state.category_map, this.state.newCategoryName)
-      let itemRef = db.collection('users')
-                      .doc(userID)
-                      .collection('stock_items')
-                      .doc(itemID)
-      await itemRef.update(
-        DBTemplate.update_content(this.state)
-      )
+      await AccessFireBase.updateItemContent(userID, itemID, this.state)
     },
     addCategory: async (userID, itemID, categoryID) => {
       // カテゴリにitemIDを追加

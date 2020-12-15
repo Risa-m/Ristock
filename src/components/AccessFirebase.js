@@ -30,6 +30,11 @@ const AccessFireBase = {
     let itemID = await addDoc.add(DBTemplate.add_content(itemContent))
                              .then(ref => {return ref.id})
     return itemID
+  },
+  updateItemContent: async (userID, itemID, itemContent) => {
+    let itemRef = db.collection('users').doc(userID)
+                    .collection('stock_items').doc(itemID)
+    await itemRef.update(DBTemplate.update_content(itemContent))
   }
 
 
