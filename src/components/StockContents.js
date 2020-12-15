@@ -203,6 +203,7 @@ export class StockContents extends React.Component{
           handleValueChanege={this.callbacks.handleChanege}
           handleCategoryChanege={this.callbacks.handleCategoryChanege}
           imageChangeHandler={this.callbacks.handleImageChange}
+          handleNewCategoryNameChange={this.callbacks.handleNewCategoryNameChange}
           {...this.state}
         />
 
