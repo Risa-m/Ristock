@@ -27,7 +27,11 @@ const AccessFireBase = {
     if(userID){
       let categoryRef = db.collection('users').doc(userID)
       let userDoc = await categoryRef.get()
-      let categoryMap = (userDoc.data()).category_map || {}
+      let categoryMap = {}
+      let userDocData = userDoc.data()
+      if(userDocData){
+        categoryMap = userDocData.category_map || {}
+      }
       return categoryMap  
     }else{
       return {}
