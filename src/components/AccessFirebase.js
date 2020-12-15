@@ -2,6 +2,17 @@ import firebase, { db } from '../firebase'
 import DBTemplate from 'components/DBTemplate';
 
 const AccessFireBase = {
+  getItemList: async (userID) => {
+    if(userID){
+      let itemCollectionRef = db.collection('users').doc(userID)
+                                .collection('stock_items')
+      let snapshots = await itemCollectionRef.get()
+      let pairOfItemIDAndData = snapshots.docs.map(doc => [doc.id, doc.data()])
+      return pairOfItemIDAndData
+    }else {
+      return []
+    }
+  },
   getItemContent: async (userID, itemID) => {
     if(userID && itemID){
       let itemRef = db.collection('users').doc(userID)
@@ -12,7 +23,7 @@ const AccessFireBase = {
       return DBTemplate.content_none
     }
   },
-  getCategoryContent: async (userID) => {
+  getCategoryMap: async (userID) => {
     if(userID){
       let categoryRef = db.collection('users').doc(userID)
       let userDoc = await categoryRef.get()

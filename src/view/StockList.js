@@ -11,6 +11,7 @@ import { StockContentsListShow } from 'components/StockList/StockContentsListSho
 import { StockDetailsUpdateModalView } from 'components/StockList/StockDetailsUpdateModalView';
 import { StockListSettingButtonsShow } from 'components/StockList/StockListSettingButtonsShow';
 import VisibleViewString from 'components/StockList/VisibleViewString';
+import AccessFireBase from 'components/AccessFirebase';
 
 const MAX_USER_ITEMS = 50
 
@@ -69,17 +70,10 @@ export class StockList extends React.Component{
   docs = {
     get: async () =>  {
       if(this.props.userID){
-        var categoryRef = db.collection('users').doc(this.props.userID)
-        let categoryDoc = await categoryRef.get()
-        let categoryList = (categoryDoc.data()).category || [""]
-        let categoryMap = (categoryDoc.data()).category_map || {}
+        let categoryMap = await AccessFireBase.getCategoryMap(this.props.userID)
+        let pairOfItemIDAndData = await AccessFireBase.getItemList(this.props.userID)
   
-        let colRef = db.collection('users')
-                        .doc(this.props.userID)
-                        .collection('stock_items')
-        let snapshots = await colRef.get()
-        let docs = snapshots.docs.map(doc => [doc.id, doc.data()])
-        this.setState({data_list: docs, show_list : docs, category_map: categoryMap, category_list: categoryList, loading: false}) 
+        this.setState({data_list: pairOfItemIDAndData, show_list : pairOfItemIDAndData, category_map: categoryMap, loading: false}) 
       }  
     },
     delete: (docID) => {

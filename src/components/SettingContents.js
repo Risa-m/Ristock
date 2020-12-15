@@ -1,5 +1,4 @@
 import React from 'react'
-import firebase, { db } from '../firebase'
 import 'asset/components.css'
 
 import SettingViewChoice from 'components/Settings/SettingViewChoice'
@@ -29,7 +28,7 @@ export class SettingContents extends React.Component{
 
   db = {
     get: async (userID) => {
-      let categoryMap = await AccessFireBase.getCategoryContent(userID)
+      let categoryMap = await AccessFireBase.getCategoryMap(userID)
       this.setState({category_map: categoryMap})
     },
     deleteCategory: async (userID, categoryID, categoryMap) => {
