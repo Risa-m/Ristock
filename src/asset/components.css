@@ -3,20 +3,11 @@
   display: none;
 }
 
-.add-stock-submit-button {
-  margin-top: 10px;
-}
-
 .stock-content-submit-button {
   margin-top: 10px;
   position: relative;
   display: inline-block;
   z-index: 1;
-}
-
-.add-stock-root {
-  width: 90%;
-  margin: auto;
 }
 
 .stock-form-category-select {
@@ -79,10 +70,6 @@
   padding-right: 6px;
   vertical-align: top;
   text-transform: none;
-}
-
-.category-setting-text-field {
-
 }
 
 .category-setting-text {

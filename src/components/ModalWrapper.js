@@ -9,7 +9,7 @@ import CloseIcon from '@material-ui/icons/Close';
 const styles = theme => ({
   paper: {
     position: 'absolute',
-    width: theme.spacing(50),
+    width: theme.spacing(80),
     maxWidth: "75%",
     maxHeight: "80%",
     overflow: 'auto',
