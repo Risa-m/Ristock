@@ -108,32 +108,18 @@ export class StockContents extends React.Component{
         await AccessFireBase.updateItemIDListOfCategory(userID, categoryID, itemIDList)
       }
     },
-    updateCategory: async (userID, itemID, oldCategoryID, newcategoryID) => {
-      // カテゴリ側にitemIDを登録
-      if(oldCategoryID !== newcategoryID){
+    updateCategory: async (userID, itemID, oldCategoryID, newCategoryID) => {
+      if(oldCategoryID !== newCategoryID){
         if(oldCategoryID !== ""){
-          // もとのカテゴリからitemIDを削除
-          let oldCategoryRef = db.collection('users')
-                                .doc(userID)
-                                .collection('categories')
-                                .doc(oldCategoryID)
-          let oldCetegoryData = (await oldCategoryRef.get()).data()
-          // DBからそのカテゴリが登録されているitemIDのリストを取得
-          let oldCategoryItems = oldCetegoryData.item_id || []
-          oldCategoryItems = oldCategoryItems.filter(item => item !== itemID)
-          oldCategoryRef.update(DBTemplate.category_update_content(oldCategoryItems))
+          let itemIDListOfOldCategory = await AccessFireBase.getItemIDListOfCategory(userID, oldCategoryID)
+          itemIDListOfOldCategory = itemIDListOfOldCategory.filter(item => item !== itemID)
+          await AccessFireBase.updateItemIDListOfCategory(userID, oldCategoryID, itemIDListOfOldCategory)
         }
-
-        // 新しいカテゴリにitemIDを追加
-        let newCategoryRef = db.collection('users')
-                              .doc(userID)
-                              .collection('categories')
-                              .doc(newcategoryID)
-        let newCetegoryData = (await newCategoryRef.get()).data()
-        // DBからそのカテゴリが登録されているitemIDのリストを取得
-        let newCategoryItems = newCetegoryData.item_id || []
-        newCategoryItems.push(itemID)
-        newCategoryRef.update(DBTemplate.category_update_content(newCategoryItems))
+        if(newCategoryID !== ""){
+          let itemIDListOfNewCategory = await AccessFireBase.getItemIDListOfCategory(userID, newCategoryID)
+          itemIDListOfNewCategory.push(itemID)
+          await AccessFireBase.updateItemIDListOfCategory(userID, newCategoryID, itemIDListOfNewCategory)
+        }
       }
     },
     checkCreateCategory: async (userID, category_map, categoryName) => {

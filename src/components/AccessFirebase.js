@@ -41,7 +41,6 @@ const AccessFireBase = {
       let categoryRef = db.collection('users').doc(userID)
                           .collection('categories').doc(categoryID)
       let categoryDocData = await categoryRef.get().then(doc => doc.data())
-      console.log(categoryDocData)
       return categoryDocData.item_id || []
     }
   },
