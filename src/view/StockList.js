@@ -146,7 +146,6 @@ export class StockList extends React.Component{
       this.setState({category_map: new_category_map})
     },
     refresh: () => {
-      console.log("view refresh")
       this.docs.get()
       this.categorySelect.all()
     }
@@ -184,7 +183,6 @@ export class StockList extends React.Component{
   }
 
   render(){
-    console.log(this.isUserDataLoaded)
     if(!this.isUserDataLoaded && this.props.userID){
       this.check.getUserData()
       return (
