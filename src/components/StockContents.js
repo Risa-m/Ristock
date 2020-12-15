@@ -5,6 +5,7 @@ import 'asset/components.css'
 import { resizeImage } from 'components/ResizeImage';
 import { StockContentGridView } from 'components/StockContents/StockContentGridView';
 import DBTemplate from 'components/DBTemplate';
+import AccessFireBase from 'components/AccessFirebase';
 
 import Button from '@material-ui/core/Button';
 
@@ -81,14 +82,8 @@ export class StockContents extends React.Component{
 
   db = {
     getDocs: async (userID, itemID) => {
-      if(userID && itemID){
-        let itemRef = db.collection('users')
-                        .doc(userID)
-                        .collection('stock_items')
-                        .doc(itemID)
-        let doc = await itemRef.get()
-        this.setState(DBTemplate.get_content(doc.data(), this.state.category_map))
-      }  
+      let contentData = await AccessFireBase.getItemContent(userID, itemID)
+      this.setState(DBTemplate.get_content(contentData, this.state.category_map))
     },
     imageUpload: async (userID, itemID) => {
       // 画像ファイルの保存
