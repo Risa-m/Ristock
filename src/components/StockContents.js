@@ -102,17 +102,10 @@ export class StockContents extends React.Component{
       await AccessFireBase.updateItemContent(userID, itemID, this.state)
     },
     addCategory: async (userID, itemID, categoryID) => {
-      // カテゴリにitemIDを追加
-      if(this.state.category_id !== ""){
-        let newCategoryRef = db.collection('users')
-                              .doc(userID)
-                              .collection('categories')
-                              .doc(categoryID)
-        let newCategoryData = (await newCategoryRef.get()).data()
-        // DBからそのカテゴリが登録されているitemIDのリストを取得
-        let newCategoryItems = newCategoryData.item_id || []
-        newCategoryItems.push(itemID)
-        newCategoryRef.update(DBTemplate.category_update_content(newCategoryItems))
+      if(categoryID !== ""){
+        let itemIDList = await AccessFireBase.getItemIDListOfCategory(userID, categoryID)
+        itemIDList.push(itemID)
+        await AccessFireBase.updateItemIDListOfCategory(userID, categoryID, itemIDList)
       }
     },
     updateCategory: async (userID, itemID, oldCategoryID, newcategoryID) => {

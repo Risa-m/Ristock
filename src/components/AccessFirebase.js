@@ -35,6 +35,22 @@ const AccessFireBase = {
     let itemRef = db.collection('users').doc(userID)
                     .collection('stock_items').doc(itemID)
     await itemRef.update(DBTemplate.update_content(itemContent))
+  },
+  getItemIDListOfCategory: async (userID, categoryID) => {
+    if(categoryID !== ""){
+      let categoryRef = db.collection('users').doc(userID)
+                          .collection('categories').doc(categoryID)
+      let categoryDocData = await categoryRef.get().then(doc => doc.data())
+      console.log(categoryDocData)
+      return categoryDocData.item_id || []
+    }
+  },
+  updateItemIDListOfCategory: async (userID, categoryID, itemIDList) => {
+    if(categoryID !== ""){
+      let categoryRef = db.collection('users').doc(userID)
+                          .collection('categories').doc(categoryID)
+      await categoryRef.update(DBTemplate.category_update_content(itemIDList))
+    }
   }
 
 
