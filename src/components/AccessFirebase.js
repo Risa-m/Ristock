@@ -23,6 +23,13 @@ const AccessFireBase = {
     let itemRef = db.collection('users').doc(userID)
                     .collection('stock_items').doc(itemID)
     return await itemRef.set({image_url: imageUrl}, { merge: true })
+  },
+  addItemContent: async (userID, itemContent) => {
+    let addDoc = db.collection('users').doc(userID)
+                   .collection('stock_items')
+    let itemID = await addDoc.add(DBTemplate.add_content(itemContent))
+                             .then(ref => {return ref.id})
+    return itemID
   }
 
 

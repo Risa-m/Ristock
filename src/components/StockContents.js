@@ -93,14 +93,8 @@ export class StockContents extends React.Component{
     },
     addStockItems: async (userID) => {
       await this.db.checkCreateCategory(userID, this.state.category_map, this.state.newCategoryName)
-      let addDoc = db.collection('users')
-                    .doc(userID)
-                    .collection('stock_items')
-      await addDoc.add(
-        DBTemplate.add_content(this.state)
-      ).then(ref => {
-        this.setState({item_id: ref.id})  
-      })
+      let newContentitemID = await AccessFireBase.addItemContent(userID, this.state)
+      this.setState({item_id: newContentitemID})
     },
     updateStockItems: async (userID, itemID) => {
       await this.db.checkCreateCategory(userID, this.state.category_map, this.state.newCategoryName)
