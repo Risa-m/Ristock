@@ -101,15 +101,8 @@ export class StockContents extends React.Component{
       await this.db.checkCreateCategory(userID, this.state.category_map, this.state.newCategoryName)
       await AccessFireBase.updateItemContent(userID, itemID, this.state)
     },
-    addCategory: async (userID, itemID, categoryID) => {
-      if(categoryID !== ""){
-        let itemIDList = await AccessFireBase.getItemIDListOfCategory(userID, categoryID)
-        itemIDList.push(itemID)
-        await AccessFireBase.updateItemIDListOfCategory(userID, categoryID, itemIDList)
-      }
-    },
-    updateCategory: async (userID, itemID, oldCategoryID, newCategoryID) => {
-      if(oldCategoryID !== newCategoryID){
+    setCategory: async (userID, itemID, oldCategoryID, newCategoryID) => {
+      if(oldCategoryID !== newCategoryID || oldCategoryID === ""){
         if(oldCategoryID !== ""){
           let itemIDListOfOldCategory = await AccessFireBase.getItemIDListOfCategory(userID, oldCategoryID)
           itemIDListOfOldCategory = itemIDListOfOldCategory.filter(item => item !== itemID)
@@ -154,7 +147,7 @@ export class StockContents extends React.Component{
 
     await this.db.updateStockItems(this.props.userID, this.state.item_id)
     await this.db.imageUpload(this.props.userID, this.state.item_id)
-    await this.db.updateCategory(this.props.userID, this.state.item_id, this.state.old_category_id, this.state.category_id)
+    await this.db.setCategory(this.props.userID, this.state.item_id, this.state.old_category_id, this.state.category_id)
 
     this.props.handleClose(this.state)
   }
@@ -167,7 +160,7 @@ export class StockContents extends React.Component{
 
     await this.db.addStockItems(this.props.userID)
     await this.db.imageUpload(this.props.userID, this.state.item_id)
-    await this.db.addCategory(this.props.userID, this.state.item_id, this.state.category_id)
+    await this.db.setCategory(this.props.userID, this.state.item_id, "",this.state.category_id)
 
     this.props.handleClose(this.state)
   }
@@ -219,8 +212,6 @@ export class StockContents extends React.Component{
     </div>
     )
     }
-
-
     // Details and Update
     if(this.props.userID && this.state.data){
       return (
@@ -235,7 +226,7 @@ export class StockContents extends React.Component{
           handleNewCategoryNameChange={this.callbacks.handleNewCategoryNameChange}
           {...this.state}
         />
-        <div className="update-stock-submit-button">
+        <div className="stock-content-submit-button">
           <Button 
           variant="outlined" 
           onClick={this.handleUpdateSubmit} 
