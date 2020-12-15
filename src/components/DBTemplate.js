@@ -16,7 +16,6 @@ const DBTemplate = {
   },
   get_content: (data, category_map) => {
     return {
-      data: data,
       name: data.name,
       modelNumber: data.modelNumber,
       size: data.size,

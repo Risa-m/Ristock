@@ -50,6 +50,19 @@ const AccessFireBase = {
                           .collection('categories').doc(categoryID)
       await categoryRef.update(DBTemplate.category_update_content(itemIDList))
     }
+  },
+  createCategoryContent: async (userID, categoryName, categoryMap) => {
+    let userRef = db.collection('users').doc(userID)
+    let categoryRef = userRef.collection('categories')
+
+    let categoryID = await categoryRef.add(DBTemplate.category_create_content(categoryName))
+                                      .then(ref => ref.id)
+
+    let newCategoryMap = JSON.parse(JSON.stringify(categoryMap)) // deep copy
+    newCategoryMap[categoryID] = categoryName
+    await userRef.update({ category_map: newCategoryMap })
+
+    return [categoryID, newCategoryMap]
   }
 
 

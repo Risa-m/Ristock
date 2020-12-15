@@ -136,20 +136,10 @@ export class StockContents extends React.Component{
     createCategory: async (userID, categoryName) => {
       let search = Object.keys(this.state.category_map).filter(val => this.state.category_map[val] === categoryName)
       if(search.length === 0){
-        let userRef = db.collection('users').doc(userID)
-        let categoryRef = userRef.collection('categories')
-        await categoryRef.add(DBTemplate.category_create_content(categoryName))
-        .then(ref => {
-          // カテゴリ名とIDの紐づけ
-            let new_category_map = JSON.parse(JSON.stringify(this.state.category_map)) // deep copy
-            // category_mapに[id, name]を追加
-            let new_category_id = ref.id
-            new_category_map[new_category_id] = categoryName
-            userRef.update({ category_map: new_category_map })
-
-            this.setState({category_map: new_category_map, category_id: new_category_id})
-            this.props.categoryChanged(new_category_map)
-        })
+        let [categoryID, newCategoryMap] = await AccessFireBase.createCategoryContent(userID, categoryName, this.state.category_map)
+        this.setState({category_map: newCategoryMap, category_id: categoryID, category: categoryName})
+        this.props.categoryChanged(newCategoryMap)
+        console.log(this.state)
       }else{
         this.setState({category_id: search[0]})
       }
