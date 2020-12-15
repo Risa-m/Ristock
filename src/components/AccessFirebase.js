@@ -103,9 +103,7 @@ const AccessFireBase = {
                                               .get()
       if(ItemContainsCategoryShots && !ItemContainsCategoryShots.empty){
         ItemContainsCategoryShots.forEach(doc => {
-          doc.ref.update({
-            category_id: ""
-          })
+          doc.ref.update({category_id: ""})
         })
       }
       // categoryIDの削除
@@ -121,7 +119,35 @@ const AccessFireBase = {
     }else{
       return categoryMap
     }
+  },
+  updateCategoryName: async (userID, categoryID, categoryName, categoryMap) => {
+    if(userID && categoryID && categoryName !== ""){
+      let userRef = db.collection('users').doc(userID)
+      let categoryRef = userRef.collection('categories').doc(categoryID)
+
+      await categoryRef.update(DBTemplate.category_update_name(categoryName))
+
+      let newCategoryMap = JSON.parse(JSON.stringify(categoryMap)) // deep copy
+      newCategoryMap[categoryID] = categoryName
+      await userRef.update({ category_map: newCategoryMap })
+
+      return newCategoryMap
+    }else{
+      return categoryMap
+    }
+  },
+  updateCategoryMap: async (userID, categoryID, categoryName, categoryMap) => {
+    if(categoryID && categoryName !== ""){
+      let userRef = db.collection('users').doc(userID)
+      let newCategoryMap = JSON.parse(JSON.stringify(categoryMap)) // deep copy
+      newCategoryMap[categoryID] = categoryName
+      await userRef.update({ category_map: newCategoryMap })
+      return newCategoryMap  
+    }else {
+      return categoryMap
+    }
   }
+
 
 }
 

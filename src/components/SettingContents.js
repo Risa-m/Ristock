@@ -29,32 +29,18 @@ export class SettingContents extends React.Component{
 
   db = {
     get: async (userID) => {
-      if(userID){
-        let categoryMap = await AccessFireBase.getCategoryContent(userID)
-        this.setState({category_map: categoryMap})
-      }
+      let categoryMap = await AccessFireBase.getCategoryContent(userID)
+      this.setState({category_map: categoryMap})
     },
     deleteCategory: async (userID, categoryID, categoryMap) => {
       let newCategoryMap = await AccessFireBase.deleteCategoryContent(userID, categoryID, categoryMap)
       this.setState({category_map: newCategoryMap})
       this.props.handleSettingChanged()
     },
-    changeCategoryName: async (userID, categoryID, newCategoryName, category_map) => {
-      if(newCategoryName !== ""){
-        let userRef = db.collection('users').doc(userID)
-        let categoryRef = userRef.collection('categories').doc(categoryID)
-        await categoryRef.update({
-          name: newCategoryName,
-          updated_at: firebase.firestore.FieldValue.serverTimestamp()
-        })
-        let new_category_map = JSON.parse(JSON.stringify(category_map)) // deep copy
-        new_category_map[categoryID] = newCategoryName
-        userRef.update({ category_map: new_category_map })
-
-        this.setState({category_map: new_category_map})
-        this.props.handleSettingChanged()
-      }
-
+    changeCategoryName: async (userID, categoryID, categoryName, categoryMap) => {
+     let newCategoryMap = await AccessFireBase.updateCategoryName(userID, categoryID, categoryName, categoryMap)
+     this.setState({category_map: newCategoryMap})
+     this.props.handleSettingChanged()
     },
     createNewCategory: async (userID, categoryName, category_map) => {
       let search = Object.keys(category_map).filter(val => category_map[val] === categoryName)

@@ -72,6 +72,12 @@ const DBTemplate = {
       item_id: itemIDListToRegister,
       updated_at: firebase.firestore.FieldValue.serverTimestamp()    
     }
+  },
+  category_update_name: (categoryName) => {
+    return {
+      name: categoryName,
+      updated_at: firebase.firestore.FieldValue.serverTimestamp()    
+    }
   }
 }
 
