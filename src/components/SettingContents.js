@@ -6,7 +6,7 @@ import SettingViewChoice from 'components/Settings/SettingViewChoice'
 import { SettingTopView } from 'components/Settings/SettingTopView'
 import { SettingOfCategoryView } from 'components/Settings/SettingOfCategoryView'
 
-import AccessFirebase from 'components/AccessFirebase'
+import AccessFireBase from 'components/AccessFirebase'
 
 export class SettingContents extends React.Component{
   constructor(props){
@@ -30,37 +30,13 @@ export class SettingContents extends React.Component{
   db = {
     get: async (userID) => {
       if(userID){
-        let categoryMap = await AccessFirebase.getCategoryContent(userID)
+        let categoryMap = await AccessFireBase.getCategoryContent(userID)
         this.setState({category_map: categoryMap})
       }
     },
-    deleteCategory: async (userID, categoryID, category_map) => {
-      let new_category_map = JSON.parse(JSON.stringify(category_map)) // deep copy
-      delete new_category_map[categoryID]
-      this.setState({category_map: new_category_map})
-
-      // category_mapからcategory_idを削除
-      await db.collection('users').doc(userID)
-              .update({category_map: new_category_map})
-  
-      // item側からcategory_idを削除
-      // category_idが削除したいものと一致しているitemを取得
-      let ItemContainsCategoryShots = await db.collection('users')
-                                              .doc(userID)
-                                              .collection('stock_items')
-                                              .where('category_id', '==', categoryID)
-                                              .get()
-      if(ItemContainsCategoryShots && !ItemContainsCategoryShots.empty){
-        ItemContainsCategoryShots.forEach(doc => {
-          doc.ref.update({
-            category_id: ""
-          })
-        })  
-      }
-      // カテゴリのドキュメントをDBから削除
-      await db.collection('users').doc(userID)
-              .collection('categories').doc(categoryID).delete()
-  
+    deleteCategory: async (userID, categoryID, categoryMap) => {
+      let newCategoryMap = await AccessFireBase.deleteCategoryContent(userID, categoryID, categoryMap)
+      this.setState({category_map: newCategoryMap})
       this.props.handleSettingChanged()
     },
     changeCategoryName: async (userID, categoryID, newCategoryName, category_map) => {

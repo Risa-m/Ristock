@@ -167,6 +167,7 @@ export class StockList extends React.Component{
       this.setState({category_map: new_category_map})
     },
     refresh: () => {
+      console.log("view refresh")
       this.docs.get()
       this.categorySelect.all()
     }

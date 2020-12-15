@@ -133,7 +133,6 @@ export class StockContents extends React.Component{
         let [categoryID, newCategoryMap] = await AccessFireBase.createCategoryContent(userID, categoryName, this.state.category_map)
         this.setState({category_map: newCategoryMap, category_id: categoryID, category: categoryName})
         this.props.categoryChanged(newCategoryMap)
-        console.log(this.state)
       }else{
         this.setState({category_id: search[0]})
       }

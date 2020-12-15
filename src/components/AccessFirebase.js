@@ -60,14 +60,41 @@ const AccessFireBase = {
     let userRef = db.collection('users').doc(userID)
     let categoryRef = userRef.collection('categories')
 
+    // categoryIDの新規発行
     let categoryID = await categoryRef.add(DBTemplate.category_create_content(categoryName))
                                       .then(ref => ref.id)
 
+    // category mapの更新
     let newCategoryMap = JSON.parse(JSON.stringify(categoryMap)) // deep copy
     newCategoryMap[categoryID] = categoryName
     await userRef.update({ category_map: newCategoryMap })
 
     return [categoryID, newCategoryMap]
+  },
+  deleteCategoryContent: async (userID, categoryID, categoryMap) => {
+    // item側からcategory_idを削除
+    // category_idが削除したいものと一致しているitemを取得し、該当する各itemからcategory_idを削除
+    let ItemContainsCategoryShots = await db.collection('users').doc(userID)
+                                            .collection('stock_items')
+                                            .where('category_id', '==', categoryID)
+                                            .get()
+    if(ItemContainsCategoryShots && !ItemContainsCategoryShots.empty){
+      ItemContainsCategoryShots.forEach(doc => {
+        doc.ref.update({
+          category_id: ""
+        })
+      })
+    }
+    // categoryIDの削除
+    await db.collection('users').doc(userID)
+            .collection('categories').doc(categoryID).delete()
+    
+    // category mapの更新
+    let newCategoryMap = JSON.parse(JSON.stringify(categoryMap)) // deep copy
+    delete newCategoryMap[categoryID]
+    await db.collection('users').doc(userID).update({category_map: newCategoryMap})
+
+    return newCategoryMap      
   }
 
 

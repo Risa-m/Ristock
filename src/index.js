@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
-//import firebase from './firebase';
 
 import {MuiThemeProvider} from '@material-ui/core/styles'
 import {theme} from './components/themePalette'
@@ -11,11 +10,9 @@ import {theme} from './components/themePalette'
 ReactDOM.render(
   <MuiThemeProvider theme={theme}>
     <App />
-    {/*
     <React.StrictMode>
       <App />
     </React.StrictMode>
-    */}
   </MuiThemeProvider>,
   document.getElementById('root')
 );
