@@ -15,7 +15,6 @@ export class SettingContents extends React.Component{
       item_id: props.item_id,
       data: null,
       visible: SettingViewChoice.top,
-      category_list: [""],
       category_map: {},
     }
   }

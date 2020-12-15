@@ -27,22 +27,11 @@ export class StockContents extends React.Component{
 
     this.state = {
       item_id: props.item_id,
-      data: null,
       isLoaded: false,
 
-      id: "",
-      name: "",
-      modelNumber: "", 
-      size: "",
-      color: "",
-      stockNumber: 0,
-      price: 0,
-      lotSize: 0,
-      category: [],  // 表示名
+      ...DBTemplate.content_none,
+
       newCategoryName: "",
-      old_category_id: "",
-      category_id: "", // カテゴリーのid TODO: リスト化
-      image_url: "", 
 
       local_image: null,
       local_image_src: null,
@@ -176,6 +165,7 @@ export class StockContents extends React.Component{
 
 
   render(){
+    console.log(this.state)
     if(this.props.userID && this.state.isLoaded){
       return (
         <div className="stock-detail-root">

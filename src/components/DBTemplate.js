@@ -10,7 +10,7 @@ const DBTemplate = {
     price: 0,
     lotSize: 0,
     old_category_id: "",
-    category_id: "",
+    category_id: "",  // カテゴリーのid TODO: リスト化
     category: "",
     image_url: "",
   },

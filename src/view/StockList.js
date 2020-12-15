@@ -1,5 +1,4 @@
 import React from 'react'
-import firebase, { db } from '../firebase'
 import 'asset/views.css';
 import LoadingOverlay from 'react-loading-overlay';
 
@@ -22,12 +21,11 @@ export class StockList extends React.Component{
    */
   constructor(props){
     super(props)
+    this.isUserDataLoaded = false
 
     this.state = {
-      isUserDataLoaded: false,
       data_list: [], // 全アイテムの[id, data]のリスト
       show_list: [], // 表示するアイテムの[id, data]のリスト
-      category_list: [""], // 全カテゴリのリスト
       category_map: {},
 
       isCategoryShow: true,
@@ -52,8 +50,8 @@ export class StockList extends React.Component{
   check = {
     getUserData: () => {
     // Note: state update but not render
-    if(!this.state.isUserDataLoaded){
-        this.state.isUserDataLoaded = true
+    if(!this.isUserDataLoaded){
+        this.isUserDataLoaded = true
         this.docs.get()
       }  
     },
@@ -84,24 +82,12 @@ export class StockList extends React.Component{
 
         let newDataList = this.state.data_list.filter(value => value[0] !== itemID)
         let newShowList = this.state.show_list.filter(value => value[0] !== itemID)
-        
+
         this.setState({data_list: newDataList, show_list: newShowList})
       }
     },
     details: (itemID) => {
       this.setState({detailsItemID: itemID, modalopen:true})      
-    }
-  }
-
-  submit = {
-    imageUpload: () => {
-
-    },
-    addStockItems: () => {
-
-    },
-    updateStockItems: () => {
-      
     }
   }
 
@@ -132,7 +118,7 @@ export class StockList extends React.Component{
           }
         })
       }
-      this.setState({data_list: newList, show_list: newList, category_list: props.category_list, category_map: props.category_map, selectedCategory: "all"})
+      this.setState({data_list: newList, show_list: newList, category_map: props.category_map, selectedCategory: "all"})
       this.modals.handleClose()  
     }
   }
@@ -198,7 +184,8 @@ export class StockList extends React.Component{
   }
 
   render(){
-    if(!this.state.isUserDataLoaded && this.props.userID){
+    console.log(this.isUserDataLoaded)
+    if(!this.isUserDataLoaded && this.props.userID){
       this.check.getUserData()
       return (
         <LoadingOverlay
@@ -251,7 +238,6 @@ export class StockList extends React.Component{
           detailsItemID={this.state.detailsItemID}
           wantToAddItem={this.state.addItem}
           modalOpen={this.state.modalopen}
-          category_list={this.state.category_list}
           category_map={this.state.category_map}
           canUserAddDocs={this.check.canUserAddDocs}
           handleClose={this.modals.handleClose}
