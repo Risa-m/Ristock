@@ -12,6 +12,17 @@ const AccessFireBase = {
     }else {
       return DBTemplate.content_none
     }
+  },
+  imageUploadToStrage: async (userID, itemID, image) => {
+    let storageRef = firebase.storage().ref().child(`users/${userID}/${itemID}.jpg`)
+    let url = await storageRef.put(image)
+                              .then(snapshot => { return snapshot.ref.getDownloadURL()})
+    return url
+  },
+  imageUrlRegister: async (userID, itemID, imageUrl) => {
+    let itemRef = db.collection('users').doc(userID)
+                    .collection('stock_items').doc(itemID)
+    return await itemRef.set({image_url: imageUrl}, { merge: true })
   }
 
 

@@ -85,30 +85,11 @@ export class StockContents extends React.Component{
       let contentData = await AccessFireBase.getItemContent(userID, itemID)
       this.setState(DBTemplate.get_content(contentData, this.state.category_map))
     },
-    imageUpload: async (userID, itemID) => {
-      // 画像ファイルの保存
-      let itemRef = db.collection('users')
-                      .doc(userID)
-                      .collection('stock_items')
-                      .doc(itemID)
-
-      const imageUploadPromise = new Promise((resolve, reject) => {
-        if(this.state.local_image){
-          let storageRef = firebase.storage().ref().child(`users/${userID}/${itemID}.jpg`);
-          storageRef.put(this.state.local_image)
-          .then(snapshot => {
-            snapshot.ref.getDownloadURL().then(url => {
-              itemRef.set({image_url: url}, { merge: true });
-              this.setState({image_url: url})
-              resolve()
-            })
-          });
-        }
-        else{
-          resolve()
-        }
-      })
-      await imageUploadPromise
+    imageUpload: async (userID, itemID) => {      
+     if(this.state.local_image){
+        let imageURL = await AccessFireBase.imageUploadToStrage(userID, itemID, this.state.local_image)
+        await AccessFireBase.imageUrlRegister(userID, itemID, imageURL)
+     }
     },
     addStockItems: async (userID) => {
       await this.db.checkCreateCategory(userID, this.state.category_map, this.state.newCategoryName)
