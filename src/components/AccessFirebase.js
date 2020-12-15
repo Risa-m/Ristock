@@ -1,4 +1,3 @@
-import React from 'react'
 import firebase, { db } from '../firebase'
 import DBTemplate from 'components/DBTemplate';
 
@@ -12,6 +11,12 @@ const AccessFireBase = {
     }else {
       return DBTemplate.content_none
     }
+  },
+  getCategoryContent: async (userID) => {
+    let categoryRef = db.collection('users').doc(userID)
+    let userDoc = await categoryRef.get()
+    let categoryMap = (userDoc.data()).category_map || {}
+    return categoryMap
   },
   imageUploadToStrage: async (userID, itemID, image) => {
     let storageRef = firebase.storage().ref().child(`users/${userID}/${itemID}.jpg`)

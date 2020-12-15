@@ -6,6 +6,8 @@ import SettingViewChoice from 'components/Settings/SettingViewChoice'
 import { SettingTopView } from 'components/Settings/SettingTopView'
 import { SettingOfCategoryView } from 'components/Settings/SettingOfCategoryView'
 
+import AccessFirebase from 'components/AccessFirebase'
+
 export class SettingContents extends React.Component{
   constructor(props){
     super(props)
@@ -27,14 +29,10 @@ export class SettingContents extends React.Component{
 
   db = {
     get: async (userID) => {
-      if(this.props.userID){
-        // DBからカテゴリリストの取得
-        var categoryRef = db.collection('users').doc(userID)
-        let userDoc = await categoryRef.get()
-        let categoryList = (userDoc.data()).category || [""]  
-        let categoryMap = (userDoc.data()).category_map || {}
-        this.setState({category_list: categoryList, category_map: categoryMap})
-      }  
+      if(userID){
+        let categoryMap = await AccessFirebase.getCategoryContent(userID)
+        this.setState({category_map: categoryMap})
+      }
     },
     deleteCategory: async (userID, categoryID, category_map) => {
       let new_category_map = JSON.parse(JSON.stringify(category_map)) // deep copy
