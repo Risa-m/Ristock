@@ -1,5 +1,4 @@
 import React from 'react'
-import firebase, { db } from '../firebase'
 import 'asset/components.css'
 
 import { resizeImage } from 'components/ResizeImage';
@@ -29,6 +28,7 @@ export class StockContents extends React.Component{
     this.state = {
       item_id: props.item_id,
       data: null,
+      isLoaded: false,
 
       id: "",
       name: "",
@@ -84,6 +84,7 @@ export class StockContents extends React.Component{
     getDocs: async (userID, itemID) => {
       let contentData = await AccessFireBase.getItemContent(userID, itemID)
       this.setState(DBTemplate.get_content(contentData, this.state.category_map))
+      this.setState({isLoaded: true})
     },
     imageUpload: async (userID, itemID) => {      
      if(this.state.local_image){
@@ -139,30 +140,20 @@ export class StockContents extends React.Component{
     }
   }
 
-
-  // update されたとき、DBを更新してモーダルに通知
-  handleUpdateSubmit = async (event) => {
+  handleSubmit = async (event) => {
 
     this.setState({submitButtonCheck: true})
 
-    await this.db.updateStockItems(this.props.userID, this.state.item_id)
+    if(this.state.item_id){
+      await this.db.updateStockItems(this.props.userID, this.state.item_id)
+    }else {
+      await this.db.addStockItems(this.props.userID)
+    }
     await this.db.imageUpload(this.props.userID, this.state.item_id)
     await this.db.setCategory(this.props.userID, this.state.item_id, this.state.old_category_id, this.state.category_id)
 
     this.props.handleClose(this.state)
-  }
 
-
-  // add されたとき、DBに追加してモーダルに通知
-  handleAddSubmit = async (event) => {
-
-    this.setState({submitButtonCheck: true})
-
-    await this.db.addStockItems(this.props.userID)
-    await this.db.imageUpload(this.props.userID, this.state.item_id)
-    await this.db.setCategory(this.props.userID, this.state.item_id, "",this.state.category_id)
-
-    this.props.handleClose(this.state)
   }
 
   createNewCategory = async (categoryName) => {
@@ -186,34 +177,7 @@ export class StockContents extends React.Component{
 
 
   render(){
-    // Add
-    if(this.props.userID && (!this.state.item_id || !this.state.data)){
-      return (
-      <div className="stock-add-root">
-        <StockContentGridView 
-          handleValueChanege={this.callbacks.handleChanege}
-          createNewCategory={this.createNewCategory}
-          handleValueChanege={this.callbacks.handleChanege}
-          handleCategoryChanege={this.callbacks.handleCategoryChanege}
-          imageChangeHandler={this.callbacks.handleImageChange}
-          handleNewCategoryNameChange={this.callbacks.handleNewCategoryNameChange}
-          {...this.state}
-        />
-
-      <div className="add-stock-submit-button">
-        <Button 
-          variant="outlined" 
-          onClick={this.handleAddSubmit} 
-          disabled={!(this.state.name) || this.state.submitButtonCheck}
-        >
-          Save
-        </Button>
-      </div>
-    </div>
-    )
-    }
-    // Details and Update
-    if(this.props.userID && this.state.data){
+    if(this.props.userID && this.state.isLoaded){
       return (
         <div className="stock-detail-root">
 
@@ -229,21 +193,21 @@ export class StockContents extends React.Component{
         <div className="stock-content-submit-button">
           <Button 
           variant="outlined" 
-          onClick={this.handleUpdateSubmit} 
+          onClick={this.handleSubmit} 
           disabled={!(this.state.name) || this.state.submitButtonCheck}
           >
             Save
           </Button>
         </div>
 
-      </div> 
-
+      </div>
       )
+    }else{
+      return (
+        <div className="stock-detail-root">
+        </div>
+        )    
     }
-    return (
-    <div className="stock-detail-root">
-    </div>
-    )
   }
 }
 
