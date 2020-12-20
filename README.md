@@ -4,7 +4,7 @@
 ハンドメイド資材在庫管理Webアプリです。  
 ご利用はこちらから
 ↓  
-<a href="https://ristock.web.app/">
+<a href="https://ristock-handmade.web.app/">
   <img src="public/icon_white.png" alt="Ristock icon" title="Ristock" width="50" style="border-radius:8px;">
   Ristock
 </a>

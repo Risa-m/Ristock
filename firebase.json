@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "site": "ristock",
+    "site": "ristock-handmade",
     "public": "build",
     "ignore": [
       "firebase.json",
