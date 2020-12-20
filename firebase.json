@@ -1,6 +1,5 @@
 {
   "hosting": {
-    "site": "ristock",
     "public": "build",
     "ignore": [
       "firebase.json",
