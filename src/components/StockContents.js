@@ -71,9 +71,15 @@ export class StockContents extends React.Component{
 
   db = {
     getDocs: async (userID, itemID) => {
-      let contentData = await AccessFireBase.getItemContent(userID, itemID)
-      this.setState(DBTemplate.get_content(contentData, this.state.category_map))
-      this.setState({isLoaded: true})
+      await AccessFireBase.getItemContent(userID, itemID)
+            .then((contentData) => {
+              this.setState(DBTemplate.get_content(contentData, this.state.category_map))
+              this.setState({isLoaded: true})                          
+            })
+            .catch((errorData) => {
+              this.setState(DBTemplate.get_content(errorData, this.state.category_map))
+              this.setState({isLoaded: true, error_code: errorData.error_code})
+            })
     },
     imageUpload: async (userID, itemID) => {      
      if(this.state.local_image){

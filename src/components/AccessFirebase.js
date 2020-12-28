@@ -3,14 +3,15 @@ import DBTemplate from 'components/DBTemplate';
 import ErrorTemplate from 'components/ErrorTemplate';
 
 const TIMEOUT_MS = 10000
+const Test_Timeout_ms = 100
 
 const timeout = async (msec) => {
   // timeout_ms ミリ秒後にrejectを実行
   return new Promise((_, reject) => setTimeout(reject, msec))
 }
-const setAccessTimeout = async (func) => {
+const setAccessTimeout = async (func, timeout_ms) => {
   // Promise.raceは二つ以上のPromiseのうち早い方を戻り値とする
-  return Promise.race([func, timeout(TIMEOUT_MS)])
+  return Promise.race([func, timeout(timeout_ms)])
 }
 
 const AccessFireBase = {
@@ -18,7 +19,7 @@ const AccessFireBase = {
     if(userID){
       let itemCollectionRef = db.collection('users').doc(userID)
                                 .collection('stock_items')
-      let snapshots = await setAccessTimeout(itemCollectionRef.get())
+      let snapshots = await setAccessTimeout(itemCollectionRef.get(), TIMEOUT_MS)
                             .catch(() => 
                               new Promise((_, reject) => {
                                 console.log("get error")
@@ -35,8 +36,16 @@ const AccessFireBase = {
     if(userID && itemID){
       let itemRef = db.collection('users').doc(userID)
                       .collection('stock_items').doc(itemID)
-      let doc = await itemRef.get()
-      return doc.data()
+      return await setAccessTimeout(itemRef.get(), TIMEOUT_MS)
+                    .then((doc) => {
+                      return doc.data()
+                    })
+                    .catch(() => 
+                      new Promise((_, reject) => {
+                        console.log("get error")
+                        reject({...DBTemplate.content_none, error_code: ErrorTemplate.error_code.DBGetError})
+                      })
+                    )
     }else {
       return DBTemplate.content_none
     }
