@@ -39,6 +39,8 @@ export class StockList extends React.Component{
 
       loading: true,
       feedbackopen: false,
+
+      error_code: null,
     }
 
   }
@@ -68,10 +70,15 @@ export class StockList extends React.Component{
   docs = {
     get: async () =>  {
       if(this.props.userID){
-        let categoryMap = await AccessFireBase.getCategoryMap(this.props.userID)
-        let pairOfItemIDAndData = await AccessFireBase.getItemList(this.props.userID)
-  
-        this.setState({data_list: pairOfItemIDAndData, show_list : pairOfItemIDAndData, category_map: categoryMap, loading: false}) 
+        Promise.all([
+          AccessFireBase.getCategoryMap(this.props.userID), 
+          AccessFireBase.getItemList(this.props.userID)
+        ]).then((success) => {
+          let [categoryMap, pairOfItemIDAndData] = success
+          this.setState({data_list: pairOfItemIDAndData, show_list : pairOfItemIDAndData, category_map: categoryMap, loading: false})
+        }).catch((error) => {
+          this.setState({data_list: [], show_list : [], category_map: {}, loading: false, error_code: error.error_code}) 
+        })
       }  
     },
     delete: async (itemID) => {
