@@ -1,14 +1,32 @@
 import firebase, { db } from '../firebase'
 import DBTemplate from 'components/DBTemplate';
+import ErrorTemplate from 'components/ErrorTemplate';
+
+const TIMEOUT_MS = 10000
+
+const timeout = async (msec) => {
+  // timeout_ms ミリ秒後にrejectを実行
+  return new Promise((_, reject) => setTimeout(reject, msec))
+}
+const setAccessTimeout = async (func) => {
+  // Promise.raceは二つ以上のPromiseのうち早い方を戻り値とする
+  return Promise.race([func, timeout(TIMEOUT_MS)])
+}
 
 const AccessFireBase = {
   getItemList: async (userID) => {
     if(userID){
       let itemCollectionRef = db.collection('users').doc(userID)
                                 .collection('stock_items')
-      let snapshots = await itemCollectionRef.get()
-      let pairOfItemIDAndData = snapshots.docs.map(doc => [doc.id, doc.data()])
-      return pairOfItemIDAndData
+      let snapshots = await setAccessTimeout(itemCollectionRef.get())
+                            .catch(() => 
+                              new Promise((_, reject) => {
+                                console.log("get error")
+                                reject({docs: [], error_code: ErrorTemplate.error_code.DBGetError})
+                              })
+                            )
+      let pairOfItemIDAndDataMap = snapshots.docs.map(doc => [doc.id, doc.data()])
+      return pairOfItemIDAndDataMap
     }else {
       return []
     }
