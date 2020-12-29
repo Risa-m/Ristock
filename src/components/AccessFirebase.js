@@ -37,9 +37,7 @@ const AccessFireBase = {
       let itemRef = db.collection('users').doc(userID)
                       .collection('stock_items').doc(itemID)
       return await setAccessTimeout(itemRef.get(), TIMEOUT_MS)
-                    .then((doc) => {
-                      return doc.data()
-                    })
+                    .then((doc) => doc.data())
                     .catch(() => 
                       new Promise((_, reject) => {
                         console.log("get error")
@@ -53,13 +51,22 @@ const AccessFireBase = {
   getCategoryMap: async (userID) => {
     if(userID){
       let categoryRef = db.collection('users').doc(userID)
-      let userDoc = await categoryRef.get()
+
       let categoryMap = {}
-      let userDocData = userDoc.data()
-      if(userDocData){
-        categoryMap = userDocData.category_map || {}
-      }
-      return categoryMap  
+      return await setAccessTimeout(categoryRef.get(), TIMEOUT_MS)
+                  .then((userDoc) => {
+                    let userDocData = userDoc.data()
+                    if(userDocData){
+                      categoryMap = userDocData.category_map || {}
+                    }
+                    return categoryMap
+                  })
+                  .catch(() => 
+                    new Promise((_, reject) => {
+                      console.log("get error")
+                      reject({category_map: categoryMap, error_code: ErrorTemplate.error_code.DBGetError})
+                    })
+                  )
     }else{
       return {}
     }

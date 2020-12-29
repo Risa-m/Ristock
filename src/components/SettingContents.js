@@ -16,6 +16,8 @@ export class SettingContents extends React.Component{
       data: null,
       visible: SettingViewChoice.top,
       category_map: {},
+
+      error_code: null,
     }
   }
 
@@ -27,8 +29,13 @@ export class SettingContents extends React.Component{
 
   db = {
     get: async (userID) => {
-      let categoryMap = await AccessFireBase.getCategoryMap(userID)
-      this.setState({category_map: categoryMap})
+      await AccessFireBase.getCategoryMap(userID)
+            .then((categoryMap) => {
+              this.setState({category_map: categoryMap})
+            })
+            .catch((error) => {
+              this.setState({category_map: {}, error_code: error.error_code})
+            })
     },
     deleteCategory: async (userID, categoryID, categoryMap) => {
       let newCategoryMap = await AccessFireBase.deleteCategoryContent(userID, categoryID, categoryMap)
