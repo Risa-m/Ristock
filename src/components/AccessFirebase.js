@@ -3,7 +3,7 @@ import DBTemplate from 'components/DBTemplate';
 import ErrorTemplate from 'components/ErrorTemplate';
 
 const TIMEOUT_MS = 10000
-const Test_Timeout_ms = 100
+const Test_Timeout_ms = 10000
 
 const timeout = async (msec) => {
   // timeout_ms ミリ秒後にrejectを実行
@@ -74,9 +74,13 @@ const AccessFireBase = {
   imageUploadToStrage: async (userID, itemID, image) => {
     if(userID && itemID){
       let storageRef = firebase.storage().ref().child(`users/${userID}/${itemID}.jpg`)
-      let url = await storageRef.put(image)
-                                .then(snapshot => { return snapshot.ref.getDownloadURL()})
-      return url  
+      return await setAccessTimeout(storageRef.put(image), TIMEOUT_MS)
+                    .then(snapshot => {return snapshot.ref.getDownloadURL()})
+                    .catch(() => 
+                      new Promise((_, reject) => {
+                        console.log("image upload error")
+                        reject({error_code: ErrorTemplate.error_code.ImageUploadError})
+                    }))
     }else {
       return ""
     }
