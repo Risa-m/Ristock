@@ -84,13 +84,16 @@ export class StockList extends React.Component{
     delete: async (itemID) => {
       if(this.props.userID){
         let delete_item = this.state.data_list.filter(value => value[0] === itemID)[0]
-
         await AccessFireBase.deleteItemContent(this.props.userID, delete_item[0], delete_item[1])
-
-        let newDataList = this.state.data_list.filter(value => value[0] !== itemID)
-        let newShowList = this.state.show_list.filter(value => value[0] !== itemID)
-
-        this.setState({data_list: newDataList, show_list: newShowList})
+              .then(() => {
+                let newDataList = this.state.data_list.filter(value => value[0] !== itemID)
+                let newShowList = this.state.show_list.filter(value => value[0] !== itemID)
+        
+                this.setState({data_list: newDataList, show_list: newShowList})  
+              })
+              .catch((error) => {
+                this.setState({error_code: error.error_code})
+              })
       }
     },
     details: (itemID) => {

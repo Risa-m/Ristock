@@ -130,13 +130,24 @@ const AccessFireBase = {
   },
   deleteItemContent: async (userID, itemID, itemContent) => {
     if(userID && itemID){
+      let itemRef = db.collection('users').doc(userID)
+                      .collection('stock_items').doc(itemID)
+      await AccessFireBase._deleteImageFromStrage(userID, itemID, itemContent)
+      return await setAccessTimeout(itemRef.delete(), TIMEOUT_MS)
+                    .catch(() =>
+                      new Promise((_, reject) => {
+                        console.log("delete error")
+                        reject({error_code: ErrorTemplate.error_code.DBDeleteError})        
+                      })
+                    )
+    }
+  },
+  _deleteImageFromStrage: async (userID, itemID, itemContent) => {
+    if(userID && itemID){
       if(itemContent.image_url){
         let deleteRef = firebase.storage().ref().child(`users/${userID}/${itemID}.jpg`)
-        deleteRef.delete()  
+        await setAccessTimeout(deleteRef.delete(), TIMEOUT_MS).catch()
       }
-      await db.collection('users').doc(userID)
-              .collection('stock_items').doc(itemID)
-              .delete();
     }
   },
   getItemIDListOfCategory: async (userID, categoryID) => {
