@@ -86,10 +86,9 @@ export class StockContents extends React.Component{
     imageUpload: async (userID, itemID) => {      
      if(this.state.local_image){
         await AccessFireBase.imageUploadToStrage(userID, itemID, this.state.local_image)
-        .then((imageURL) => {
+        .then((imageURL) => 
           AccessFireBase.imageUrlRegister(userID, itemID, imageURL)
-          return imageURL
-        }).then((imageURL) => {
+        ).then((imageURL) => {
           this.setState({image_url: imageURL})
         }).catch((error) => {
           this.setState({image_url: "", error_code: error.error_code})

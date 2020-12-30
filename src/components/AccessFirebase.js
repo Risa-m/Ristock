@@ -3,7 +3,7 @@ import DBTemplate from 'components/DBTemplate';
 import ErrorTemplate from 'components/ErrorTemplate';
 
 const TIMEOUT_MS = 10000
-const Test_Timeout_ms = 10000
+const Test_Timeout_ms = 100
 
 const timeout = async (msec) => {
   // timeout_ms ミリ秒後にrejectを実行
@@ -89,7 +89,14 @@ const AccessFireBase = {
     if(userID && itemID && imageUrl !== ""){
       let itemRef = db.collection('users').doc(userID)
                       .collection('stock_items').doc(itemID)
-      await itemRef.set({image_url: imageUrl}, { merge: true })
+      return await setAccessTimeout(itemRef.set({image_url: imageUrl}, { merge: true }), Test_Timeout_ms)
+                  .then(() => imageUrl)
+                  .catch(() => 
+                    new Promise((_, reject) => {
+                      console.log("image upload error")
+                      reject({error_code: ErrorTemplate.error_code.ImageUploadError})
+                    })
+                  )
     }
   },
   addItemContent: async (userID, itemContent) => {
