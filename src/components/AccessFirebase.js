@@ -3,7 +3,7 @@ import DBTemplate from 'components/DBTemplate';
 import ErrorTemplate from 'components/ErrorTemplate';
 
 const TIMEOUT_MS = 10000
-const Test_Timeout_ms = 10
+const Test_Timeout_ms = 100
 
 const timeout = async (msec) => {
   // timeout_ms ミリ秒後にrejectを実行
@@ -119,7 +119,13 @@ const AccessFireBase = {
     if(userID && itemID && itemContent !== {}){
       let itemRef = db.collection('users').doc(userID)
                       .collection('stock_items').doc(itemID)
-      await itemRef.update(DBTemplate.update_content(itemContent))
+      return await setAccessTimeout(itemRef.update(DBTemplate.update_content(itemContent)), TIMEOUT_MS)
+                   .catch(() => 
+                    new Promise((_, reject) => {
+                      console.log("update item error")
+                      reject({error_code: ErrorTemplate.error_code.DBSaveError})
+                    })
+                   )
     }
   },
   deleteItemContent: async (userID, itemID, itemContent) => {
