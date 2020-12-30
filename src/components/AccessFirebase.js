@@ -3,7 +3,7 @@ import DBTemplate from 'components/DBTemplate';
 import ErrorTemplate from 'components/ErrorTemplate';
 
 const TIMEOUT_MS = 10000
-const Test_Timeout_ms = 100
+const Test_Timeout_ms = 10
 
 const timeout = async (msec) => {
   // timeout_ms ミリ秒後にrejectを実行
@@ -89,7 +89,7 @@ const AccessFireBase = {
     if(userID && itemID && imageUrl !== ""){
       let itemRef = db.collection('users').doc(userID)
                       .collection('stock_items').doc(itemID)
-      return await setAccessTimeout(itemRef.set({image_url: imageUrl}, { merge: true }), Test_Timeout_ms)
+      return await setAccessTimeout(itemRef.set({image_url: imageUrl}, { merge: true }), TIMEOUT_MS)
                   .then(() => imageUrl)
                   .catch(() => 
                     new Promise((_, reject) => {
@@ -103,9 +103,14 @@ const AccessFireBase = {
     if(userID && itemContent !== {}){
       let addDoc = db.collection('users').doc(userID)
                      .collection('stock_items')
-      let itemID = await addDoc.add(DBTemplate.add_content(itemContent))
-                               .then(ref => {return ref.id})
-      return itemID
+      return await setAccessTimeout(addDoc.add(DBTemplate.add_content(itemContent)), TIMEOUT_MS)
+                  .then(ref =>  ref.id)
+                  .catch(() => 
+                  new Promise((_, reject) => {
+                    console.log("add item error")
+                    reject({error_code: ErrorTemplate.error_code.DBSaveError})
+                  })
+                  )
     }else{
       return ""
     }

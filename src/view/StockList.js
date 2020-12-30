@@ -110,22 +110,24 @@ export class StockList extends React.Component{
       })  
     },
     handleSubmitClose: async (props) => {
-      let newList = this.state.data_list.slice()
-      // Add
-      if(this.state.addItem){
-        newList.push([props.item_id, props])
+      if(!props.error_code){
+        let newList = this.state.data_list.slice()
+        // Add
+        if(this.state.addItem){
+          newList.push([props.item_id, props])
+        }
+        // Update
+        else if(this.state.detailsItemID){
+          newList = this.state.data_list.map(item => {
+            if(item[0] === this.state.detailsItemID){
+              return [this.state.detailsItemID, props]
+            }else{
+              return item
+            }
+          })
+        }
+        this.setState({data_list: newList, show_list: newList, category_map: props.category_map, selectedCategory: "all"})
       }
-      // Update
-      else if(this.state.detailsItemID){
-        newList = this.state.data_list.map(item => {
-          if(item[0] === this.state.detailsItemID){
-            return [this.state.detailsItemID, props]
-          }else{
-            return item
-          }
-        })
-      }
-      this.setState({data_list: newList, show_list: newList, category_map: props.category_map, selectedCategory: "all"})
       this.modals.handleClose()  
     }
   }

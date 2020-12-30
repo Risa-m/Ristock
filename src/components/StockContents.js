@@ -97,8 +97,14 @@ export class StockContents extends React.Component{
     },
     addStockItems: async (userID) => {
       await this.db.checkCreateCategory(userID, this.state.category_map, this.state.newCategoryName)
-      let newContentitemID = await AccessFireBase.addItemContent(userID, this.state)
-      this.setState({item_id: newContentitemID})
+      await AccessFireBase.addItemContent(userID, this.state)
+      .then((newContentItemID) => {
+        this.setState({item_id: newContentItemID})
+      })
+      .catch((error) => {
+        console.log("add item error")
+        this.setState({error_code: error.error_code})
+      })
     },
     updateStockItems: async (userID, itemID) => {
       await this.db.checkCreateCategory(userID, this.state.category_map, this.state.newCategoryName)
