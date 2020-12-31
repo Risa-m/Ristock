@@ -154,7 +154,7 @@ const AccessFireBase = {
     if(userID && categoryID !== ""){
       let categoryRef = db.collection('users').doc(userID)
                           .collection('categories').doc(categoryID)
-      return await setAccessTimeout(categoryRef.get(), Test_Timeout_ms)
+      return await setAccessTimeout(categoryRef.get(), TIMEOUT_MS)
                   .then(doc => {
                     let categoryDocData = doc.data()
                     return categoryDocData.item_id || []
@@ -173,7 +173,13 @@ const AccessFireBase = {
     if(userID && categoryID !== ""){
       let categoryRef = db.collection('users').doc(userID)
                           .collection('categories').doc(categoryID)
-      await categoryRef.update(DBTemplate.category_update_content(itemIDList))
+      return await setAccessTimeout(categoryRef.update(DBTemplate.category_update_content(itemIDList)), TIMEOUT_MS)
+            .catch(() => 
+              new Promise((_, reject) => {
+                console.log("update itemID list error")
+                reject({error_code: ErrorTemplate.error_code.DBSaveError})
+              })
+            )
     }
   },
   createCategoryContent: async (userID, categoryName, categoryMap) => {

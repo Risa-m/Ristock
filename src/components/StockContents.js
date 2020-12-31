@@ -118,7 +118,7 @@ export class StockContents extends React.Component{
           await AccessFireBase.getItemIDListOfCategory(userID, oldCategoryID)
                 .then((itemIDListOfOldCategory) => {
                   itemIDListOfOldCategory.filter(item => item !== itemID)
-                  AccessFireBase.updateItemIDListOfCategory(userID, oldCategoryID, itemIDListOfOldCategory)
+                  return AccessFireBase.updateItemIDListOfCategory(userID, oldCategoryID, itemIDListOfOldCategory)
                 })
                 .catch((error) => {
                   this.setState({error_code: error.error_code})
@@ -128,7 +128,7 @@ export class StockContents extends React.Component{
           await AccessFireBase.getItemIDListOfCategory(userID, newCategoryID)
                 .then((itemIDListOfNewCategory) => {
                   itemIDListOfNewCategory.push(itemID)
-                  AccessFireBase.updateItemIDListOfCategory(userID, newCategoryID, itemIDListOfNewCategory)
+                  return AccessFireBase.updateItemIDListOfCategory(userID, newCategoryID, itemIDListOfNewCategory)
                 })
                 .catch((error) => {
                   this.setState({error_code: error.error_code})
