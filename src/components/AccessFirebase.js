@@ -154,8 +154,17 @@ const AccessFireBase = {
     if(userID && categoryID !== ""){
       let categoryRef = db.collection('users').doc(userID)
                           .collection('categories').doc(categoryID)
-      let categoryDocData = await categoryRef.get().then(doc => doc.data())
-      return categoryDocData.item_id || []
+      return await setAccessTimeout(categoryRef.get(), Test_Timeout_ms)
+                  .then(doc => {
+                    let categoryDocData = doc.data()
+                    return categoryDocData.item_id || []
+                  })
+                  .catch(() => 
+                    new Promise((_, reject) => {
+                      console.log("get category list error")
+                      reject({error_code: ErrorTemplate.error_code.DBGetError})
+                    })
+                  )
     }else {
       return []
     }

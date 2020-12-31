@@ -115,14 +115,24 @@ export class StockContents extends React.Component{
     setCategory: async (userID, itemID, oldCategoryID, newCategoryID) => {
       if(oldCategoryID !== newCategoryID || oldCategoryID === ""){
         if(oldCategoryID !== ""){
-          let itemIDListOfOldCategory = await AccessFireBase.getItemIDListOfCategory(userID, oldCategoryID)
-          itemIDListOfOldCategory = itemIDListOfOldCategory.filter(item => item !== itemID)
-          await AccessFireBase.updateItemIDListOfCategory(userID, oldCategoryID, itemIDListOfOldCategory)
+          await AccessFireBase.getItemIDListOfCategory(userID, oldCategoryID)
+                .then((itemIDListOfOldCategory) => {
+                  itemIDListOfOldCategory.filter(item => item !== itemID)
+                  AccessFireBase.updateItemIDListOfCategory(userID, oldCategoryID, itemIDListOfOldCategory)
+                })
+                .catch((error) => {
+                  this.setState({error_code: error.error_code})
+                })
         }
         if(newCategoryID !== ""){
-          let itemIDListOfNewCategory = await AccessFireBase.getItemIDListOfCategory(userID, newCategoryID)
-          itemIDListOfNewCategory.push(itemID)
-          await AccessFireBase.updateItemIDListOfCategory(userID, newCategoryID, itemIDListOfNewCategory)
+          await AccessFireBase.getItemIDListOfCategory(userID, newCategoryID)
+                .then((itemIDListOfNewCategory) => {
+                  itemIDListOfNewCategory.push(itemID)
+                  AccessFireBase.updateItemIDListOfCategory(userID, newCategoryID, itemIDListOfNewCategory)
+                })
+                .catch((error) => {
+                  this.setState({error_code: error.error_code})
+                })
         }
       }
     },
