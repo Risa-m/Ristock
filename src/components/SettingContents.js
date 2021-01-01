@@ -50,9 +50,15 @@ export class SettingContents extends React.Component{
     createNewCategory: async (userID, categoryName, categoryMap) => {
       let search = Object.keys(categoryMap).filter(val => categoryMap[val] === categoryName)
       if(categoryName !== "" && search.length === 0){
-        let [_, newCategoryMap] = await AccessFireBase.createCategoryContent(userID, categoryName, this.state.category_map)
-        this.setState({category_map: newCategoryMap})
-        this.props.handleSettingChanged()
+        await AccessFireBase.createCategoryContent(userID, categoryName, this.state.category_map)
+              .then(success => {
+                let [_, newCategoryMap] = success
+                this.setState({category_map: newCategoryMap})
+                this.props.handleSettingChanged()  
+              })
+              .catch(error => {
+                this.setState({error_code: error.error_code})
+              })
       }
     }
 

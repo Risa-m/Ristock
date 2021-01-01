@@ -186,17 +186,27 @@ const AccessFireBase = {
     if(userID && categoryName !== ""){
       let userRef = db.collection('users').doc(userID)
       let categoryRef = userRef.collection('categories')
-  
-      // categoryIDの新規発行
-      let categoryID = await categoryRef.add(DBTemplate.category_create_content(categoryName))
-                                        .then(ref => ref.id)
-  
-      // category mapの更新
       let newCategoryMap = JSON.parse(JSON.stringify(categoryMap)) // deep copy
-      newCategoryMap[categoryID] = categoryName
-      await userRef.update({ category_map: newCategoryMap })
-  
-      return [categoryID, newCategoryMap]  
+      let newCategoryID = ""
+
+      // categoryIDの新規発行
+      return await setAccessTimeout(categoryRef.add(DBTemplate.category_create_content(categoryName)), TIMEOUT_MS)
+                    .then(ref => ref.id)
+                    .then(categoryID => {
+                      // category mapの更新
+                      newCategoryMap[categoryID] = categoryName
+                      newCategoryID = categoryID
+                      return setAccessTimeout(userRef.update({ category_map: newCategoryMap }), TIMEOUT_MS)
+                    })
+                    .then(() => {
+                      return [newCategoryID, newCategoryMap] 
+                    })
+                    .catch(() => 
+                      new Promise((_, reject) => {
+                        console.log("create category error")
+                        reject({error_code: ErrorTemplate.error_code.DBSaveError})
+                      })
+                    )
     }else {
       return ["", categoryMap]
     }

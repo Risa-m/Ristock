@@ -150,9 +150,13 @@ export class StockContents extends React.Component{
     createCategory: async (userID, categoryName) => {
       let search = Object.keys(this.state.category_map).filter(val => this.state.category_map[val] === categoryName)
       if(search.length === 0){
-        let [categoryID, newCategoryMap] = await AccessFireBase.createCategoryContent(userID, categoryName, this.state.category_map)
-        this.setState({category_map: newCategoryMap, category_id: categoryID, category: categoryName})
-        this.props.categoryChanged(newCategoryMap)
+        await AccessFireBase.createCategoryContent(userID, categoryName, this.state.category_map)
+              .then((success) => {
+                let [categoryID, newCategoryMap] = success
+                this.setState({category_map: newCategoryMap, category_id: categoryID, category: categoryName})
+                this.props.categoryChanged(newCategoryMap)  
+              })
+              .catch(error => this.setState({error_code: error.error_code}))
       }else{
         this.setState({category_id: search[0]})
       }
