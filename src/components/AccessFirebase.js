@@ -215,25 +215,40 @@ const AccessFireBase = {
     if(userID && categoryID){
       // item側からcategory_idを削除
       // category_idが削除したいものと一致しているitemを取得し、該当する各itemからcategory_idを削除
-      let ItemContainsCategoryShots = await db.collection('users').doc(userID)
-                                              .collection('stock_items')
-                                              .where('category_id', '==', categoryID)
-                                              .get()
-      if(ItemContainsCategoryShots && !ItemContainsCategoryShots.empty){
-        ItemContainsCategoryShots.forEach(doc => {
-          doc.ref.update({category_id: ""})
-        })
-      }
-      // categoryIDの削除
-      await db.collection('users').doc(userID)
-              .collection('categories').doc(categoryID).delete()
-      
-      // category mapの更新
+
+      let userIDRef = db.collection('users').doc(userID)
+      let ItemContainsCategoryRef = userIDRef.collection('stock_items')
+                                             .where('category_id', '==', categoryID)
+      let categroyIDRef = userIDRef.collection('categories').doc(categoryID)
+
       let newCategoryMap = JSON.parse(JSON.stringify(categoryMap)) // deep copy
       delete newCategoryMap[categoryID]
-      await db.collection('users').doc(userID).update({category_map: newCategoryMap})
-
-      return newCategoryMap
+                      
+      return await setAccessTimeout(ItemContainsCategoryRef.get(), TIMEOUT_MS)
+                  .then(ItemContainsCategoryShots => {
+                    if(ItemContainsCategoryShots && !ItemContainsCategoryShots.empty){
+                      return ItemContainsCategoryShots.forEach(doc => {
+                        doc.ref.update({category_id: ""})
+                      })
+                    }
+                  })
+                  .then(() => {
+                    // category mapの更新
+                    return setAccessTimeout(userIDRef.update({category_map: newCategoryMap}), TIMEOUT_MS)
+                  })
+                  .then(() => {
+                    // categoryIDの削除
+                    return categroyIDRef.delete()
+                  })
+                  .then(() => {
+                    return newCategoryMap
+                  })
+                  .catch(() => 
+                    new Promise((_, reject) => {
+                      console.log("delete category eror")
+                      reject({error_code: ErrorTemplate.error_code.DBDeleteError})
+                    })
+                  )
     }else{
       return categoryMap
     }

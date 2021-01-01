@@ -38,9 +38,14 @@ export class SettingContents extends React.Component{
             })
     },
     deleteCategory: async (userID, categoryID, categoryMap) => {
-      let newCategoryMap = await AccessFireBase.deleteCategoryContent(userID, categoryID, categoryMap)
-      this.setState({category_map: newCategoryMap})
-      this.props.handleSettingChanged()
+      await AccessFireBase.deleteCategoryContent(userID, categoryID, categoryMap)
+            .then(newCategoryMap => {
+              this.setState({category_map: newCategoryMap})
+              this.props.handleSettingChanged()  
+            })
+            .catch(error => {
+              this.setState({error_code: error.error_code})
+            })
     },
     changeCategoryName: async (userID, categoryID, categoryName, categoryMap) => {
      let newCategoryMap = await AccessFireBase.updateCategoryName(userID, categoryID, categoryName, categoryMap)
