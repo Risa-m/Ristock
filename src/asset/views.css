@@ -287,12 +287,32 @@ p.stock-list-image-stock{
 /* SignUp画面 */
 
 .signup-root {
-  width: 70%;
+  width: 80%;
   margin: auto;
+  color: #7c8993;
+  font-family: "M PLUS Rounded 1c";
 }
+.signup-root h2{
+  color: #7c8993;
+  font-size: 1.5em;
+}
+.signup-outline {
+  padding: 10px;
+  padding-right: 25px;
+  display: inline-block;
+}
+.signup-outline p {
+  margin-top: 5px;
+  color: #7c8993;
+}
+.signup-logo-image {
+  margin-left: 20px;
+}
+
 .service-terms-root {
   width: 80%;
   margin: auto;
+  font-family: "M PLUS Rounded 1c";
 }
 .service-terms-root h2{
   color: #7c8993;
