@@ -81,6 +81,7 @@ export class StockContents extends React.Component{
             .catch((errorData) => {
               this.setState(DBTemplate.get_content(errorData, this.state.category_map))
               this.setState({isLoaded: true, error_code: errorData.error_code})
+              this.props.setErrorCode(errorData.error_code)
             })
     },
     imageUpload: async (userID, itemID) => {      
@@ -92,6 +93,7 @@ export class StockContents extends React.Component{
           this.setState({image_url: imageURL})
         }).catch((error) => {
           this.setState({image_url: "", error_code: error.error_code})
+          this.props.setErrorCode(error.error_code)
         })
      }
     },
@@ -103,6 +105,7 @@ export class StockContents extends React.Component{
       })
       .catch((error) => {
         this.setState({error_code: error.error_code})
+        this.props.setErrorCode(error.error_code)
       })
     },
     updateStockItems: async (userID, itemID) => {
@@ -110,6 +113,7 @@ export class StockContents extends React.Component{
       await AccessFireBase.updateItemContent(userID, itemID, this.state)
       .catch((error) => {
         this.setState({error_code: error.error_code})
+        this.props.setErrorCode(error.error_code)
       })
     },
     setCategory: async (userID, itemID, oldCategoryID, newCategoryID) => {
@@ -122,6 +126,7 @@ export class StockContents extends React.Component{
                 })
                 .catch((error) => {
                   this.setState({error_code: error.error_code})
+                  this.props.setErrorCode(error.error_code)
                 })
         }
         if(newCategoryID !== ""){
@@ -132,6 +137,7 @@ export class StockContents extends React.Component{
                 })
                 .catch((error) => {
                   this.setState({error_code: error.error_code})
+                  this.props.setErrorCode(error.error_code)
                 })
         }
       }
@@ -156,7 +162,10 @@ export class StockContents extends React.Component{
                 this.setState({category_map: newCategoryMap, category_id: categoryID, category: categoryName})
                 this.props.categoryChanged(newCategoryMap)  
               })
-              .catch(error => this.setState({error_code: error.error_code}))
+              .catch(error => {
+                this.setState({error_code: error.error_code})
+                this.props.setErrorCode(error.error_code)
+              })
       }else{
         this.setState({category_id: search[0]})
       }

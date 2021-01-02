@@ -2,7 +2,7 @@ import firebase, { db } from '../firebase'
 import DBTemplate from 'components/DBTemplate';
 import ErrorTemplate from 'components/ErrorTemplate';
 
-const TIMEOUT_MS = 10000
+const TIMEOUT_MS = 15000
 const Test_Timeout_ms = 100
 
 const timeout = async (msec) => {

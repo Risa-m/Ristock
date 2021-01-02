@@ -33,6 +33,7 @@ export const SettingModal = (props) => {
               userID={userID} 
               handleClose={handleModalClose} 
               handleSettingChanged={settingChanged}
+              setErrorCode={props.setErrorCode}
             />
           }
         />

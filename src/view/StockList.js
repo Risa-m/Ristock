@@ -11,6 +11,7 @@ import { StockDetailsUpdateModalView } from 'components/StockList/StockDetailsUp
 import { StockListSettingButtonsShow } from 'components/StockList/StockListSettingButtonsShow';
 import VisibleViewString from 'components/StockList/VisibleViewString';
 import AccessFireBase from 'components/AccessFirebase';
+import ErrorTemplate from 'components/ErrorTemplate';
 
 const MAX_USER_ITEMS = 50
 
@@ -78,6 +79,7 @@ export class StockList extends React.Component{
           this.setState({data_list: pairOfItemIDAndData, show_list : pairOfItemIDAndData, category_map: categoryMap, loading: false})
         }).catch((error) => {
           this.setState({data_list: [], show_list : [], category_map: {}, loading: false, error_code: error.error_code}) 
+          this.props.setErrorCode(error.error_code)
         })
       }  
     },
@@ -93,6 +95,7 @@ export class StockList extends React.Component{
               })
               .catch((error) => {
                 this.setState({error_code: error.error_code})
+                this.props.setErrorCode(error.error_code)
               })
       }
     },
@@ -160,7 +163,7 @@ export class StockList extends React.Component{
     refresh: () => {
       this.docs.get()
       this.categorySelect.all()
-    }
+    },
   }
 
   categorySelect = {
@@ -212,6 +215,8 @@ export class StockList extends React.Component{
       return (
       <div className="stock-list-root">
 
+        {//<Snackbar open={!!this.state.error_code} message={ErrorTemplate.error_msg[this.state.error_code]} autoHideDuration={6000} onClose={this.view.errorBarClose} />
+        }
         <CategorySelectionShow 
           category_map={this.state.category_map} 
           data_list={this.state.data_list} 
@@ -253,6 +258,7 @@ export class StockList extends React.Component{
           handleClose={this.modals.handleClose}
           handleSubmitClose={this.modals.handleSubmitClose}
           categoryChanged={this.view.categoryChanged}
+          setErrorCode={this.props.setErrorCode}
         />
       </div>
       )

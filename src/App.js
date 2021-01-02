@@ -1,5 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Route, Link, Switch } from 'react-router-dom'
+
+import Snackbar from '@material-ui/core/Snackbar';
 import 'asset/App.css';
 
 import firebase from './firebase';
@@ -9,6 +11,7 @@ import { StockList } from 'view/StockList'
 import { SignUp } from 'view/SignUp';
 import Auth from 'components/Auth.js'
 import { Login } from 'components/Login.js'
+import ErrorTemplate from 'components/ErrorTemplate';
 
 import { AppMenuForPhone } from 'components/AppMenu/AppMenuForPhone'
 import { AppMenuForPC } from 'components/AppMenu/AppMenuForPC'
@@ -26,6 +29,8 @@ class App extends React.Component {
 
       settingChanged: false,
       refresh: false,
+
+      error_code: null,
     }
 
     this.stockListRef = React.createRef();
@@ -74,11 +79,25 @@ class App extends React.Component {
     }
   }
 
+  errorHandler = {
+    handleBarClose: () => {
+      this.setState({error_code: null})
+    },
+    setErrorCode: (error_code) => {
+      this.setState({error_code: error_code})
+    }
+  }
+
   render(){
     return (
     <BrowserRouter>
     <div className="App-root">
       <div className="App-header">
+        <Snackbar 
+          open={!!this.state.error_code} 
+          message={ErrorTemplate.error_msg[this.state.error_code]} 
+          autoHideDuration={6000} 
+          onClose={this.errorHandler.handleBarClose} />
 
         <AppMenuForPhone 
           userID={this.state.userID} 
@@ -101,6 +120,7 @@ class App extends React.Component {
           modalOpen={this.state.isSettingModalOpen}
           settingChanged={this.handleSettingChanged}
           setModalClose={this.modal.settingModalClose}
+          setErrorCode={this.errorHandler.setErrorCode}
           />
       <div className="App-view">
         <Switch>
@@ -109,7 +129,7 @@ class App extends React.Component {
           <Auth setUser={this.auth.setUser} setUserID={this.auth.setUserID}  {...this.props}>
             <Switch>
               <Route exact path='/login' render={props => <Login user={this.state.user} userID={this.state.userID} {...props}/>} />
-              <Route exact path='/stocks' render={props =><StockList user={this.state.user} userID={this.state.userID} ref={this.stockListRef} {...props}/>} />
+              <Route exact path='/stocks' render={props =><StockList user={this.state.user} userID={this.state.userID} ref={this.stockListRef} setErrorCode={this.errorHandler.setErrorCode} {...props}/>} />
               <Route render={() => <p>Sorry, page not found.</p>}/>
             </Switch>
           </Auth>

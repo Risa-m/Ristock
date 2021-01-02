@@ -35,6 +35,7 @@ export class SettingContents extends React.Component{
             })
             .catch((error) => {
               this.setState({category_map: {}, error_code: error.error_code})
+              this.props.setErrorCode(error.error_code)
             })
     },
     deleteCategory: async (userID, categoryID, categoryMap) => {
@@ -45,6 +46,7 @@ export class SettingContents extends React.Component{
             })
             .catch(error => {
               this.setState({error_code: error.error_code})
+              this.props.setErrorCode(error.error_code)
             })
     },
     changeCategoryName: async (userID, categoryID, categoryName, categoryMap) => {
@@ -57,6 +59,7 @@ export class SettingContents extends React.Component{
           })
           .catch(error => {
             this.setState({error_code: error.error_code})
+            this.props.setErrorCode(error.error_code)
           })
     },
     createNewCategory: async (userID, categoryName, categoryMap) => {
@@ -70,6 +73,7 @@ export class SettingContents extends React.Component{
               })
               .catch(error => {
                 this.setState({error_code: error.error_code})
+                this.props.setErrorCode(error.error_code)
               })
       }
     }
