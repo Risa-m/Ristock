@@ -48,9 +48,16 @@ export class SettingContents extends React.Component{
             })
     },
     changeCategoryName: async (userID, categoryID, categoryName, categoryMap) => {
-     let newCategoryMap = await AccessFireBase.updateCategoryName(userID, categoryID, categoryName, categoryMap)
-     this.setState({category_map: newCategoryMap})
-     this.props.handleSettingChanged()
+    // todo: 更新失敗した時に表示がもとに戻るようにする
+     await AccessFireBase.updateCategoryName(userID, categoryID, categoryName, categoryMap)
+          .then(newCategoryMap => {
+            console.log(newCategoryMap)
+            this.setState({category_map: newCategoryMap})
+            this.props.handleSettingChanged()
+          })
+          .catch(error => {
+            this.setState({error_code: error.error_code})
+          })
     },
     createNewCategory: async (userID, categoryName, categoryMap) => {
       let search = Object.keys(categoryMap).filter(val => categoryMap[val] === categoryName)

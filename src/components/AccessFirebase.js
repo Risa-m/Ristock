@@ -257,14 +257,26 @@ const AccessFireBase = {
     if(userID && categoryID && categoryName !== ""){
       let userRef = db.collection('users').doc(userID)
       let categoryRef = userRef.collection('categories').doc(categoryID)
-
-      await categoryRef.update(DBTemplate.category_update_name(categoryName))
-
       let newCategoryMap = JSON.parse(JSON.stringify(categoryMap)) // deep copy
-      newCategoryMap[categoryID] = categoryName
-      await userRef.update({ category_map: newCategoryMap })
 
-      return newCategoryMap
+      return await setAccessTimeout(categoryRef.update(DBTemplate.category_update_name(categoryName)), Test_Timeout_ms)
+      .then(() => {
+        newCategoryMap[categoryID] = categoryName
+        return newCategoryMap
+      })
+      .then(() => {
+        return setAccessTimeout(userRef.update({ category_map: newCategoryMap }), Test_Timeout_ms)
+      })
+      .then(() => {
+        return newCategoryMap
+      })
+      .catch(() => 
+        new Promise((_, reject) => {
+          console.log("update category name error")
+          reject({error_code: ErrorTemplate.error_code.DBSaveError})
+        })
+      )
+
     }else{
       return categoryMap
     }
