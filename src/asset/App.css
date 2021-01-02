@@ -151,12 +151,17 @@
   margin-bottom: 5px;
 }
 .copyright{
-  size: 0.65em;
+  size: 0.9rem;
   text-align: center;
   line-height: 0.8em;
 }
 .copyright a {
   color: #7c8993;
+}
+
+.footer-menu {
+  font-size: 0.8rem;
+  text-align: center;
 }
 
 ::-webkit-scrollbar {

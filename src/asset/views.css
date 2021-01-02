@@ -290,3 +290,23 @@ p.stock-list-image-stock{
   width: 70%;
   margin: auto;
 }
+.service-terms-root {
+  width: 80%;
+  margin: auto;
+}
+.service-terms-root h2{
+  color: #7c8993;
+  font-size: 1.5em;
+}
+.service-terms {
+  color: #7c8993;
+  font-size: 0.8rem;
+  line-height: 1.5rem;
+  margin-top: 10px;
+  padding: 8px;
+  max-height: 65vh;
+  overflow: auto;
+}
+.service-terms ol{
+  padding-left: 20px;
+}

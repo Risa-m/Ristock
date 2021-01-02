@@ -9,6 +9,8 @@ import firebase from './firebase';
 import { Home } from 'view/Home.js'
 import { StockList } from 'view/StockList'
 import { SignUp } from 'view/SignUp';
+import { ServiceTerms } from 'view/ServiceTerms'
+
 import Auth from 'components/Auth.js'
 import { Login } from 'components/Login.js'
 import ErrorTemplate from 'components/ErrorTemplate';
@@ -126,6 +128,7 @@ class App extends React.Component {
         <Switch>
           <Route exact path='/' render={props =><Home user={this.state.user} userID={this.state.userID}  {...props}/>} />
           <Route exact path='/signup' render={props =><SignUp user={this.state.user} userID={this.state.userID}  {...props}/>} />
+          <Route exact path='/serviceterms' render={props =><ServiceTerms />} />
           <Auth setUser={this.auth.setUser} setUserID={this.auth.setUserID}  {...this.props}>
             <Switch>
               <Route exact path='/login' render={props => <Login user={this.state.user} userID={this.state.userID} {...props}/>} />
@@ -136,6 +139,7 @@ class App extends React.Component {
         </Switch>
       </div>
       <div className="App-footer">
+        <p className="footer-menu"><Link to="/serviceterms">利用規約</Link></p>
         <p className="copyright"><a href="https://github.com/Risa-m">&copy; 2020 Risa-m</a></p>
         <p className="version" style={{fontSize: "0.6em", textAlign: "center"}}>version: 0.2.3</p>   
       </div>
