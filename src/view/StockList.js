@@ -11,6 +11,7 @@ import { StockDetailsUpdateModalView } from 'components/StockList/StockDetailsUp
 import { StockListSettingButtonsShow } from 'components/StockList/StockListSettingButtonsShow';
 import VisibleViewString from 'components/StockList/VisibleViewString';
 import AccessFireBase from 'components/AccessFirebase';
+import ErrorTemplate from 'components/ErrorTemplate';
 
 const MAX_USER_ITEMS = 50
 
@@ -39,6 +40,8 @@ export class StockList extends React.Component{
 
       loading: true,
       feedbackopen: false,
+
+      error_code: null,
     }
 
   }
@@ -68,22 +71,32 @@ export class StockList extends React.Component{
   docs = {
     get: async () =>  {
       if(this.props.userID){
-        let categoryMap = await AccessFireBase.getCategoryMap(this.props.userID)
-        let pairOfItemIDAndData = await AccessFireBase.getItemList(this.props.userID)
-  
-        this.setState({data_list: pairOfItemIDAndData, show_list : pairOfItemIDAndData, category_map: categoryMap, loading: false}) 
+        Promise.all([
+          AccessFireBase.getCategoryMap(this.props.userID), 
+          AccessFireBase.getItemList(this.props.userID)
+        ]).then((success) => {
+          let [categoryMap, pairOfItemIDAndData] = success
+          this.setState({data_list: pairOfItemIDAndData, show_list : pairOfItemIDAndData, category_map: categoryMap, loading: false})
+        }).catch((error) => {
+          this.setState({data_list: [], show_list : [], category_map: {}, loading: false, error_code: error.error_code}) 
+          this.props.setErrorCode(error.error_code)
+        })
       }  
     },
     delete: async (itemID) => {
       if(this.props.userID){
         let delete_item = this.state.data_list.filter(value => value[0] === itemID)[0]
-
         await AccessFireBase.deleteItemContent(this.props.userID, delete_item[0], delete_item[1])
-
-        let newDataList = this.state.data_list.filter(value => value[0] !== itemID)
-        let newShowList = this.state.show_list.filter(value => value[0] !== itemID)
-
-        this.setState({data_list: newDataList, show_list: newShowList})
+              .then(() => {
+                let newDataList = this.state.data_list.filter(value => value[0] !== itemID)
+                let newShowList = this.state.show_list.filter(value => value[0] !== itemID)
+        
+                this.setState({data_list: newDataList, show_list: newShowList})  
+              })
+              .catch((error) => {
+                this.setState({error_code: error.error_code})
+                this.props.setErrorCode(error.error_code)
+              })
       }
     },
     details: (itemID) => {
@@ -103,22 +116,24 @@ export class StockList extends React.Component{
       })  
     },
     handleSubmitClose: async (props) => {
-      let newList = this.state.data_list.slice()
-      // Add
-      if(this.state.addItem){
-        newList.push([props.item_id, props])
+      if(!props.error_code){
+        let newList = this.state.data_list.slice()
+        // Add
+        if(this.state.addItem){
+          newList.push([props.item_id, props])
+        }
+        // Update
+        else if(this.state.detailsItemID){
+          newList = this.state.data_list.map(item => {
+            if(item[0] === this.state.detailsItemID){
+              return [this.state.detailsItemID, props]
+            }else{
+              return item
+            }
+          })
+        }
+        this.setState({data_list: newList, show_list: newList, category_map: props.category_map, selectedCategory: "all"})
       }
-      // Update
-      else if(this.state.detailsItemID){
-        newList = this.state.data_list.map(item => {
-          if(item[0] === this.state.detailsItemID){
-            return [this.state.detailsItemID, props]
-          }else{
-            return item
-          }
-        })
-      }
-      this.setState({data_list: newList, show_list: newList, category_map: props.category_map, selectedCategory: "all"})
       this.modals.handleClose()  
     }
   }
@@ -148,7 +163,7 @@ export class StockList extends React.Component{
     refresh: () => {
       this.docs.get()
       this.categorySelect.all()
-    }
+    },
   }
 
   categorySelect = {
@@ -200,6 +215,8 @@ export class StockList extends React.Component{
       return (
       <div className="stock-list-root">
 
+        {//<Snackbar open={!!this.state.error_code} message={ErrorTemplate.error_msg[this.state.error_code]} autoHideDuration={6000} onClose={this.view.errorBarClose} />
+        }
         <CategorySelectionShow 
           category_map={this.state.category_map} 
           data_list={this.state.data_list} 
@@ -241,6 +258,7 @@ export class StockList extends React.Component{
           handleClose={this.modals.handleClose}
           handleSubmitClose={this.modals.handleSubmitClose}
           categoryChanged={this.view.categoryChanged}
+          setErrorCode={this.props.setErrorCode}
         />
       </div>
       )

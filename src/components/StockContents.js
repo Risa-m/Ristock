@@ -39,6 +39,8 @@ export class StockContents extends React.Component{
       category_map: this.props.category_map, // 全categoryの{id: name}
 
       submitButtonCheck: false,
+
+      error_code: null
     }
   }
 
@@ -71,37 +73,72 @@ export class StockContents extends React.Component{
 
   db = {
     getDocs: async (userID, itemID) => {
-      let contentData = await AccessFireBase.getItemContent(userID, itemID)
-      this.setState(DBTemplate.get_content(contentData, this.state.category_map))
-      this.setState({isLoaded: true})
+      await AccessFireBase.getItemContent(userID, itemID)
+            .then((contentData) => {
+              this.setState(DBTemplate.get_content(contentData, this.state.category_map))
+              this.setState({isLoaded: true})                          
+            })
+            .catch((errorData) => {
+              this.setState(DBTemplate.get_content(errorData, this.state.category_map))
+              this.setState({isLoaded: true, error_code: errorData.error_code})
+              this.props.setErrorCode(errorData.error_code)
+            })
     },
     imageUpload: async (userID, itemID) => {      
      if(this.state.local_image){
-        let imageURL = await AccessFireBase.imageUploadToStrage(userID, itemID, this.state.local_image)
-        await AccessFireBase.imageUrlRegister(userID, itemID, imageURL)
-        this.setState({image_url: imageURL})
+        await AccessFireBase.imageUploadToStrage(userID, itemID, this.state.local_image)
+        .then((imageURL) => 
+          AccessFireBase.imageUrlRegister(userID, itemID, imageURL)
+        ).then((imageURL) => {
+          this.setState({image_url: imageURL})
+        }).catch((error) => {
+          this.setState({image_url: "", error_code: error.error_code})
+          this.props.setErrorCode(error.error_code)
+        })
      }
     },
     addStockItems: async (userID) => {
       await this.db.checkCreateCategory(userID, this.state.category_map, this.state.newCategoryName)
-      let newContentitemID = await AccessFireBase.addItemContent(userID, this.state)
-      this.setState({item_id: newContentitemID})
+      await AccessFireBase.addItemContent(userID, this.state)
+      .then((newContentItemID) => {
+        this.setState({item_id: newContentItemID})
+      })
+      .catch((error) => {
+        this.setState({error_code: error.error_code})
+        this.props.setErrorCode(error.error_code)
+      })
     },
     updateStockItems: async (userID, itemID) => {
       await this.db.checkCreateCategory(userID, this.state.category_map, this.state.newCategoryName)
       await AccessFireBase.updateItemContent(userID, itemID, this.state)
+      .catch((error) => {
+        this.setState({error_code: error.error_code})
+        this.props.setErrorCode(error.error_code)
+      })
     },
     setCategory: async (userID, itemID, oldCategoryID, newCategoryID) => {
       if(oldCategoryID !== newCategoryID || oldCategoryID === ""){
         if(oldCategoryID !== ""){
-          let itemIDListOfOldCategory = await AccessFireBase.getItemIDListOfCategory(userID, oldCategoryID)
-          itemIDListOfOldCategory = itemIDListOfOldCategory.filter(item => item !== itemID)
-          await AccessFireBase.updateItemIDListOfCategory(userID, oldCategoryID, itemIDListOfOldCategory)
+          await AccessFireBase.getItemIDListOfCategory(userID, oldCategoryID)
+                .then((itemIDListOfOldCategory) => {
+                  itemIDListOfOldCategory.filter(item => item !== itemID)
+                  return AccessFireBase.updateItemIDListOfCategory(userID, oldCategoryID, itemIDListOfOldCategory)
+                })
+                .catch((error) => {
+                  this.setState({error_code: error.error_code})
+                  this.props.setErrorCode(error.error_code)
+                })
         }
         if(newCategoryID !== ""){
-          let itemIDListOfNewCategory = await AccessFireBase.getItemIDListOfCategory(userID, newCategoryID)
-          itemIDListOfNewCategory.push(itemID)
-          await AccessFireBase.updateItemIDListOfCategory(userID, newCategoryID, itemIDListOfNewCategory)
+          await AccessFireBase.getItemIDListOfCategory(userID, newCategoryID)
+                .then((itemIDListOfNewCategory) => {
+                  itemIDListOfNewCategory.push(itemID)
+                  return AccessFireBase.updateItemIDListOfCategory(userID, newCategoryID, itemIDListOfNewCategory)
+                })
+                .catch((error) => {
+                  this.setState({error_code: error.error_code})
+                  this.props.setErrorCode(error.error_code)
+                })
         }
       }
     },
@@ -119,9 +156,16 @@ export class StockContents extends React.Component{
     createCategory: async (userID, categoryName) => {
       let search = Object.keys(this.state.category_map).filter(val => this.state.category_map[val] === categoryName)
       if(search.length === 0){
-        let [categoryID, newCategoryMap] = await AccessFireBase.createCategoryContent(userID, categoryName, this.state.category_map)
-        this.setState({category_map: newCategoryMap, category_id: categoryID, category: categoryName})
-        this.props.categoryChanged(newCategoryMap)
+        await AccessFireBase.createCategoryContent(userID, categoryName, this.state.category_map)
+              .then((success) => {
+                let [categoryID, newCategoryMap] = success
+                this.setState({category_map: newCategoryMap, category_id: categoryID, category: categoryName})
+                this.props.categoryChanged(newCategoryMap)  
+              })
+              .catch(error => {
+                this.setState({error_code: error.error_code})
+                this.props.setErrorCode(error.error_code)
+              })
       }else{
         this.setState({category_id: search[0]})
       }

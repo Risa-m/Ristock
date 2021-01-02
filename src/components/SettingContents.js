@@ -16,6 +16,8 @@ export class SettingContents extends React.Component{
       data: null,
       visible: SettingViewChoice.top,
       category_map: {},
+
+      error_code: null,
     }
   }
 
@@ -27,25 +29,52 @@ export class SettingContents extends React.Component{
 
   db = {
     get: async (userID) => {
-      let categoryMap = await AccessFireBase.getCategoryMap(userID)
-      this.setState({category_map: categoryMap})
+      await AccessFireBase.getCategoryMap(userID)
+            .then((categoryMap) => {
+              this.setState({category_map: categoryMap})
+            })
+            .catch((error) => {
+              this.setState({category_map: {}, error_code: error.error_code})
+              this.props.setErrorCode(error.error_code)
+            })
     },
     deleteCategory: async (userID, categoryID, categoryMap) => {
-      let newCategoryMap = await AccessFireBase.deleteCategoryContent(userID, categoryID, categoryMap)
-      this.setState({category_map: newCategoryMap})
-      this.props.handleSettingChanged()
+      await AccessFireBase.deleteCategoryContent(userID, categoryID, categoryMap)
+            .then(newCategoryMap => {
+              this.setState({category_map: newCategoryMap})
+              this.props.handleSettingChanged()  
+            })
+            .catch(error => {
+              this.setState({error_code: error.error_code})
+              this.props.setErrorCode(error.error_code)
+            })
     },
     changeCategoryName: async (userID, categoryID, categoryName, categoryMap) => {
-     let newCategoryMap = await AccessFireBase.updateCategoryName(userID, categoryID, categoryName, categoryMap)
-     this.setState({category_map: newCategoryMap})
-     this.props.handleSettingChanged()
+    // todo: 更新失敗した時に表示がもとに戻るようにする
+     await AccessFireBase.updateCategoryName(userID, categoryID, categoryName, categoryMap)
+          .then(newCategoryMap => {
+            console.log(newCategoryMap)
+            this.setState({category_map: newCategoryMap})
+            this.props.handleSettingChanged()
+          })
+          .catch(error => {
+            this.setState({error_code: error.error_code})
+            this.props.setErrorCode(error.error_code)
+          })
     },
     createNewCategory: async (userID, categoryName, categoryMap) => {
       let search = Object.keys(categoryMap).filter(val => categoryMap[val] === categoryName)
       if(categoryName !== "" && search.length === 0){
-        let [_, newCategoryMap] = await AccessFireBase.createCategoryContent(userID, categoryName, this.state.category_map)
-        this.setState({category_map: newCategoryMap})
-        this.props.handleSettingChanged()
+        await AccessFireBase.createCategoryContent(userID, categoryName, this.state.category_map)
+              .then(success => {
+                let [_, newCategoryMap] = success
+                this.setState({category_map: newCategoryMap})
+                this.props.handleSettingChanged()  
+              })
+              .catch(error => {
+                this.setState({error_code: error.error_code})
+                this.props.setErrorCode(error.error_code)
+              })
       }
     }
 
