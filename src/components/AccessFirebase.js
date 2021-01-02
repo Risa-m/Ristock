@@ -259,13 +259,13 @@ const AccessFireBase = {
       let categoryRef = userRef.collection('categories').doc(categoryID)
       let newCategoryMap = JSON.parse(JSON.stringify(categoryMap)) // deep copy
 
-      return await setAccessTimeout(categoryRef.update(DBTemplate.category_update_name(categoryName)), Test_Timeout_ms)
+      return await setAccessTimeout(categoryRef.update(DBTemplate.category_update_name(categoryName)), TIMEOUT_MS)
       .then(() => {
         newCategoryMap[categoryID] = categoryName
         return newCategoryMap
       })
       .then(() => {
-        return setAccessTimeout(userRef.update({ category_map: newCategoryMap }), Test_Timeout_ms)
+        return setAccessTimeout(userRef.update({ category_map: newCategoryMap }), TIMEOUT_MS)
       })
       .then(() => {
         return newCategoryMap
@@ -286,8 +286,17 @@ const AccessFireBase = {
       let userRef = db.collection('users').doc(userID)
       let newCategoryMap = JSON.parse(JSON.stringify(categoryMap)) // deep copy
       newCategoryMap[categoryID] = categoryName
-      await userRef.update({ category_map: newCategoryMap })
-      return newCategoryMap  
+
+      return await setAccessTimeout(userRef.update({ category_map: newCategoryMap }), TIMEOUT_MS)
+      .then(() => {
+        return newCategoryMap
+      })
+      .catch(() => 
+        new Promise((_, reject) => {
+          console.log("update category map error")
+          reject({error_code: ErrorTemplate.error_code.DBSaveError})
+        })
+      )
     }else {
       return categoryMap
     }
