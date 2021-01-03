@@ -114,6 +114,7 @@ class App extends React.Component {
         </div>
         <AppMenuForPC 
           userID={this.state.userID} 
+          user={this.state.user} 
           settingChangeModalOpen={this.modal.settingModalOpen}
           logout={this.auth.logout}/>
       </div>

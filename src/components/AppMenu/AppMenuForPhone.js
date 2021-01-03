@@ -3,6 +3,7 @@ import { Link} from 'react-router-dom'
 import 'asset/App.css';
 import PropTypes from 'prop-types';
 
+import SvgIcon from '@material-ui/core/SvgIcon';
 import Drawer from '@material-ui/core/Drawer';
 
 import MenuIcon from '@material-ui/icons/Menu';
@@ -56,10 +57,12 @@ export const AppMenuForPhone = (props) => {
       return (
         <div className="App-menu-list">
           <div className="App-menu-list-item">
-          <Link to="login" title="Sign in with Google Account">
-            Login&nbsp;
-            <br/>
-            <p style={{fontSize: "0.7em", paddingLeft: "10px"}}>ご利用にはGoogleアカウントによる認証が必要です。</p>
+          <Link to={(props.user)?"/stocks":"/signup"} title="loginページへ移動">
+            <SvgIcon style={{verticalAlign: "middle"}}>
+              <svg><path d="M11,7L9.6,8.4l2.6,2.6H2v2h10.2l-2.6,2.6L11,17l5-5L11,7z M20,19h-8v2h8c1.1,0,2-0.9,2-2V5c0-1.1-0.9-2-2-2h-8v2h8V19z"/></svg>
+            </SvgIcon>
+            &nbsp;
+            Login
           </Link>
           </div>
         </div>
