@@ -15,14 +15,12 @@ export class SignUp extends React.Component{
         <div className="signup-root">
           <h2>ログイン・新規登録</h2>
           <Paper variant="outlined" className="signup-outline">
-
           <p>お持ちのアカウントで登録/ログイン</p>
-          <div className="signup-logo-image">
-            <Link to="login" title="Sign in with Google Account">
-              <img src="image/google_signin_normal.png" width="180" alt="Sign in with Google"/>
-            </Link>
-          </div>
-
+            <div className="signup-logo-image">
+              <Link to="login" title="Sign in with Google Account">
+                <img src="image/google_signin_normal.png" width="180" alt="Sign in with Google"/>
+              </Link>
+            </div>
           </Paper>
         </div>
     )
