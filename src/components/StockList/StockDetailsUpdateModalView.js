@@ -6,9 +6,9 @@ import { StockContents } from 'components/StockContents'
 import ModalWrapper from 'components/ModalWrapper'
 
 export const StockDetailsUpdateModalView = (props) => {
-  const { userID, detailsItemID, wantToAddItem, modalOpen, category_map } = props
+  const { userID, detailsItemID, wantToAddItem, modalOpen, category_map, canUserAddDocs } = props
 
-  if((detailsItemID) || (wantToAddItem && props.canUserAddDocs())){
+  if((detailsItemID) || (wantToAddItem && canUserAddDocs)){
     return (
       <div className="stock-list-details-modal">
         <ModalWrapper
@@ -38,7 +38,7 @@ StockDetailsUpdateModalView.propTypes = {
   wantToAddItem: PropTypes.bool,
   modalopen: PropTypes.bool,
   category_map: PropTypes.object,
-  canUserAddDocs: PropTypes.func,
+  canUserAddDocs: PropTypes.bool,
   handleClose: PropTypes.func,
   handleSubmitClose: PropTypes.func,
   categoryChanged: PropTypes.func,

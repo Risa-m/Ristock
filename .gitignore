@@ -4,6 +4,7 @@
 .env
 design_memo.md
 /.firebase/
+/src/Admins.js
 
 # dependencies
 /node_modules
