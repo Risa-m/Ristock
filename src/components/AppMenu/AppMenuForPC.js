@@ -27,9 +27,8 @@ export const AppMenuForPC = (props) => {
       return (
         <div className="App-menu-side">
           <div className="App-menu-side-item">
-            <Link to="login" title="Sign in with Google Account">
+            <Link to={(props.user)?"/stocks":"/signup"} title="loginページへ移動">
               Login
-              <p style={{fontSize: "0.7em", paddingLeft: "10px"}}>with google</p>
             </Link>
           </div>
         </div>

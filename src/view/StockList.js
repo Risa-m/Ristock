@@ -2,8 +2,6 @@ import React from 'react'
 import 'asset/views.css';
 import LoadingOverlay from 'react-loading-overlay';
 
-import Snackbar from '@material-ui/core/Snackbar';
-
 import { CategorySelectionShow } from 'components/StockList/CategorySelectionShow';
 import { StockContentsImageShow } from 'components/StockList/StockContentsImageShow';
 import { StockContentsListShow } from 'components/StockList/StockContentsListShow';
@@ -12,8 +10,10 @@ import { StockListSettingButtonsShow } from 'components/StockList/StockListSetti
 import VisibleViewString from 'components/StockList/VisibleViewString';
 import AccessFireBase from 'components/AccessFirebase';
 import ErrorTemplate from 'components/ErrorTemplate';
+import ADMINS_LIST from 'Admins'
 
-const MAX_USER_ITEMS = 50
+const MAX_USER_ITEMS = 100
+
 
 export class StockList extends React.Component{ 
   /*
@@ -23,6 +23,7 @@ export class StockList extends React.Component{
   constructor(props){
     super(props)
     this.isUserDataLoaded = false
+    this.canUserAddDocs = true
 
     this.state = {
       data_list: [], // 全アイテムの[id, data]のリスト
@@ -59,10 +60,13 @@ export class StockList extends React.Component{
       }  
     },
     canUserAddDocs: () => {
-      if(this.state.data_list.length <= MAX_USER_ITEMS){
+      if(this.state.data_list.length < MAX_USER_ITEMS || ADMINS_LIST.indexOf(this.props.userID) >= 0){
+        this.canUserAddDocs = true
         return true
       }
       else{
+        this.props.setErrorCode(ErrorTemplate.error_code.MaxStockItemsError)
+        this.canUserAddDocs = false
         return false
       }  
     }
@@ -106,6 +110,7 @@ export class StockList extends React.Component{
 
   modals = {
     addDocModalOpen: () => {
+      this.check.canUserAddDocs()
       this.setState({addItem: true, modalopen: true})
     },
     handleClose: () => {
@@ -254,7 +259,7 @@ export class StockList extends React.Component{
           wantToAddItem={this.state.addItem}
           modalOpen={this.state.modalopen}
           category_map={this.state.category_map}
-          canUserAddDocs={this.check.canUserAddDocs}
+          canUserAddDocs = {this.canUserAddDocs}
           handleClose={this.modals.handleClose}
           handleSubmitClose={this.modals.handleSubmitClose}
           categoryChanged={this.view.categoryChanged}
