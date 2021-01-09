@@ -2,8 +2,6 @@ import React from 'react'
 import 'asset/views.css';
 import LoadingOverlay from 'react-loading-overlay';
 
-import Snackbar from '@material-ui/core/Snackbar';
-
 import { CategorySelectionShow } from 'components/StockList/CategorySelectionShow';
 import { StockContentsImageShow } from 'components/StockList/StockContentsImageShow';
 import { StockContentsListShow } from 'components/StockList/StockContentsListShow';
@@ -14,7 +12,7 @@ import AccessFireBase from 'components/AccessFirebase';
 import ErrorTemplate from 'components/ErrorTemplate';
 import ADMINS_LIST from 'Admins'
 
-const MAX_USER_ITEMS = 5
+const MAX_USER_ITEMS = 100
 
 
 export class StockList extends React.Component{ 
