@@ -142,7 +142,7 @@ class App extends React.Component {
       <div className="App-footer">
         <p className="footer-menu"><Link to="/serviceterms">利用規約</Link></p>
         <p className="copyright"><a href="https://github.com/Risa-m">&copy; 2020 Risa-m</a></p>
-        <p className="version" style={{fontSize: "0.6em", textAlign: "center"}}>version: 0.2.3</p>   
+        <p className="version" style={{fontSize: "0.6em", textAlign: "center"}}>version: 0.2.4</p>   
       </div>
     </div>
     </BrowserRouter>
